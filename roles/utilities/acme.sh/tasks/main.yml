@@ -1,0 +1,105 @@
+---
+# If we use webroot, not standalone mode for renewal, we need to ensure the webroot directory exists
+- name: Ensure letsencrypt webroot exists
+  file:
+    path: /opt/letsencrypt_webroot
+    state: directory
+    mode: "0755"
+  when: renew_via_webroot
+
+- name: Ensure certificates directory exists
+  file:
+    path: "{{ le_certs_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: install base pkgs
+  apt:
+    state: present
+    cache_valid_time: "86400"
+    name:
+      - "socat"
+      - "git"
+      - "sendmail"
+
+- name: Clone acme.sh git repo
+  git:
+    repo: https://github.com/Neilpang/acme.sh.git
+    version: 3.0.6
+    dest: /root/.acme.sh_install_repo
+  register: acme_repo
+
+- name: Configure acme.sh
+  command: ./acme.sh --set-default-ca --server letsencrypt -m "le+{{domain_names | first}}@quickpipes.io"
+  args:
+    chdir: /root/.acme.sh_install_repo
+  when: acme_repo.changed
+
+- name: Install acme.sh
+  command: ./acme.sh --install --nocron --server letsencrypt -m "le+{{domain_names | first}}@quickpipes.io"
+  args:
+    chdir: /root/.acme.sh_install_repo
+  when: acme_repo.changed
+
+- name: Check if certificates already exists
+  stat:
+    path: "{{ le_certs_dir }}/{{ le_fullchain_filename }}"
+  register: certificate_exists
+
+- include_tasks: provision.yml
+  when: not certificate_exists.stat.exists
+
+- name: Check if notify needs to be enabled
+  lineinfile:
+    dest: /root/.acme.sh/account.conf
+    line: "SAVED_MAIL_FROM='{{ notification_mail_from }}'"
+  check_mode: yes
+  register: notify_enabled
+
+- name: Enable email notify hook
+  command: /root/.acme.sh/acme.sh --set-notify --notify-hook mail --notify-level 2
+  environment:
+    MAIL_FROM: "{{ notification_mail_from }}"
+    MAIL_TO: "{{ notification_mail_to }}"
+  when: notify_enabled.changed == True
+
+# If the certificate exists, we still update the reload command that might change over time
+- name: Update renewal config for reload command hook
+  replace:
+    path: "/root/.acme.sh/*.services.dataforgood.fr_ecc/*.services.dataforgood.fr.conf"
+    regexp: "Le_ReloadCmd='(.*)'"
+    replace: "Le_ReloadCmd='{{reload_cmd}}'"
+    backup: true
+
+- name: Update renewal config for pre-renewal hook
+  replace:
+    path: "/root/.acme.sh/*.services.dataforgood.fr_ecc/*.services.dataforgood.fr.conf"
+    regexp: "Le_PreHook='(.*)'"
+    replace: "Le_PreHook='{{prehook_command}}'"
+    backup: true
+
+- name: Update renewal config for post-renewal hook
+  replace:
+    path: "/root/.acme.sh/*.services.dataforgood.fr_ecc/*.services.dataforgood.fr.conf"
+    regexp: "Le_PostHook='(.*)'"
+    replace: "Le_PostHook='{{posthook_command}}'"
+    backup: true
+
+- name: Change permissions on installed key
+  file:
+    path: "{{ le_certs_dir }}/{{ le_key_filename }}"
+    mode: "0644"
+
+- name: Change permissions on installed certificate
+  file:
+    path: "{{ le_certs_dir }}/{{ le_fullchain_filename }}"
+    mode: "0644"
+
+# # And we make sure the ansible managed cron for renewals is present
+- name: Creating ansible-managed acme.sh renewal cronjob
+  cron:
+    name: "acme.sh ansible-managed crontab"
+    minute: "{{ 59 | random(seed=inventory_hostname) }}"
+    hour: "0"
+    job: '"/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" 2>&1 /var/log/acme_cron.log'
+  when: failover_setup == False or (failover_setup == True and is_failover_leader == True)

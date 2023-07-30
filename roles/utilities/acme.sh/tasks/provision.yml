@@ -1,0 +1,11 @@
+---
+# We try to generate a cert from acme.sh and install it to our directory
+# Whatever happens, we delete the iptables rule that opens port 80
+- name: Provision a certificate using acme.sh
+  block:
+    - name: Provisioning certificate
+      shell: /root/.acme.sh/acme.sh --issue --dns dns_scaleway --server {{ ' letsencrypt_test ' if staging else ' letsencrypt ' }}--log -d {{domain_names | join(' -d ')}} --debug
+      environment:
+        SCALEWAY_API_TOKEN: "{{ scaleway_api_token }}"
+    - name: Installing certificate (nginx format)
+      shell: /root/.acme.sh/acme.sh --install-cert --log -d {{domain_names | join(' -d ')}} --key-file {{ le_certs_dir }}/{{ le_key_filename }} --fullchain-file {{ le_certs_dir }}/{{ le_fullchain_filename }}

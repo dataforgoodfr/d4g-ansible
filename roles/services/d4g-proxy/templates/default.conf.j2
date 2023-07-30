@@ -1,0 +1,72 @@
+#############################
+# Common configuration part #
+#############################
+server {
+    listen       80 default_server;
+    server_name  "";
+
+    return 420 "Enhance your calm.\n";
+}
+
+server {
+    listen 80;
+    server_name {{ default_server_name }};
+
+    location / {
+        return 302 https://{{ default_server_name }}$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name {{ default_server_name }};
+    return 420 "Enhance your calm\n";
+
+    add_header 'X-Frame-Options' 'SAMEORIGIN';
+    add_header 'X-XSS-Protection' '1; mode=block';
+    add_header 'X-Content-Type-Options' 'nosniff';
+    add_header 'Referrer-Policy' 'same-origin';
+    add_header 'Strict-Transport-Security' 'max-age=63072000';
+
+    ssl_certificate /opt/certificates/le-fullchain.pem;
+    ssl_certificate_key /opt/certificates/le-key.pem;
+}
+
+###################
+# Recofish config #
+###################
+server {
+    listen 80;
+    server_name recofish.services.dataforgood.fr;
+
+    location / {
+        return 302 https://recofish.services.dataforgood.fr$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name recofish.services.dataforgood.fr;
+
+    add_header 'X-Frame-Options' 'SAMEORIGIN';
+    add_header 'X-XSS-Protection' '1; mode=block';
+    add_header 'X-Content-Type-Options' 'nosniff';
+    add_header 'Referrer-Policy' 'same-origin';
+    add_header 'Strict-Transport-Security' 'max-age=63072000';
+
+    ssl_certificate /opt/certificates/le-fullchain.pem;
+    ssl_certificate_key /opt/certificates/le-key.pem;
+
+    location / {
+        #include uwsgi_params;
+        #uwsgi_pass 51.159.144.205:8080;
+        proxy_pass         http://51.159.144.205:8080;
+        proxy_redirect     off;
+
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $http_host;
+        client_max_body_size 250M;
+    }
+}

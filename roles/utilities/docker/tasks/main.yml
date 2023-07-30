@@ -1,0 +1,46 @@
+---
+- name: Install apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Make sure older versions of Docker are not present
+  apt:
+    state: absent
+    name:
+      - docker
+      - docker-engine
+      - docker.io
+
+- name: Add docker repo key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+
+- name: Add docker repository
+  apt_repository:
+    repo: deb [arch={{ arch }}] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    filename: docker
+    state: present
+
+- name: Install docker
+  apt:
+    name: docker-ce
+    update_cache: yes
+    state: present
+
+- name: Install docker pkgs
+  apt:
+    state: present
+    update_cache: yes
+    name:
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+
+- name: Enable docker
+  service:
+    name: docker
+    state: started
+    enabled: yes

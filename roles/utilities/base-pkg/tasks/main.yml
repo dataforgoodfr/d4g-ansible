@@ -1,0 +1,14 @@
+---
+- name: install base pkgs
+  apt:
+    state: present
+    cache_valid_time: "86400"
+    name:
+      - "vim"
+      - "curl"
+      - "git"
+      - "gpg"
+      - "jq"
+      - "tcpdump"
+      - "less"
+      - "ripgrep"

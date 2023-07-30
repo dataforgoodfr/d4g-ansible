@@ -1,0 +1,13 @@
+version: "3"
+services:
+    proxy-nginx:
+        image: "nginx:1-alpine"
+        container_name: "proxy-nginx"
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - /opt/certificates:/opt/certificates
+            - ./nginx.conf:/etc/nginx/nginx.conf
+            - ./default.conf:/etc/nginx/conf.d/default.conf
+        restart: always

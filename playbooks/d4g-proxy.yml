@@ -1,0 +1,30 @@
+---
+- name: Create d4g-proxy
+  hosts: d4g_proxy
+  remote_user: root
+
+  tasks:
+    - hostname:
+        name: proxy.services.dataforgood.fr
+
+    - import_role:
+        name: utilities/base-pkg
+
+    - import_role:
+        name: utilities/docker
+
+    - import_role:
+        name: utilities/acme.sh
+      vars:
+        domain_names:
+          - "*.services.dataforgood.fr"
+        reload_cmd: docker exec proxy-nginx nginx -s reload
+        notification_mail_from: proxyd4g@dataforgood.fr
+        notification_mail_to: proxyd4g@quickpipes.io
+      tags:
+        - acme
+
+    - import_role:
+        name: services/d4g-proxy
+      tags:
+        - service

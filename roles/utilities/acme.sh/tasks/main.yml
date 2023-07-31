@@ -1,12 +1,4 @@
 ---
-# If we use webroot, not standalone mode for renewal, we need to ensure the webroot directory exists
-- name: Ensure letsencrypt webroot exists
-  file:
-    path: /opt/letsencrypt_webroot
-    state: directory
-    mode: "0755"
-  when: renew_via_webroot
-
 - name: Ensure certificates directory exists
   file:
     path: "{{ le_certs_dir }}"
@@ -95,7 +87,7 @@
     path: "{{ le_certs_dir }}/{{ le_fullchain_filename }}"
     mode: "0644"
 
-# # And we make sure the ansible managed cron for renewals is present
+# And we make sure the ansible managed cron for renewals is present
 - name: Creating ansible-managed acme.sh renewal cronjob
   cron:
     name: "acme.sh ansible-managed crontab"

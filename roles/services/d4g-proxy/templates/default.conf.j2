@@ -59,7 +59,7 @@ server {
 
     location / {
         #include uwsgi_params;
-        #uwsgi_pass 51.159.144.205:8080;
+        uwsgi_pass 51.159.144.205:8080;
         proxy_pass         http://51.159.144.205:8080;
         proxy_redirect     off;
 

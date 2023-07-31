@@ -11,11 +11,27 @@
 
 - name: Creating d4g-proxy templates
   template:
-    src: "{{ item }}.j2"
-    dest: /opt/d4g-proxy/{{ item }}
+    src: "docker-compose.yml.j2"
+    dest: /opt/d4g-proxy/docker-compose.yml
+
+- name: Create nginx-conf directory
+  file:
+    path: "/opt/d4g-proxy/nginx-conf"
+    state: directory
+
+- name: Create services configurations
+  template:
+    src: "default.conf.j2"
+    dest: /opt/d4g-proxy/nginx-conf/default.conf
+  notify:
+    - "nginx config updated"
+
+- name: Create services configurations
+  template:
+    src: "service.conf.j2"
+    dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
   with_items:
-    - docker-compose.yml
-    - default.conf
+    - { service_name: "recofish", service_address: "51.159.144.205:8080" }
   notify:
     - "nginx config updated"
 

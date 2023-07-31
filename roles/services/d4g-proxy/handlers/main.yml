@@ -1,0 +1,5 @@
+---
+- name: Reload nginx container
+  command: docker exec proxy-nginx nginx -s reload
+  listen:
+    - "nginx config updated"

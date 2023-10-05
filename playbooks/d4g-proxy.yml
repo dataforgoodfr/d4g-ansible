@@ -11,6 +11,11 @@
         name: utilities/base-pkg
 
     - import_role:
+        name: utilities/ssh-keys
+      tags:
+        - ssh
+
+    - import_role:
         name: utilities/docker
 
     - import_role:

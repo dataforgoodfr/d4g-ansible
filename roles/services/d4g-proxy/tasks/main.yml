@@ -14,18 +14,17 @@
     src: "docker-compose.yml.j2"
     dest: /opt/d4g-proxy/docker-compose.yml
 
+- name: Cleanup services configurations
+  file:
+    state: absent
+    path: /opt/d4g-proxy/nginx-conf/
+  notify:
+    - "clean service config"
+
 - name: Create nginx-conf directory
   file:
     path: "/opt/d4g-proxy/nginx-conf"
     state: directory
-
-- name: Delete services configurations
-  file:
-    state: absent
-    path: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
-  with_items:
-    - { service_name: "recofish" }
-    - { service_name: "default" }
 
 - name: Create services configurations
   template:
@@ -33,7 +32,6 @@
     dest: /opt/d4g-proxy/nginx-conf/default.conf
   notify:
     - "nginx config updated"
-
 
 - name: Pull
   command: docker compose pull

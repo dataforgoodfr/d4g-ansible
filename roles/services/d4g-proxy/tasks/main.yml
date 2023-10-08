@@ -19,6 +19,14 @@
     path: "/opt/d4g-proxy/nginx-conf"
     state: directory
 
+- name: Delete services configurations
+  file:
+    state: absent
+    path: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
+  with_items:
+    - { service_name: "recofish" }
+    - { service_name: "default" }
+
 - name: Create services configurations
   template:
     src: "default.conf.j2"
@@ -26,21 +34,6 @@
   notify:
     - "nginx config updated"
 
-# - name: Create services configurations
-#   template:
-#     src: "service.conf.j2"
-#     dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
-#   with_items:
-#     - { service_name: "recofish", service_address: "51.159.144.205:8080" }
-#   notify:
-#     - "nginx config updated"
-
-- name: Delete content & directory
-  file:
-    state: absent
-    path: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
-  with_items:
-    - { service_name: "recofish" }
 
 - name: Pull
   command: docker compose pull

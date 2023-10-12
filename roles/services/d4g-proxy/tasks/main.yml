@@ -33,6 +33,15 @@
   notify:
     - "nginx config updated"
 
+- name: Create services configurations
+  template:
+    src: "service.conf.j2"
+    dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
+  with_items:
+    - { service_name: "dummy", service_address: "51.159.163.211:8080" }
+  notify:
+    - "nginx config updated"
+
 - name: Pull
   command: docker compose pull
   args:

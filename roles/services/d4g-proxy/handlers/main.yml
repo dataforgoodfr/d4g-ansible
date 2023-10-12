@@ -3,3 +3,4 @@
   command: docker exec proxy-nginx nginx -s reload
   listen:
     - "nginx config updated"
+    - "clean service config"

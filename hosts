@@ -1,2 +1,2 @@
 [d4g_proxy]
-proxy.services.dataforgood.fr ansible_host=51.159.163.211 ansible_python_interpreter=/usr/bin/python3
+51.159.163.211 ansible_python_interpreter=/usr/bin/python3

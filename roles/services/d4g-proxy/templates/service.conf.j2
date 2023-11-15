@@ -25,6 +25,7 @@ server {
     ssl_certificate_key /opt/certificates/le-key.pem;
 
     location / {
+        resolver 127.0.0.11 ipv6=off valid=30s;
         proxy_pass http://{{ item.service_address }};
         proxy_redirect off;
         keepalive_requests 100;

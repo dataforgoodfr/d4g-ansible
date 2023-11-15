@@ -19,7 +19,7 @@
     state: absent
     path: /opt/d4g-proxy/nginx-conf/
   notify:
-    - "clean service config"
+    - "nginx config updated"
 
 - name: Create nginx-conf directory
   file:
@@ -38,7 +38,7 @@
     src: "service.conf.j2"
     dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
   with_items:
-    - { service_name: "dummy", service_address: "51.159.163.211" }
+    - { service_name: "vaultwarden", service_address: "10.42.0.3" }
   notify:
     - "nginx config updated"
 

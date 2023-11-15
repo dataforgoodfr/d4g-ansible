@@ -1,0 +1,34 @@
+services:
+  d4g-vaultwarden:
+    image: "vaultwarden/server:latest"
+    container_name: "d4g-vaultwarden"
+    environment:
+      - SERVICE_FQDN_VAULTWARDEN={{ default_server_name }}
+      - SIGNUPS_ALLOWED=false
+      - ADMIN_TOKEN={{ vaultwarden_admin_token_argonized }}
+      - SMTP_HOST=smtp.sendgrid.net
+      - SMTP_FROM=orga@dataforgood.fr
+      - SMTP_PORT=587
+      - SMTP_SECURITY=starttls
+      - SMTP_USERNAME=apikey
+      - SMTP_PASSWORD={{ sendgrid_api_key }}
+      - DATABASE_URL={{ vaultwarden_postgresql_connection_string }}
+      - SHOW_PASSWORD_HINT=false
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - "-f"
+        - "http://localhost:80"
+      interval: 2s
+      timeout: 10s
+      retries: 15
+    restart: always
+    networks:
+      d4g-network:
+        ipv4_address: "10.42.0.3"
+networks:
+  d4g-network:
+    external: true

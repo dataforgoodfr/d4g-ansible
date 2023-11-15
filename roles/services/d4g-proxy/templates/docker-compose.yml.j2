@@ -1,13 +1,24 @@
 version: "3"
 services:
-    proxy-nginx:
-        image: "nginx:1-alpine"
-        container_name: "proxy-nginx"
-        ports:
-            - 80:80
-            - 443:443
-        volumes:
-            - /opt/certificates:/opt/certificates
-            - ./nginx.conf:/etc/nginx/nginx.conf
-            - ./nginx-conf:/etc/nginx/conf.d/
-        restart: always
+  d4g-proxy:
+    image: "nginx:1-alpine"
+    container_name: "d4g-proxy"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /opt/certificates:/opt/certificates
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx-conf:/etc/nginx/conf.d/
+    restart: always
+    networks:
+      d4g-network:
+        ipv4_address: "10.42.0.2"
+networks:
+  d4g-network:
+    name: d4g-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "10.42.0.0/24"
+          gateway: "10.42.0.1"

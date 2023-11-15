@@ -1,6 +1,5 @@
 ---
 - name: Reload nginx container
-  command: docker exec proxy-nginx nginx -s reload
+  command: docker restart d4g-proxy
   listen:
     - "nginx config updated"
-    - "clean service config"

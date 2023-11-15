@@ -1,0 +1,24 @@
+---
+- name: Create d4g-vaultwarden directory
+  file:
+    path: "/opt/d4g-vaultwarden"
+    state: directory
+
+- name: Creating d4g-vaultwarden template
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/d4g-vaultwarden/docker-compose.yml
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-vaultwarden
+  tags:
+    - pull
+
+- name: Up
+  command: docker compose up -d
+  args:
+    chdir: /opt/d4g-vaultwarden
+  tags:
+    - up

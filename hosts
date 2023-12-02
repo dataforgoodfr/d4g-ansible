@@ -1,2 +1,6 @@
 [d4g_proxy]
 51.159.163.211 ansible_python_interpreter=/usr/bin/python3
+
+[cartovegetation_rdp]
+51.159.133.232 ansible_python_interpreter=/usr/bin/python3
+51.159.181.76 ansible_python_interpreter=/usr/bin/python3

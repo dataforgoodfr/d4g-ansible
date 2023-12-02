@@ -6,6 +6,7 @@
     name:
       - "vim"
       - "curl"
+      - "cron"
       - "git"
       - "gpg"
       - "jq"

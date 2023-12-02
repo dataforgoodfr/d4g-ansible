@@ -1,0 +1,69 @@
+---
+- name: install rdp packages
+  apt:
+    state: present
+    cache_valid_time: "86400"
+    name:
+      - xorg
+      - xorgxrdp
+      - xserver-xorg-core
+      - xserver-xorg-input-all
+      - xfce4
+      - xfce4-goodies
+      - dbus-x11
+      - x11-xserver-utils
+      - ufw
+      - xrdp
+
+- name: Allow all connections to port 22
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+    state: enabled
+
+- name: IP whitelist
+  ufw:
+    rule: allow
+    port: 3389
+    proto: tcp
+    from_ip: "{{ item }}"
+    state: enabled
+  with_items: "{{ whitelisted_rdp_ips }}"
+
+- name: Add carto user
+  user:
+    name: carto
+    shell: /bin/bash
+
+- name: Set carto's password (dirty)
+  shell: "echo carto:{{ carto_password }} | sudo chpasswd"
+
+- name: Make carto sudo user
+  lineinfile:
+    path: /etc/sudoers
+    line: "carto ALL=(ALL) NOPASSWD:ALL"
+    create: yes
+
+- name: Append line to file
+  lineinfile:
+    path: /etc/xrdp/xrdp.ini
+    line: "exec startxfce4"
+    create: yes
+  register: restart_xdrp
+
+- name: Create xsession file in carto home
+  copy:
+    content: |
+      xfce4-session
+    dest: /home/carto/.xsession
+    owner: carto
+    group: carto
+    mode: 0644
+  register: restart_xrdp
+
+- name: Restart xrdp
+  service:
+    name: xrdp
+    state: restarted
+  when: restart_xdrp.changed

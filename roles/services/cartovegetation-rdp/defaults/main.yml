@@ -1,6 +1,8 @@
 ---
 whitelisted_rdp_ips:
-  - 90.60.65.215
+  - 90.60.65.215 # Paul Gabriel
+  - 193.248.43.45 # Mélodie Fleury & Antoine Le Manchec
+  - 77.134.174.2 # Ronan Sy
 carto_password: !vault |
   $ANSIBLE_VAULT;1.1;AES256
   31303834333032326634363930653861613264363037346337316133343639636265636131613232

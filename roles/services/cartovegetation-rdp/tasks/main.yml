@@ -45,6 +45,21 @@
     line: "carto ALL=(ALL) NOPASSWD:ALL"
     create: yes
 
+- name: Allow ssh password login for carto user
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication yes"
+    state: present
+    backup: yes
+  register: restart_ssh
+
+- name: Restart ssh service
+  service:
+    name: sshd
+    state: restarted
+  when: restart_ssh.changed
+
 - name: Append line to file
   lineinfile:
     path: /etc/xrdp/xrdp.ini
@@ -67,3 +82,44 @@
     name: xrdp
     state: restarted
   when: restart_xdrp.changed
+
+- name: Install qgis deps
+  apt:
+    state: present
+    cache_valid_time: "86400"
+    name:
+      - software-properties-common
+      - gnupg
+
+- name: Downloag qgis gpg
+  get_url:
+    url: https://download.qgis.org/downloads/qgis-archive-keyring.gpg
+    dest: /etc/apt/keyrings/qgis-archive-keyring.gpg
+
+- name: Create sources file with content
+  copy:
+    content: |
+      Types: deb deb-src
+      URIs: https://qgis.org/debian
+      Suites: bookworm
+      Architectures: amd64
+      Components: main
+      Signed-By: /etc/apt/keyrings/qgis-archive-keyring.gpg
+    dest: /etc/apt/sources.list.d/qgis.sources
+    owner: root
+    group: root
+    mode: 0644
+  register: update_apt
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: update_apt.changed
+
+- name: Install qgis
+  apt:
+    state: present
+    cache_valid_time: "86400"
+    name:
+      - qgis
+      - qgis-plugin-grass

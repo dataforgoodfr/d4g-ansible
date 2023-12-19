@@ -6,12 +6,12 @@ services:
       - SERVICE_FQDN_VAULTWARDEN={{ default_server_name }}
       - SIGNUPS_ALLOWED=false
       - ADMIN_TOKEN={{ vaultwarden_admin_token_argonized }}
-      - SMTP_HOST=smtp.sendgrid.net
-      - SMTP_FROM=orga@dataforgood.fr
+      - SMTP_HOST=smtp-relay.brevo.com
+      - SMTP_FROM=tech@dataforgood.fr
       - SMTP_PORT=587
       - SMTP_SECURITY=starttls
-      - SMTP_USERNAME=apikey
-      - SMTP_PASSWORD={{ sendgrid_api_key }}
+      - SMTP_USERNAME=hellodataforgood@gmail.com
+      - SMTP_PASSWORD={{ smtp_password }}
       - DATABASE_URL={{ vaultwarden_postgresql_connection_string }}
       - SHOW_PASSWORD_HINT=false
     volumes:

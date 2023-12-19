@@ -38,3 +38,11 @@
         name: roles/services/d4g-vaultwarden
       tags:
         - service
+
+    - import_role:
+        name: roles/utilities/s3-backup
+      vars:
+        service_name: vaultwarden
+        data_dir: /opt/d4g-vaultwarden/data
+      tags:
+        - backup

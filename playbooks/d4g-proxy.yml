@@ -32,11 +32,13 @@
     - import_role:
         name: roles/services/d4g-proxy
       tags:
+        - proxy
         - service
 
     - import_role:
         name: roles/services/d4g-vaultwarden
       tags:
+        - vaultwarden
         - service
 
     - import_role:
@@ -46,3 +48,4 @@
         data_dir: /opt/d4g-vaultwarden/data
       tags:
         - backup
+        - service

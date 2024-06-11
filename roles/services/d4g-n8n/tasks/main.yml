@@ -1,0 +1,10 @@
+---
+- name: Create d4g-n8n directory
+  file:
+    path: "{{ d4g_n8n_install_dir }}"
+    state: directory
+
+- name: Creating d4g-n8n template
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/d4g-n8n/docker-compose.yml

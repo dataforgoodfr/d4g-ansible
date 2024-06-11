@@ -42,10 +42,25 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-n8n
+      tags:
+        - n8n
+        - service
+
+    - import_role:
         name: roles/utilities/s3-backup
       vars:
         service_name: vaultwarden
         data_dir: /opt/d4g-vaultwarden/data
+      tags:
+        - backup
+        - service
+
+    - import_role:
+        name: roles/utilities/s3-backup
+      vars:
+        service_name: n8n
+        data_dir: /opt/d4g-n8n/data
       tags:
         - backup
         - service

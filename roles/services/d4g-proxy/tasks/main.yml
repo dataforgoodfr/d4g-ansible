@@ -25,6 +25,8 @@
   file:
     path: "/opt/d4g-proxy/nginx-conf"
     state: directory
+    owner: 1000
+    group: 1000
 
 - name: Create services configurations
   template:
@@ -39,7 +41,7 @@
     dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
   with_items:
     - { service_name: "vaultwarden", service_address: "10.42.0.3" }
-    - { service_name: "community", service_address: "51.15.193.24:3000" }
+    - { service_name: "n8n", service_address: "10.42.0.4" }
   notify:
     - "nginx config updated"
 

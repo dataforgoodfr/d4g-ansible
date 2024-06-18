@@ -40,8 +40,27 @@
     src: "service.conf.j2"
     dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
   with_items:
-    - { service_name: "vaultwarden", service_address: "10.42.0.3" }
-    - { service_name: "n8n", service_address: "10.42.0.4" }
+    - {
+        service_name: "vaultwarden",
+        service_addresses: ["10.42.0.3"],
+        open_bar_cors: false,
+      }
+    - {
+        service_name: "n8n",
+        service_addresses: ["10.42.0.4"],
+        open_bar_cors: false,
+      }
+    - {
+        service_name: "circo-ed",
+        service_addresses:
+          ["51.159.97.28:8500", "51.159.97.28:8501", "51.159.97.28:8502"],
+        open_bar_cors: false,
+      }
+    - {
+        service_name: "circos",
+        service_addresses: ["51.159.97.28:8503"],
+        open_bar_cors: true,
+      }
   notify:
     - "nginx config updated"
 

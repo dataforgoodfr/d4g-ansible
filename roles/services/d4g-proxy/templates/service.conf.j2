@@ -2,6 +2,16 @@
 ###################
 # {{ item.service_name }} config #
 ###################
+
+upstream {{item.service_name}}_backend {
+    least_conn;
+
+    # For each item.services_addresses, we create a server
+    {% for service_address in item.service_addresses %}
+    server {{ service_address }};
+    {% endfor %}
+}
+
 server {
     listen 80;
     server_name {{ item.service_name }}.services.dataforgood.fr;
@@ -21,12 +31,18 @@ server {
     add_header 'Referrer-Policy' 'same-origin';
     add_header 'Strict-Transport-Security' 'max-age=63072000';
 
+    {% if item.open_bar_cors %}
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+    {% endif %}
+
     ssl_certificate /opt/certificates/le-fullchain.pem;
     ssl_certificate_key /opt/certificates/le-key.pem;
 
     location / {
         resolver 127.0.0.11 ipv6=off valid=30s;
-        proxy_pass http://{{ item.service_address }};
+        proxy_pass http://{{item.service_name}}_backend;
         proxy_redirect off;
         keepalive_requests 100;
 

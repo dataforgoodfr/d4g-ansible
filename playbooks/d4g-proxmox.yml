@@ -1,0 +1,11 @@
+---
+- name: Create d4g-proxy
+  hosts: d4g_proxmox
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/utilities/base-pkg
+
+    - import_role:
+        name: roles/utilities/docker

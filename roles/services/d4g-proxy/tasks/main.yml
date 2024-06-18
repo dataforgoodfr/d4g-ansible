@@ -51,6 +51,11 @@
         open_bar_cors: false,
       }
     - {
+        service_name: "uptime",
+        service_addresses: ["10.42.0.5:8080"],
+        open_bar_cors: false,
+      }
+    - {
         service_name: "circo-ed",
         service_addresses:
           ["51.159.97.28:8500", "51.159.97.28:8501", "51.159.97.28:8502"],

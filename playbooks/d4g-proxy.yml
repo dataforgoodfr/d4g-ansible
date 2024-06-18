@@ -50,6 +50,12 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-uptime-kuma
+      tags:
+        - uptime-kuma
+        - service
+
+    - import_role:
         name: roles/utilities/s3-backup
       vars:
         service_name: vaultwarden
@@ -63,6 +69,15 @@
       vars:
         service_name: n8n
         data_dir: /opt/d4g-n8n/data
+      tags:
+        - backup
+        - service
+
+    - import_role:
+        name: roles/utilities/s3-backup
+      vars:
+        service_name: uptime-kuma
+        data_dir: /opt/d4g-uptime-kuma/data
       tags:
         - backup
         - service

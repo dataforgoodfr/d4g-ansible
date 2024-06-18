@@ -1,0 +1,18 @@
+---
+services:
+  d4g-uptime-kuma:
+    image: louislam/uptime-kuma
+    container_name: "d4g-uptime-kuma"
+    environment:
+      - NODE_ENV=production
+      - UPTIME_KUMA_HOST=0.0.0.0
+      - UPTIME_KUMA_PORT=8080
+    volumes:
+      - ./data:/app/data
+    restart: always
+    networks:
+      d4g-network:
+        ipv4_address: "10.42.0.5"
+networks:
+  d4g-network:
+    external: true

@@ -4,5 +4,5 @@
     name: "backup-{{ service_name }}"
     minute: "{{ 59 |random(seed=service_name) }}"
     hour: 3
-    job: "/usr/bin/docker run --rm -v {{ data_dir }}:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --access-key={{ access_key }} --bucket-name={{ bucket_name }} --service-name={{ service_name }} --secret-key={{ secret_key }}"
+    job: "/usr/bin/docker run --rm -v {{ data_dir }}:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --access-key={{ access_key }} --bucket-name={{ bucket_name }} --service-name={{ service_name }} --secret-key={{ secret_key }} 2>&1 | logger -t backup_{{ service_name }}"
     state: present

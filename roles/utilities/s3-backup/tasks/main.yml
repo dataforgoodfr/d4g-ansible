@@ -1,8 +1,16 @@
 ---
+- name: Create backups.env file for configuration
+  template:
+    src: backups.env.j2
+    dest: /opt/backups.env
+    owner: root
+    group: root
+    mode: 0600
+
 - name: Create cron to run the d4g-s3-backup docker image
   cron:
     name: "backup-{{ service_name }}"
     minute: "{{ 59 |random(seed=service_name) }}"
     hour: 3
-    job: "/usr/bin/docker run --rm -v {{ data_dir }}:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --access-key={{ access_key }} --bucket-name={{ bucket_name }} --service-name={{ service_name }} --secret-key={{ secret_key }} 2>&1 | logger -t backup_{{ service_name }}"
+    job: "/usr/bin/docker run --rm --env-file=/opt/backups.env -v {{ data_dir }}:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --service-name={{ service_name }} 2>&1 | logger -t backup_{{ service_name }}"
     state: present

@@ -30,3 +30,4 @@
       - "ripgrep"
       - "gum"
       - "rsyslog"
+      - "htop"

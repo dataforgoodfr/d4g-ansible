@@ -6,6 +6,8 @@
   tasks:
       - import_role:
             name: roles/utilities/base-pkg
+        tags:
+            - base-pkg
 
       - import_role:
             name: roles/utilities/docker

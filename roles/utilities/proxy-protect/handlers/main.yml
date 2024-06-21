@@ -1,0 +1,4 @@
+---
+- name: Reload iptables config
+  command: iptables-save > /etc/iptables/rules.v4 && iptables-restore < /etc/iptables/rules.v4
+  listen: "reload iptables"

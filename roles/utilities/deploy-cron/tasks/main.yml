@@ -1,0 +1,14 @@
+---
+- name: Create deploy_cron.env file for configuration
+  template:
+    src: deploy_cron.env.j2
+    dest: /opt/deploy_cron.env
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Create cron to run a repo's deploy cron
+  cron:
+    name: "deploy-{{ service_name }}"
+    job: "bash -c 'source /opt/deploy_cron.env && {{ deploy_cron_location }} --repository-name={{ repo_canonical_name }} 2>&1' | /usr/bin/logger -t deploy_{{ service_name }}"
+    state: present

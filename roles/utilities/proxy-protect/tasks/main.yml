@@ -1,0 +1,19 @@
+# Close port to d4g-proxy IP only to prevent direct communication
+- name: Accept connections from d4g-proxy ip
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    source: "51.159.163.211"
+    jump: ACCEPT
+  with_items: "{{ proxy_ports }}"
+  notify: reload iptables
+
+- name: Prevent all other connections to port
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    jump: DROP
+  with_items: "{{ proxy_ports }}"
+  notify: reload iptables

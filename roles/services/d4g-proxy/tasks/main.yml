@@ -66,6 +66,11 @@
         service_addresses: ["51.159.97.28:8503"],
         open_bar_cors: true,
       }
+    - {
+        service_name: "secondemain",
+        service_addresses: ["51.159.97.28:3001"],
+        open_bar_cors: false,
+      }
   notify:
     - "nginx config updated"
 

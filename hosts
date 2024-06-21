@@ -7,4 +7,4 @@
 
 [d4g_proxmox]
 proxmox-0.dataforgood.fr ansible_python_interpreter=/usr/bin/python3
-proxmox-1.dataforgood.fr ansible_python_interpreter=/usr/bin/python3
+# proxmox-1.dataforgood.fr ansible_python_interpreter=/usr/bin/python3

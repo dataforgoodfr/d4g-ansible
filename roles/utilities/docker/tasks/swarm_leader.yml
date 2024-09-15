@@ -1,0 +1,19 @@
+---
+- name: Initialize Docker Swarm (only if not already initialized)
+  shell: |
+    docker swarm init --advertise-addr {{ ansible_default_ipv4.address }} || true
+  register: swarm_init_output
+  changed_when: "'Swarm initialized' in swarm_init_output.stdout"
+
+- name: Create an internal Docker overlay network
+  docker_network:
+    name: d4g-internal
+    driver: overlay
+    attachable: true
+    scope: swarm
+    ipam_config:
+      - subnet: "10.42.0.0/16"
+    driver_options:
+      encrypted: "true"
+
+    state: present

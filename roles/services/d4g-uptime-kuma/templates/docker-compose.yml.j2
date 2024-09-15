@@ -1,4 +1,3 @@
----
 services:
   d4g-uptime-kuma:
     image: louislam/uptime-kuma
@@ -9,10 +8,10 @@ services:
       - UPTIME_KUMA_PORT=8080
     volumes:
       - ./data:/app/data
-    restart: always
     networks:
-      d4g-network:
-        ipv4_address: "10.42.0.5"
+      - d4g-internal
+    restart: unless-stopped
+
 networks:
-  d4g-network:
+  d4g-internal:
     external: true

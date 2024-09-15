@@ -42,37 +42,40 @@
   with_items:
     - {
         service_name: "vaultwarden",
-        service_addresses: ["10.42.0.3"],
+        service_addresses: ["d4g-vaultwarden"],
         open_bar_cors: false,
       }
     - {
         service_name: "n8n",
-        service_addresses: ["10.42.0.4"],
+        service_addresses: ["d4g-n8n"],
         open_bar_cors: false,
       }
     - {
         service_name: "uptime",
-        service_addresses: ["10.42.0.5:8080"],
+        service_addresses: ["d4g-uptime-kuma:8080"],
         open_bar_cors: false,
       }
     - {
-        service_name: "circo-ed",
-        service_addresses:
-          ["51.159.97.28:8500", "51.159.97.28:8501", "51.159.97.28:8502"],
+        service_name: "outline",
+        service_addresses: ["d4g-outline:3000"],
         open_bar_cors: false,
-      }
-    - {
-        service_name: "circos",
-        service_addresses: ["51.159.97.28:8503"],
-        open_bar_cors: true,
       }
     - {
         service_name: "secondemain",
-        service_addresses: ["51.159.97.28:3001"],
+        service_addresses: ["secondemain-metabase:3000"],
         open_bar_cors: false,
       }
   notify:
     - "nginx config updated"
+
+# - name: Create static nginx configuration
+#   copy:
+#     src: static-nginx/{{ item }}
+#     dest: /opt/d4g-proxy/nginx-conf/{{ item }}
+#   with_items:
+#     - room303.conf
+#   notify:
+#     - "nginx config updated"
 
 - name: Pull
   command: docker compose pull

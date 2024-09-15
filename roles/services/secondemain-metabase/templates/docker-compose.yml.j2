@@ -11,6 +11,10 @@ services:
       - MB_DB_USER=metabase
       - MB_DB_PASS={{ secondemain_metabase_db_password }}
       - MB_SITE_URL=https://secondemain.services.dataforgood.fr
+    networks:
+      - d4g-internal
     restart: always
-    ports:
-      - "3001:3000"
+
+networks:
+  d4g-internal:
+    external: true

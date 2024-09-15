@@ -1,0 +1,13 @@
+---
+- name: Get Docker Swarm join token for workers
+  shell: docker swarm join-token -q worker
+  register: worker_token
+  changed_when: false
+  delegate_to: "{{ groups['d4g_cluster_leader'][0] }}"
+
+- name: Join Docker Swarm as worker
+  shell: |
+    docker swarm join --token {{ worker_token.stdout }} metal-1.dataforgood.fr:2377
+  register: swarm_join_output
+  changed_when: "'This node is already part of a swarm' not in swarm_join_output.stderr"
+  when: "'This node is already part of a swarm' not in lookup('pipe', 'docker info')"

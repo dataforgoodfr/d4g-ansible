@@ -1,0 +1,29 @@
+---
+- name: Create d4g-outline directory
+  file:
+    path: "{{ d4g_outline_install_dir }}"
+    state: directory
+
+- name: Creating d4g-outline template
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/d4g-outline/docker-compose.yml
+
+- name: Create d4g-outline env file
+  template:
+    src: "outline.env.j2"
+    dest: /opt/d4g-outline/outline.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-outline
+  tags:
+    - pull
+
+- name: Up
+  command: docker compose up -d
+  args:
+    chdir: /opt/d4g-outline
+  tags:
+    - up

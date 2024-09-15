@@ -1,0 +1,68 @@
+---
+- name: Set hostname to current inventory hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Disable ssh password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+  notify: restart sshd
+
+- name: Copy authorized keys to root
+  copy:
+    src: "/home/ubuntu/.ssh/authorized_keys"
+    dest: /root/.ssh/authorized_keys
+    owner: root
+    group: root
+    remote_src: yes
+    mode: "0600"
+
+- name: Disable motd news ENABLED=0
+  lineinfile:
+    path: /etc/default/motd-news
+    regexp: "^ENABLED="
+    line: "ENABLED=0"
+
+- name: Disable motd messages for the items
+  command: chmod -x /etc/update-motd.d/{{ item }}
+  with_items:
+    - 10-help-text
+    - 90-updates-available
+    - 98-reboot-required
+
+- name: Create custom motd
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Apt update
+  apt:
+    update_cache: yes
+
+- name: install base pkgs
+  apt:
+    state: present
+    cache_valid_time: "86400"
+    name:
+      - "build-essential"
+      - "cron"
+      - "curl"
+      - "file"
+      - "git"
+      - "gpg"
+      - "htop"
+      - "jq"
+      - "less"
+      - "procps"
+      - "ripgrep"
+      - "rsyslog"
+      - "tcpdump"
+      - "vim"
+      - "wget"
+      - "htop"

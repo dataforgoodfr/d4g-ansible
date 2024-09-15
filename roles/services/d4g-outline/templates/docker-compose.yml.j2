@@ -1,0 +1,27 @@
+services:
+  d4g-outline:
+    image: docker.getoutline.com/outlinewiki/outline:0.78.0
+    container_name: d4g-outline
+    env_file: ./outline.env
+    depends_on:
+      - d4g-outline-redis
+    networks:
+      - d4g-internal
+    restart: unless-stopped
+
+  d4g-outline-redis:
+    image: redis
+    container_name: d4g-outline-redis
+    command: ["redis-server"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+    networks:
+      - d4g-internal
+    restart: unless-stopped
+
+networks:
+  d4g-internal:
+    external: true

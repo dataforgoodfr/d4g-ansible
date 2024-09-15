@@ -16,6 +16,8 @@ services:
       - SHOW_PASSWORD_HINT=false
     volumes:
       - ./data:/data
+    networks:
+      - d4g-internal
     healthcheck:
       test:
         - CMD
@@ -25,10 +27,8 @@ services:
       interval: 2s
       timeout: 10s
       retries: 15
-    restart: always
-    networks:
-      d4g-network:
-        ipv4_address: "10.42.0.3"
+    restart: unless-stopped
+
 networks:
-  d4g-network:
+  d4g-internal:
     external: true

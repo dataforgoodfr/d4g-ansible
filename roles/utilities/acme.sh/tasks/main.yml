@@ -93,5 +93,5 @@
     name: "acme.sh ansible-managed crontab"
     minute: "{{ 59 | random(seed=inventory_hostname) }}"
     hour: "0"
-    job: '"/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" 2>&1 /var/log/acme_cron.log'
+    job: '"/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" 2>&1 | logger -t acme-sh'
   when: failover_setup == False or (failover_setup == True and is_failover_leader == True)

@@ -1,2 +1,2 @@
-docker_no_iptable: False
-arch: amd64
+use_swarm: false
+is_swarm_leader: false

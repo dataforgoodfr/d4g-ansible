@@ -14,13 +14,6 @@
     src: "docker-compose.yml.j2"
     dest: /opt/d4g-proxy/docker-compose.yml
 
-- name: Cleanup services configurations
-  file:
-    state: absent
-    path: /opt/d4g-proxy/nginx-conf/
-  notify:
-    - "nginx config updated"
-
 - name: Create nginx-conf directory
   file:
     path: "/opt/d4g-proxy/nginx-conf"
@@ -32,39 +25,23 @@
   template:
     src: "default.conf.j2"
     dest: /opt/d4g-proxy/nginx-conf/default.conf
-  notify:
-    - "nginx config updated"
-
-- name: Create services configurations
-  template:
-    src: "service.conf.j2"
-    dest: /opt/d4g-proxy/nginx-conf/{{ item.service_name }}.conf
-  with_items:
-    - {
-        service_name: "vaultwarden",
-        service_addresses: ["d4g-vaultwarden"],
-        open_bar_cors: false,
-      }
-    - {
-        service_name: "n8n",
-        service_addresses: ["d4g-n8n"],
-        open_bar_cors: false,
-      }
-    - {
-        service_name: "uptime",
-        service_addresses: ["d4g-uptime-kuma:8080"],
-        open_bar_cors: false,
-      }
-    - {
-        service_name: "outline",
-        service_addresses: ["d4g-outline:3000"],
-        open_bar_cors: false,
-      }
-    - {
-        service_name: "secondemain",
-        service_addresses: ["secondemain-metabase:3000"],
-        open_bar_cors: false,
-      }
+  vars:
+    services:
+      - name: "vaultwarden"
+        addresses: ["d4g-vaultwarden"]
+        open_bar_cors: false
+      - name: "n8n"
+        addresses: ["d4g-n8n"]
+        open_bar_cors: false
+      - name: "uptime"
+        addresses: ["d4g-uptime-kuma"]
+        open_bar_cors: false
+      - name: "outline"
+        addresses: ["d4g-outline"]
+        open_bar_cors: false
+      - name: "secondemain"
+        addresses: ["secondemain-metabase:3000"]
+        open_bar_cors: false
   notify:
     - "nginx config updated"
 

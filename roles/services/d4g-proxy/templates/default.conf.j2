@@ -31,3 +31,74 @@ server {
     ssl_certificate /opt/certificates/le-fullchain.pem;
     ssl_certificate_key /opt/certificates/le-key.pem;
 }
+
+
+###############################
+###############################
+##  SERVICES CONFIGURATION   ##
+###############################
+###############################
+
+{% for item in services %}
+###################
+# {{ item.name }} config #
+###################
+
+upstream {{item.name}}_backend {
+    least_conn;
+
+    # For each item.services_addresses, we create a server
+{% for address in item.addresses %}
+    server {{ address }};
+{% endfor %}
+}
+
+server {
+    listen 80;
+    server_name {{ item.name }}.services.dataforgood.fr;
+
+    location / {
+        return 302 https://{{ item.name }}.services.dataforgood.fr$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name {{ item.name }}.services.dataforgood.fr;
+
+    add_header 'X-Frame-Options' 'SAMEORIGIN';
+    add_header 'X-XSS-Protection' '1; mode=block';
+    add_header 'X-Content-Type-Options' 'nosniff';
+    add_header 'Referrer-Policy' 'same-origin';
+    add_header 'Strict-Transport-Security' 'max-age=63072000';
+
+    {% if item.open_bar_cors %}
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+    {% endif %}
+
+    ssl_certificate /opt/certificates/le-fullchain.pem;
+    ssl_certificate_key /opt/certificates/le-key.pem;
+
+    location / {
+        proxy_pass http://{{item.name}}_backend;
+        keepalive_requests 100;
+
+        proxy_read_timeout 75s;
+        proxy_connect_timeout 75s;
+        proxy_http_version 1.1;
+        client_max_body_size 100M;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_redirect off;
+    }
+}
+{% endfor %}

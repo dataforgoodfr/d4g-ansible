@@ -4,6 +4,7 @@ services:
     image: metabase/metabase:latest
     container_name: "secondemain-metabase"
     environment:
+      - MB_
       - MB_DB_TYPE=postgres
       - MB_DB_DBNAME=metabase
       - MB_DB_PORT=18871
@@ -13,7 +14,7 @@ services:
       - MB_SITE_URL=https://secondemain.services.dataforgood.fr
     networks:
       - d4g-internal
-    restart: always
+    restart: unless-stopped
 
 networks:
   d4g-internal:

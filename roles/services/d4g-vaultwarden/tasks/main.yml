@@ -4,6 +4,11 @@
     path: "{{ d4g_vaultwarden_install_dir }}"
     state: directory
 
+- name: Create d4g-outline env file
+  template:
+    src: "vaultwarden.env.j2"
+    dest: /opt/d4g-outline/vaultwarden.env
+
 - name: Creating d4g-vaultwarden template
   template:
     src: "docker-compose.yml.j2"

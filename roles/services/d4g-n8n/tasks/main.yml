@@ -1,13 +1,21 @@
 ---
 - name: Create d4g-n8n directory
   file:
-    path: "{{ d4g_n8n_install_dir }}"
+    path: /opt/d4g-n8n
     state: directory
 
-- name: Creating d4g-n8n template
+- name: Create d4g-n8n files
   template:
-    src: "docker-compose.yml.j2"
-    dest: /opt/d4g-n8n/docker-compose.yml
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-n8n/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - n8n.env
+
+- name: Create d4g-n8n data directory
+  file:
+    path: /opt/d4g-n8n/data
+    state: directory
 
 - name: Pull
   command: docker compose pull
@@ -15,10 +23,22 @@
     chdir: /opt/d4g-n8n
   tags:
     - pull
+  when: inventory_hostname == host_node
 
 - name: Up
-  command: docker compose up -d
+  command: docker stack deploy -c docker-compose.yml d4g-n8n
   args:
     chdir: /opt/d4g-n8n
   tags:
     - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: n8n
+    data_dir: /opt/d4g-n8n/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == host_node

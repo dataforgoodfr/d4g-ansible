@@ -1,16 +1,16 @@
 services:
-  d4g-uptime-kuma:
+  app:
     image: louislam/uptime-kuma
-    container_name: "d4g-uptime-kuma"
-    environment:
-      - NODE_ENV=production
-      - UPTIME_KUMA_HOST=0.0.0.0
-      - UPTIME_KUMA_PORT=80
+    env_file: ./uptime-kuma.env
     volumes:
       - ./data:/app/data
     networks:
       - d4g-internal
-    restart: unless-stopped
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ host_node }}
 
 networks:
   d4g-internal:

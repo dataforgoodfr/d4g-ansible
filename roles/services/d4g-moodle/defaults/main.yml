@@ -1,0 +1,18 @@
+---
+default_server_name: moodle.services.dataforgood.fr
+d4g_moodle_install_dir: /opt/d4g-moodle
+
+moodle_admin_username: d4g-admin
+moodle_admin_email: orga@dataforgood.fr
+moodle_admin_password: "{{ lookup('env', 'MOODLE_ADMIN_PASSWORD') }}"
+
+moodle_smtp_host: "{{ lookup('env', 'SMTP_HOST') }}"
+moodle_smtp_port: "{{ lookup('env', 'SMTP_PORT_NUMBER') }}"
+moodle_smtp_user: "{{ lookup('env', 'SMTP_USER') }}"
+moodle_smtp_password: "{{ lookup('env', 'SMTP_PASSWORD') }}"
+
+moodle_db_name: moodle
+moodle_db_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+moodle_db_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+moodle_db_user: moodle
+moodle_db_password: "{{ lookup('env', 'MOODLE_DATABASE_PASSWORD') }}"

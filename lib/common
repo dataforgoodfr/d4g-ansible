@@ -1,0 +1,86 @@
+info() {
+  gum style --foreground=4 "$@"
+}
+
+warning() {
+  gum style --foreground=3 "$@"
+}
+
+success() {
+  gum style --bold --foreground=2 "$@"
+}
+
+error() {
+  gum style --bold --foreground=1 "$@"
+}
+
+debug() {
+  if [ "$DEBUG" != 'false' ]; then
+    gum style --faint "$@"
+  fi
+}
+
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  if [ "$code" -eq 1 ]; then
+    error "$msg"
+  else
+    info "$msg"
+  fi
+  exit "$code"
+}
+
+refresh_vaultwarden_secrets() {
+  BW_SECRET_ID="0be4cad8-9a8a-44a2-bbb6-d652d0ace220"
+  info "Logging into Vaultwarden, you may be prompted for your master password."
+  get_bw_session
+  [[ -z "$BW_SESSION" ]] && die "Missing bw session."
+  # Syncing distant secrets to local vault
+  bw sync
+  SECRETS=$(bw get item ${BW_SECRET_ID} --raw --session "${BW_SESSION}" | jq -r .notes)
+  echo "$SECRETS" > .env
+  success "Vaultwarden secrets saved to .env"
+
+  source .env
+}
+
+bw_create_session() {
+    # No session, new session !
+    export BW_PASSWORD="$(gum input --password --prompt="Please enter your Vaultwarden master password")"
+    debug "BW_PASSWORD: $BW_PASSWORD"
+    BW_SESSION=$(bw unlock --passwordenv BW_PASSWORD --raw)
+}
+
+get_bw_session() {
+  # Check if .bw-session.env exists
+  BW_SESSION=
+  if [ -f .bw-session.env ]; then
+    source .bw-session.env
+  fi
+
+  if [ -n "$BW_SESSION" ]; then
+    # Check vault status before we begin
+    BW_STATUS_RAW=$(bw status)
+    VAULT_SERVER_URL=$(echo $BW_STATUS_RAW | jq -r '.serverUrl')
+    BW_STATUS=$(echo $BW_STATUS_RAW | jq -r '.status')
+
+    if [ "$VAULT_SERVER_URL" != "https://vaultwarden.services.dataforgood.fr" ]; then
+      bw logout
+      bw config server "https://vaultwarden.services.dataforgood.fr"
+    fi
+
+    if [ "$BW_STATUS" == "unauthenticated" ]; then
+      bw login
+    fi
+
+    # If check is not successful, unlock
+    if ! bw unlock --check --session "$BW_SESSION" > /dev/null; then
+      bw_create_session
+    fi
+  else
+    bw_create_session
+  fi
+  # Now we know for sure our session is valid. Let's write it to a file to be reused
+  echo "export BW_SESSION=$BW_SESSION" > .bw-session.env
+}

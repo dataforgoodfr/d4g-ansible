@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+usage() {
+  cat <<EOF
+USAGE ${0} [-v] [-h] <command> <arguments>
+
+This script is a wrapper to run ansible commands.
+It will load required secrets from Vaultwarden and has git-based safeguards
+to prevent applying stale configurations to production.
+
+Required arguments :
+command : The ansible command to run. Currently only the playbook command is supported (Values: playbook)
+arguments : Ansible command arguments. All will be appended as-is to the ansible command.
+Supported parameters :
+-h, --help : display this message
+-v, --verbose : enable enhanced logging (Default : false, also set by environment variable DEBUG)
+--skip-git-checks : Skip git checks for production deployments (Default : false, also set by environment variable SKIP_GIT_CHECKS)
+--skip-secrets-refresh : Skip refreshing Vaultwarden secrets (Default : false, also set by environment variable SKIP_SECRETS)
+EOF
+  exit 1
+}
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+  exit 0
+}
+
+parse_params() {
+
+  # Sane defaults
+  DEBUG="${DEBUG:-false}"
+  # This is the directory where this script live (bin), useful
+  SOURCE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+  # This is the repository directory.
+  ANSIBLE_DIR=$(dirname "$SOURCE")
+  SKIP_GIT_CHECKS="${SKIP_GIT_CHECKS:-false}"
+  SKIP_SECRETS="${SKIP_SECRETS:-false}"
+
+  source "$ANSIBLE_DIR/lib/git-hooks"
+  source "$ANSIBLE_DIR/lib/common"
+
+  while :; do
+    case "${1-}" in
+    -h | --help)
+      usage
+      ;;
+    -v | --verbose)
+      DEBUG="true"
+      ;;
+    --skip-git-checks*)
+      SKIP_GIT_CHECKS="true"
+      ;;
+    --skip-secrets*)
+      SKIP_SECRETS="true"
+      ;;
+    -?*)
+      echo "Unknown option: $1"
+      usage
+      ;;
+    *)
+      break
+      ;;
+    esac
+    shift
+  done
+
+  ANSIBLE_COMMAND="${1-}"
+  if [ -z "$ANSIBLE_COMMAND" ]; then
+    die "No ansible commmand provided."
+  fi
+  # Check if the ANSIBLE_COMMAND is not 'vault' or 'cookbook'
+  if [[ "$ANSIBLE_COMMAND" != "playbook" ]]; then
+    die "Unrecognized command. See --help for available commands."
+  fi
+  ANSIBLE_COMMAND="ansible-${ANSIBLE_COMMAND}"
+  shift
+
+  # Capture all remaining args as terraform command
+  ANSIBLE_PARAMS="$*"
+  [[ -z "$ANSIBLE_PARAMS" ]] && die "Missing ansible parameters."
+  shift
+
+  debug "DEBUG: $DEBUG"
+  debug "SKIP_GIT_CHECKS: $SKIP_GIT_CHECKS"
+  debug "SOURCE: $SOURCE"
+  debug "ANSIBLE_DIR: $ANSIBLE_DIR"
+  debug "ANSIBLE_COMMAND: $ANSIBLE_COMMAND"
+  debug "ANSIBLE_PARAMS: $ANSIBLE_PARAMS"
+
+  return 0
+}
+
+parse_params "$@"
+
+# Run the git checks if we're applying to production and we're not skipping them
+if [ "$SKIP_GIT_CHECKS" == "false" ]; then
+  check_branch
+  check_local_and_remote_heads_match
+  check_for_uncommitted_changes
+fi
+
+if [ "$SKIP_SECRETS" == "false" ]; then
+  refresh_vaultwarden_secrets
+fi
+
+source .env
+$ANSIBLE_COMMAND $ANSIBLE_PARAMS
+success "All done!"

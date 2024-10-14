@@ -1,8 +1,7 @@
 services:
-  d4g-vaultwarden:
+  app:
     image: "vaultwarden/server:latest"
-    container_name: "d4g-vaultwarden"
-    env_file: ./outline.env
+    env_file: ./vaultwarden.env
     volumes:
       - ./data:/data
     networks:
@@ -16,7 +15,11 @@ services:
       interval: 2s
       timeout: 10s
       retries: 15
-    restart: unless-stopped
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ host_node }}
 
 networks:
   d4g-internal:

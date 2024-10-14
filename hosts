@@ -1,5 +1,0 @@
-[d4g_cluster_leader]
-metal-1.dataforgood.fr ansible_python_interpreter=/usr/bin/python3
-
-[d4g_cluster]
-metal-2.dataforgood.fr ansible_python_interpreter=/usr/bin/python3

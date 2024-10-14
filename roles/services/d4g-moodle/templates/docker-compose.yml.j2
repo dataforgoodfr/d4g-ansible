@@ -1,7 +1,10 @@
 services:
   app:
-    image: metabase/metabase:latest
-    env_file: ./secondemain-metabase.env
+    image: docker.io/bitnami/moodle:4.5
+    env_file: './moodle.env'
+    volumes:
+      - ./data/moodle:/bitnami/moodle
+      - ./data/moodledata:/bitnami/moodledata
     networks:
       - d4g-internal
     deploy:

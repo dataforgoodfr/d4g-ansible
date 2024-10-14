@@ -1,17 +1,17 @@
 services:
-  d4g-outline:
+  app:
     image: docker.getoutline.com/outlinewiki/outline:0.79.1
-    container_name: d4g-outline
     env_file: ./outline.env
-    depends_on:
-      - d4g-outline-redis
     networks:
       - d4g-internal
-    restart: unless-stopped
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ host_node }}
 
-  d4g-outline-redis:
+  redis:
     image: redis
-    container_name: d4g-outline-redis
     command: ["redis-server"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -20,7 +20,11 @@ services:
       retries: 3
     networks:
       - d4g-internal
-    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ host_node }}
 
 networks:
   d4g-internal:

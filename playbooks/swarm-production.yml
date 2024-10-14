@@ -1,0 +1,107 @@
+---
+- name: Initial configuration
+  hosts: production_swarm_cluster_nodes
+  remote_user: ubuntu
+  become: true
+
+  tasks:
+    - import_role:
+        name: roles/utilities/base-ubuntu
+      tags:
+        - base-ubuntu
+
+- name: Create swarm workers
+  hosts: production_swarm_cluster_nodes
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/utilities/docker
+      vars:
+        use_swarm: true
+        group_name: "production_swarm_cluster_nodes"
+      tags:
+        - docker
+        - utils
+
+- name: Create swarm applications
+  hosts: production_swarm_cluster_nodes
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/utilities/acme.sh
+      vars:
+        domain_names:
+          - "*.services.dataforgood.fr"
+        reload_cmd: docker exec d4g-proxy nginx -s reload
+        notification_mail_from: proxyd4g@dataforgood.fr
+        notification_mail_to: proxyd4g@quickpipes.io
+      when: is_swarm_leader | default(false)
+      tags:
+        - acme
+
+    - import_role:
+        name: roles/services/d4g-moodle
+      vars:
+        host_node: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - moodle
+        - service
+
+    - import_role:
+        name: roles/services/d4g-outline
+      vars:
+        host_node: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - outline
+        - service
+
+    - import_role:
+        name: roles/services/d4g-n8n
+      vars:
+        host_node: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - n8n
+        - service
+
+    - import_role:
+        name: roles/services/d4g-uptime-kuma
+      vars:
+        host_node: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - uptime-kuma
+        - service
+
+    - import_role:
+        name: roles/services/d4g-vaultwarden
+      vars:
+        host_node: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - vaultwarden
+        - service
+
+    - import_role:
+        name: roles/services/secondemain-metabase
+      vars:
+        host_node: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - saison12
+        - secondemain
+        - service
+
+    - import_role:
+        name: roles/services/d4g-proxy
+      vars:
+        host_node: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - proxy
+        - nginx
+        - service

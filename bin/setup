@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+# This is the directory where this script live (bin), useful
+SOURCE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# This is the repository directory.
+ANSIBLE_DIR=$(dirname "$SOURCE")
+
+source "$ANSIBLE_DIR/lib/common"
+
+info "Installing d4g-ansible requirements"
+# Create .venv
+info "Creating venv"
+python3 -m venv "$ANSIBLE_DIR/.venv"
+info "Sourcing venv"
+source "$ANSIBLE_DIR/.venv/bin/activate"
+info "Python: Install requirements"
+pip install -r requirements.txt
+
+success "Ready to go 🏗️"

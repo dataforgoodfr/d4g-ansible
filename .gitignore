@@ -11,3 +11,5 @@ roles/test-role
 **/__pycache__/**
 *.TEST
 ansible.cfg
+.venv
+*.env*

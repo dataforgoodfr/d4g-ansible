@@ -1,7 +1,6 @@
 services:
-  d4g-proxy:
+  app:
     image: "nginx:1-alpine"
-    container_name: "d4g-proxy"
     ports:
       - 80:80
       - 443:443
@@ -11,7 +10,11 @@ services:
       - ./nginx-conf:/etc/nginx/conf.d/
     networks:
       - d4g-internal  # Attach to the internal overlay network for container communication
-    restart: unless-stopped
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ host_node }}
 
 networks:
   d4g-internal:

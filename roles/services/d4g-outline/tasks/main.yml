@@ -1,7 +1,7 @@
 ---
 - name: Create d4g-outline directory
   file:
-    path: "{{ d4g_outline_install_dir }}"
+    path: /opt/d4g-outline
     state: directory
 
 - name: Creating d4g-outline template
@@ -20,10 +20,12 @@
     chdir: /opt/d4g-outline
   tags:
     - pull
+  when: inventory_hostname == host_node
 
 - name: Up
-  command: docker compose up -d
+  command: docker stack deploy -c docker-compose.yml d4g-outline
   args:
     chdir: /opt/d4g-outline
   tags:
     - up
+  when: is_swarm_leader | default(false)

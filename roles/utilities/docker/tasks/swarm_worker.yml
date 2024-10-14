@@ -1,13 +1,26 @@
 ---
+- name: Get Swarm leader from inventory
+  set_fact:
+    # This scans all hosts in group_name and extracts the host that has is_swarm_leader set to true
+    swarm_leader: "{{ groups[group_name] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}"
+
 - name: Get Docker Swarm join token for workers
-  shell: docker swarm join-token -q worker
+  command: docker swarm join-token -q worker
   register: worker_token
   changed_when: false
-  delegate_to: "{{ groups['d4g_cluster_leader'][0] }}"
+  delegate_to: "{{ swarm_leader }}"
+
+- name: Get docker info
+  shell: docker info
+  register: docker_info_output
+  changed_when: false
+
+- name: Parse Docker info to check if node is part of a swarm
+  set_fact:
+    is_in_swarm: "{{ 'Swarm: active' in docker_info_output.stdout }}"
 
 - name: Join Docker Swarm as worker
-  shell: |
-    docker swarm join --token {{ worker_token.stdout }} metal-1.dataforgood.fr:2377
+  command: docker swarm join --token {{ worker_token.stdout }} {{ swarm_leader }}:2377
   register: swarm_join_output
+  when: not is_in_swarm # Run only if the node is not already part of the cluster
   changed_when: "'This node is already part of a swarm' not in swarm_join_output.stderr"
-  when: "'This node is already part of a swarm' not in lookup('pipe', 'docker info')"

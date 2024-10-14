@@ -11,8 +11,11 @@
 
 - name: Creating d4g-uptime-kuma template
   template:
-    src: "docker-compose.yml.j2"
-    dest: /opt/d4g-uptime-kuma/docker-compose.yml
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-uptime-kuma/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - uptime-kuma.env
 
 - name: Pull
   command: docker compose pull
@@ -20,10 +23,22 @@
     chdir: /opt/d4g-uptime-kuma
   tags:
     - pull
+  when: inventory_hostname == host_node
 
 - name: Up
-  command: docker compose up -d
+  command: docker stack deploy -c docker-compose.yml d4g-uptime-kuma
   args:
     chdir: /opt/d4g-uptime-kuma
   tags:
     - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: uptime-kuma
+    data_dir: /opt/d4g-uptime-kuma/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == host_node

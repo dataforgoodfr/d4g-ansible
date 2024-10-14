@@ -1,13 +1,16 @@
 ---
 - name: Create secondemain-metabase directory
   file:
-    path: "/opt/secondemain-metabase"
+    path: /opt/secondemain-metabase
     state: directory
 
-- name: Creating secondemain-metabase template
+- name: Create secondemain-metabase files
   template:
-    src: "docker-compose.yml.j2"
-    dest: /opt/secondemain-metabase/docker-compose.yml
+    src: "{{ item }}.j2"
+    dest: /opt/secondemain-metabase/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - secondemain-metabase.env
 
 - name: Pull
   command: docker compose pull
@@ -15,10 +18,12 @@
     chdir: /opt/secondemain-metabase
   tags:
     - pull
+  when: inventory_hostname == host_node
 
 - name: Up
-  command: docker compose up -d
+  command: docker stack deploy -c docker-compose.yml secondemain-metabase
   args:
     chdir: /opt/secondemain-metabase
   tags:
     - up
+  when: is_swarm_leader | default(false)

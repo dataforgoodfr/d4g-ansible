@@ -1,14 +1,4 @@
 ---
-- name: Install dependencies for Docker
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - curl
-    - software-properties-common
-
 - name: Add Docker's official GPG key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg

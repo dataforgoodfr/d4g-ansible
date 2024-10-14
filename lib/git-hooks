@@ -1,0 +1,24 @@
+check_for_uncommitted_changes() {
+  if [ "$(git status --porcelain)" != "" ]; then
+    error "You have uncommitted changes, aborting"
+    exit 1
+  fi
+}
+
+check_branch() {
+  CURRENT_BRANCH=$(git branch --show-current)
+  if [ "$CURRENT_BRANCH" != "main" ]; then
+    error "Only the main branch should be applied to production, current branch is $CURRENT_BRANCH. If this is expected, try again with --skip-git-checks appended to the command"
+    exit 1
+  fi
+}
+
+check_local_and_remote_heads_match() {
+  remote_head=$(git ls-remote origin --tags $(git branch --show-current) | cut -f1 | head -1)
+  local_head=$(git rev-parse HEAD)
+
+  if [ "$local_head" != "$remote_head" ]; then
+    error "Remote HEAD $remote_head, differs from local HEAD $local_head, aborting"
+    exit 1
+  fi
+}

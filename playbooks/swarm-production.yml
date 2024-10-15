@@ -97,6 +97,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-strapi
+      vars:
+        host_node: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - strapi
+        - service
+
+    - import_role:
         name: roles/services/d4g-proxy
       vars:
         host_node: "metal-1.dataforgood.fr"

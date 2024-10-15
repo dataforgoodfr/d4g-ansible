@@ -45,6 +45,9 @@
       - name: "moodle"
         addresses: ["d4g-moodle_app:8080"]
         open_bar_cors: false
+      - name: "strapi"
+        addresses: ["d4g-strapi_app:1337"]
+        open_bar_cors: false
 
 # - name: Create static nginx configuration
 #   copy:

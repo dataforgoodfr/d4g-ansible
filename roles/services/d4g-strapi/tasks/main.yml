@@ -1,0 +1,29 @@
+---
+- name: Create d4g-strapi directory
+  file:
+    path: /opt/d4g-strapi
+    state: directory
+
+- name: Create d4g-strapi files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-strapi/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - strapi.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-strapi
+  tags:
+    - pull
+  when: inventory_hostname == host_node
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-strapi
+  args:
+    chdir: /opt/d4g-strapi
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

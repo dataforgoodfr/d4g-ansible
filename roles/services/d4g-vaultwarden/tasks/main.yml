@@ -1,7 +1,7 @@
 ---
 - name: Create d4g-vaultwarden directory
   file:
-    path: "{{ d4g_vaultwarden_install_dir }}"
+    path: /opt/d4g-vaultwarden
     state: directory
 
 - name: Create d4g-vaultwarden files

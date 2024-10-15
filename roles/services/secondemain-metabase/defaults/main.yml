@@ -1,4 +1,0 @@
----
-secondemain_metabase_db_password: "{{ lookup('env', 'SECONDEMAIN_METABASE_DB_PASSWORD') }}"
-secondemain_metabase_db_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
-secondemain_metabase_db_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"

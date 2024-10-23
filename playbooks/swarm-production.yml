@@ -106,6 +106,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-noco
+      vars:
+        host_node: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - noco
+        - service
+
+    - import_role:
         name: roles/services/d4g-proxy
       vars:
         host_node: "metal-1.dataforgood.fr"

@@ -13,3 +13,4 @@ roles/test-role
 ansible.cfg
 .venv
 *.env*
+!*.env.j2

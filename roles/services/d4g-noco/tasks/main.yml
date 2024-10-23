@@ -1,0 +1,44 @@
+---
+- name: Create d4g-noco directory
+  file:
+    path: "/opt/d4g-noco"
+    state: directory
+
+- name: Create d4g-noco data directory
+  file:
+    path: "/opt/d4g-noco/data"
+    state: directory
+
+- name: Creating d4g-noco template
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-noco/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - noco.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-noco
+  tags:
+    - pull
+  when: inventory_hostname == host_node
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-noco
+  args:
+    chdir: /opt/d4g-noco
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: noco
+    data_dir: /opt/d4g-noco/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == host_node

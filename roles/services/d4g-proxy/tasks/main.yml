@@ -48,6 +48,9 @@
       - name: "strapi"
         addresses: ["d4g-strapi_app:1337"]
         open_bar_cors: false
+      - name: "noco"
+        addresses: ["d4g-noco_app"]
+        open_bar_cors: false
 
 # - name: Create static nginx configuration
 #   copy:

@@ -2,6 +2,7 @@
 - name: Get Swarm leader from inventory
   set_fact:
     # This scans all hosts in group_name and extracts the host that has is_swarm_leader set to true
+    # swarm_leader: "{{ groups[group_names[0]] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}"
     swarm_leader: "{{ groups[group_name] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}"
 
 - name: Get Docker Swarm join token for workers
@@ -24,3 +25,14 @@
   register: swarm_join_output
   when: not is_in_swarm # Run only if the node is not already part of the cluster
   changed_when: "'This node is already part of a swarm' not in swarm_join_output.stderr"
+
+- name: Make sure node promotion is up to date
+  command: >
+    {% if hostvars[inventory_hostname].get('is_promoted', false) %}
+      docker node promote {{ inventory_hostname }}
+    {% else %}
+      docker node demote {{ inventory_hostname }}
+    {% endif %}
+  delegate_to: "{{ swarm_leader }}"
+  register: command_result
+  changed_when: "'is already' not in command_result.stdout"

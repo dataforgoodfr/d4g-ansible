@@ -8,7 +8,7 @@
     - import_role:
         name: roles/utilities/base-ubuntu
       tags:
-        - base-ubuntu
+        - base
 
 - name: Create swarm workers
   hosts: production_swarm_cluster_nodes

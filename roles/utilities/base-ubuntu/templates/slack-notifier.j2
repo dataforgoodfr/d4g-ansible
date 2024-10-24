@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+usage() {
+  cat <<EOF
+USAGE ${0} [-v] [-h]
+
+This script is an example of a shell script based on https://betterdev.blog/minimal-safe-bash-script-template/
+On top of everything the articles states, it can also be fully configured using environment variables.
+This flavor of the script also uses gum for nice interactive terminal apps.
+
+Supported parameters :
+-h, --help : display this message
+-v, --verbose : enable enhanced logging (Default : false, also set by environment variable DEBUG)
+--dummy-flag : a dummy flag (default: false, also set by environment variable RAW_DATA)
+--dummy-param : a dummy parameter (required, also set by environment variable DUMMY_PARAM)
+EOF
+  exit 1
+}
+
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # script cleanup here
+  exit 0
+}
+
+info() {
+  gum style --foreground=4 "$@"
+}
+
+warning() {
+  gum style --foreground=3 "$@"
+}
+
+success() {
+  gum style --bold --foreground=2 "$@"
+}
+
+error() {
+  gum style --bold --foreground=1 "$@"
+}
+
+debug() {
+  if [ "$DEBUG" == 'true' ]; then
+    gum style --faint "$@"
+  fi
+}
+
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  if [ "$code" -eq 1 ]; then
+    error "$msg"
+  else
+    info "$msg"
+  fi
+  exit "$code"
+}
+
+parse_params() {
+  if [ $# -gt 2 ]; then
+    echo "Too many parameters provided"
+    usage
+  fi
+
+  # Sane defaults
+  DEBUG="false"
+  RUN_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+  RAW_DATA="${RAW_DATA-false}"
+
+  while :; do
+    case "${1-}" in
+    -h | --help)
+      usage
+      ;;
+    -v | --verbose)
+      DEBUG="true"
+      ;;
+    --raw-data*)
+      RAW_DATA="true"
+      ;;
+    -?*)
+      echo "Unknown option: $1"
+      usage
+      ;;
+    *)
+      break
+      ;;
+    esac
+    shift
+  done
+
+  # After parsing all options, the rest of the args is the data
+  DATA=${@-}
+
+  debug "DEBUG: $DEBUG"
+  debug "RAW_DATA: $RAW_DATA"
+  debug "DATA: $DATA"
+
+  return 0
+}
+
+parse_params "$@"
+
+# If raw data is set, we pass it directly. Otherwise build the data json
+if [ "$RAW_DATA" == 'true' ]; then
+  DATA_JSON=$DATA
+else
+  DATA_JSON=$(jq -n --arg text "$DATA" '{text: $text}')
+fi
+
+curl -X POST -H 'Content-type: application/json' --data "$DATA_JSON" {{ lookup('env', 'SLACK_WEBHOOK_ENDPOINT') }}

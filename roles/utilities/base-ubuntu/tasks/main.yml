@@ -70,3 +70,11 @@
       - "tcpdump"
       - "vim"
       - "wget"
+
+- name: Create d4g tools
+  template:
+    src: "{{ item }}.j2"
+    dest: /usr/local/bin/{{ item }}
+    mode: "0755"
+  with_items:
+    - slack-notifier

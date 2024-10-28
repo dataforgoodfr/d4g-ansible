@@ -24,6 +24,14 @@
         - docker
         - utils
 
+    - import_role:
+        name: roles/utilities/datadog
+      vars:
+        dd_env: production
+      tags:
+        - datadog
+        - utils
+
 - name: Create swarm applications
   hosts: production_swarm_cluster_nodes
   remote_user: root

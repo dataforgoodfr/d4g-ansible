@@ -1,0 +1,4 @@
+---
+- name: restart datadog-agent
+  command:
+    cmd: docker service update --force datadog-agent_app

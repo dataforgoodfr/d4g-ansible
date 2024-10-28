@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  app:
+    image: gcr.io/datadoghq/agent:latest
+    env_file: ./datadog.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /proc/:/host/proc/:ro
+      - /opt/datadog-agent/data/run:/opt/datadog-agent/run:rw
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    pid: host
+    deploy:
+      mode: global

@@ -122,15 +122,15 @@
         - noco
         - service
 
-    - import_role:
-        name: roles/services/d4g-people
-      vars:
-        host_node: "metal-1.dataforgood.fr" # metal-2 ?
-        replicas: 1
-      tags:
-        - people
-        - service
-        - api
+    # - import_role:
+    #     name: roles/services/d4g-people
+    #   vars:
+    #     host_node: "metal-1.dataforgood.fr" # metal-2 ?
+    #     replicas: 1
+    #   tags:
+    #     - people
+    #     - service
+    #     - api
 
     - import_role:
         name: roles/services/d4g-proxy

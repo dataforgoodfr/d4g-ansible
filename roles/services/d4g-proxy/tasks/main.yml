@@ -51,6 +51,9 @@
       - name: "noco"
         addresses: ["d4g-noco_app"]
         open_bar_cors: false
+      - name: "people"
+        addresses: ["d4g-people_frontend:3000"]
+        open_bar_cors: false
 
 # - name: Create static nginx configuration
 #   copy:

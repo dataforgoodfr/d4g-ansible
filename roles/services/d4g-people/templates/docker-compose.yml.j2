@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ghcr.io/dataforgoodfr/d4g-people/backend:latest
+    image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_backend:main
     env_file: './people.env'
     networks:
       - d4g-internal
@@ -21,7 +21,7 @@ services:
       start_period: 5s
 
   frontend:
-    image: ghcr.io/dataforgoodfr/d4g-people/frontend:latest
+    image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_frontend:main
     env_file: './people.env'
     networks:
       - d4g-internal

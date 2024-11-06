@@ -1,25 +1,22 @@
 - name: Create d4g-people directory
   file:
-    path: /opt/d4g-people #/{{ item }}
+    path: /opt/d4g-people
     state: directory
-  # with_items:
-  # - backend
-  # - frontend
 
 - name: Create d4g-people files
   template:
     src: "{{ item }}.j2"
     dest: /opt/d4g-people/{{ item }}
   with_items:
-  - docker-compose.yml
-  - people.env
+    - docker-compose.yml
+    - people.env
 
 - name: Pull
   command: docker compose pull
   args:
     chdir: /opt/d4g-people
   tags:
-  - pull
+    - pull
   when: inventory_hostname == host_node
 
 - name: Up
@@ -27,5 +24,5 @@
   args:
     chdir: /opt/d4g-people
   tags:
-  - up
+    - up
   when: is_swarm_leader | default(false)

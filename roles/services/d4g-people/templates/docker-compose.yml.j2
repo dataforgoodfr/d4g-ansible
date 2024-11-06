@@ -1,7 +1,7 @@
 services:
   backend:
     image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_backend:main
-    env_file: './people.env'
+    env_file: ./people.env
     networks:
       - d4g-internal
     deploy:
@@ -9,31 +9,28 @@ services:
       placement:
         constraints:
           - node.hostname == {{ host_node }}
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - "http://d4g-people_backend:${API_PORT}/api/v1/health/
-      interval: 5s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
+    # healthcheck:
+    #   test:
+    #     - CMD
+    #     - curl
+    #     - "-f"
+    #     - "http://d4g-people_backend/api/v1/health/"
+    #   interval: 5s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 5s
 
   frontend:
     image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_frontend:main
-    env_file: './people.env'
+    env_file: "./people.env"
     networks:
       - d4g-internal
-    depends_on:
-      backend:
-        condition: service_healthy
     deploy:
       replicas: {{ replicas }}
       placement:
         constraints:
-          - node.hostname == {{ host_node }}  
-   
+          - node.hostname == {{ host_node }}
+
 networks:
   d4g-internal:
     external: true

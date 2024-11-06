@@ -125,7 +125,7 @@
     # - import_role:
     #     name: roles/services/d4g-people
     #   vars:
-    #     host_node: "metal-1.dataforgood.fr" # metal-2 ?
+    #     host_node: "metal-1.dataforgood.fr"
     #     replicas: 1
     #   tags:
     #     - people

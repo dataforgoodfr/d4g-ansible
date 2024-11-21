@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_backend:main
+    image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_backend:latest
     env_file: ./people.env
     networks:
       - d4g-internal
@@ -14,14 +14,14 @@ services:
     #     - CMD
     #     - curl
     #     - "-f"
-    #     - "http://d4g-people_backend/api/v1/health/"
+    #     - "http://d4g-people_backend/api/v1/health"
     #   interval: 5s
     #   timeout: 10s
     #   retries: 3
     #   start_period: 5s
 
   frontend:
-    image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_frontend:main
+    image: ghcr.io/dataforgoodfr/d4g-people/d4g-people_frontend:latest
     env_file: "./people.env"
     networks:
       - d4g-internal

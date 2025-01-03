@@ -10,7 +10,6 @@ playbooks/test-playbook.yml
 roles/test-role
 **/__pycache__/**
 *.TEST
-ansible.cfg
 .venv
 *.env*
 !*.env.j2

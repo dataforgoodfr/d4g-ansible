@@ -131,6 +131,15 @@
         - people
         - service
         - api
+  
+    - import_role:
+        name: roles/services/d4g-kano
+      vars:
+        host_node: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - kano
+        - service
 
     - import_role:
         name: roles/services/d4g-proxy

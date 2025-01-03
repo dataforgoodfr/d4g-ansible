@@ -57,6 +57,9 @@
       - name: "people"
         addresses: ["d4g-people_frontend"]
         open_bar_cors: false
+      - name: "kano"
+        addresses: ["d4g-kano_app:8081"]
+        open_bar_cors: false
 
 # - name: Create static nginx configuration
 #   copy:

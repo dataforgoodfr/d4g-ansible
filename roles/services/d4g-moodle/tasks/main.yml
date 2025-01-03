@@ -14,7 +14,7 @@
 
 - name: Create d4g-moodle data
   file:
-    path: /opt/d4g-moodle/data
+    path: "{{ item }}"
     state: directory
   with_items:
     - /opt/d4g-moodle/data

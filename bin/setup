@@ -8,13 +8,53 @@ ANSIBLE_DIR=$(dirname "$SOURCE")
 
 source "$ANSIBLE_DIR/lib/common"
 
-info "Installing d4g-ansible requirements"
+echo "Installing d4g-ansible requirements"
+# Start by making sure node is installed
+# we won't install because the user might have strong opinions about how to install node
+if ! command -v node &> /dev/null
+then
+    error "Please install node >=18 before running this script."
+    exit 1
+fi
+# Make sure node version is >18
+NODE_VERSION=$(node -v)
+if [ "$(echo $NODE_VERSION | cut -c 2-3)" -lt 18 ]; then
+    error "Please install node version 18 or higher before running this script."
+    exit 1
+fi
+
+# Install brew if not installed.
+# We will use brew to install dependencies on macOS and linux
+if ! command -v brew &> /dev/null
+then
+    error "Please install brew before running this script. Brew is compatible with macOS, linux, and WSL2 (https://docs.brew.sh/Homebrew-on-Linux)."
+    exit 1
+fi
+
+# Technically bitwarden-cli is available on brew,
+# but it still depends on node, so we will install it using npm.
+if ! command -v bw &> /dev/null
+then
+    info "Installing bw cli"
+    npm install -g @bitwarden/cli
+fi
+
+for package in jq gum; do
+  if ! command -v $package &> /dev/null
+  then
+      info "Installing $package"
+      brew install $package
+  else
+      success "$package is already installed"
+  fi
+done
+
 # Create .venv
+info "Done installing dependencies, setting up ansible environment"
 info "Creating venv"
 python3 -m venv "$ANSIBLE_DIR/.venv"
 info "Sourcing venv"
 source "$ANSIBLE_DIR/.venv/bin/activate"
 info "Python: Install requirements"
 pip install -r requirements.txt
-
 success "Ready to go 🏗️"

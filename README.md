@@ -7,21 +7,30 @@ This repository is organised as such :
  - `roles/services` holds service ansible roles. They are used to setup the specific parts of a service (e.g. docker-compose configuration, etc.)
  - `roles/utilities` holds utility standalone ansible roles, which can be composed and used in playbooks (e.g. the docker role installs docker)
 
-You can apply a playbook using the following command :
-```
-ansible-playbook playbooks/d4g-proxy.yml --diff --verbose
+## Setting up the repository
+
+As all our d4g repositories, d4g-ansible comes with a `bin/setup` utility to install most of the required dependencies on your machine.
+The only hard dependency is nodejs, which we leave up to the user to install however they want and configure. Nodejs is required by bitwarden's CLI.
+
+To install dependencies and setup the repo, run
+```bash
+bin/setup
 ```
 
-You can also apply only specific tagged steps by using the `--tags` flag :
+You are now ready to run the playbooks.
+
+## Running a playbook
+
+You can run a playbook using the following command :
 ```
-ansible-playbook playbooks/d4g-proxy.yml --diff --verbose --tags=acme.sh
+bin/d4g-ansible playbook playbooks/swarm-production.yml --diff --verbose
 ```
 
-Here are the existing services at the moment :
-  - d4g-proxy : Used to create the proxy that is in front of all applications to provide out-of-the-box TLS on all domains *.services.dataforgood.fr
-
-
-Here are the existing utilities at the moment :
-  - base-pkg : Install some basic packages to the host (curl, vim, etc.)
-  - docker : Installs docker to the host
-  - acme.sh : Provision a TLS certificate for the given domain and sets up the automatic renewal of this certificate. /!\ It's currently custom tweaked for *.services.dataforgood.fr
+You can apply only specific tagged steps by using the `--tags` flag :
+```bash
+bin/d4g-ansible playbook playbooks/swarm-production.yml --diff --verbose --tags=acme
+```
+You can also limit the apply to a specific host in the inventory using the `--limit` flag :
+```bash
+bin/d4g-ansible playbook playbooks/swarm-production.yml --diff --verbose --limit=metal-1.dataforgood.fr
+```

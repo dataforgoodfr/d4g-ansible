@@ -21,6 +21,9 @@ You are now ready to run the playbooks.
 
 ## Running a playbook
 
+**DO NOT RUN PLAYBOOKS DIRECTLY USING `ansible-playbook` AS DOING THIS WILL REMOVE ALL SHARED SECRETS AND BREAK YOUR DEPLOYMENT.**
+**PLEASE USE `bin/d4g-ansible` AS DETAILED BELOW**
+
 You can run a playbook using the following command :
 ```
 bin/d4g-ansible playbook playbooks/swarm-production.yml --diff --verbose

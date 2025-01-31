@@ -1,0 +1,44 @@
+---
+- name: Create d4g-penpot directory
+  file:
+    path: "/opt/d4g-penpot"
+    state: directory
+
+- name: Create d4g-penpot data directory
+  file:
+    path: "/opt/d4g-penpot/data"
+    state: directory
+
+- name: Creating d4g-penpot template
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-penpot/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - penpot.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-penpot
+  tags:
+    - pull
+  when: inventory_hostname == host_node
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-penpot
+  args:
+    chdir: /opt/d4g-penpot
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: penpot
+    data_dir: /opt/d4g-penpot/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == host_node

@@ -51,6 +51,9 @@
       - name: "noco"
         addresses: ["d4g-noco_app"]
         open_bar_cors: false
+      - name: "penpot"
+        addresses: ["d4g-penpot_app:8080"]
+        open_bar_cors: false
       - name: "people-api"
         addresses: ["d4g-people_backend"]
         open_bar_cors: false

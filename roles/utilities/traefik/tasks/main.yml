@@ -1,0 +1,30 @@
+---
+- name: Create traefik directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /opt/traefik
+    - /opt/traefik/config
+
+- name: Create traefik service definition
+  template:
+    src: "{{ item }}.j2"
+    dest: "/opt/traefik/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - docker-compose.yml
+    - config/config.yml
+
+- name: Apply traefik service definition
+  command: docker stack deploy --with-registry-auth -c /opt/traefik/docker-compose.yml traefik
+  args:
+    chdir: /opt/traefik
+  register: traefik_stack_output
+  changed_when: traefik_stack_output.stdout != "traefik"
+  when: is_swarm_leader | default(false)

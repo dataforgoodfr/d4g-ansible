@@ -121,7 +121,7 @@
       tags:
         - noco
         - service
-  
+
     - import_role:
         name: roles/services/d4g-penpot
       vars:
@@ -140,7 +140,7 @@
         - people
         - service
         - api
-  
+
     - import_role:
         name: roles/services/d4g-kano
       vars:
@@ -151,11 +151,35 @@
         - service
 
     - import_role:
-        name: roles/services/d4g-proxy
+        name: roles/utilities/traefik
       vars:
-        host_node: "metal-1.dataforgood.fr"
-        replicas: 1
+        base_domain: services.dataforgood.fr
+        services:
+          - name: "vaultwarden"
+            addresses: ["d4g-vaultwarden_app"]
+          - name: "n8n"
+            addresses: ["d4g-n8n_app"]
+          - name: "uptime"
+            addresses: ["d4g-uptime-kuma_app"]
+          - name: "outline"
+            addresses: ["d4g-outline_app"]
+          - name: "secondemain"
+            addresses: ["secondemain-metabase_app:3000"]
+          - name: "moodle"
+            addresses: ["d4g-moodle_app:8080"]
+          - name: "strapi"
+            addresses: ["d4g-strapi_app:1337"]
+          - name: "noco"
+            addresses: ["d4g-noco_app"]
+          - name: "penpot"
+            addresses: ["d4g-penpot_app:8080"]
+          - name: "people-api"
+            addresses: ["d4g-people_backend"]
+          - name: "people"
+            addresses: ["d4g-people_frontend"]
+          - name: "kano"
+            addresses: ["d4g-kano_app:8081"]
       tags:
         - proxy
-        - nginx
+        - traefik
         - service

@@ -1,0 +1,81 @@
+log:
+  level: "INFO"
+
+accessLog:
+  format: "json"
+  filters:
+    statusCodes:
+      - "200-299" # log successful http requests
+      - "400-599" # log failed http requests
+  # collect logs as in-memory buffer before writing into log file
+  bufferingSize: 0
+  fields:
+    headers:
+      defaultMode: drop # drop all headers per default
+      names:
+        User-Agent: keep
+        X-Forwarded-For: keep
+        X-Real-Ip: keep
+
+entrypoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: "webtls"
+          scheme: "https"
+          permanent: true
+
+  webtls:
+    address: ":443"
+
+providers:
+  file:
+    filename: /opt/traefik/config/config.yml
+    watch: true
+
+http:
+  middlewares:
+    basic-auth:
+      basicAuth:
+        users:
+          - "{{ lookup('env', 'BASIC_AUTH_USER') }}"
+
+  routers:
+{% for item in services %}
+    {{ item.name }}:
+      rule: "Host(`{{ item.name }}.{{ base_domain }}`)"
+      service: {{ item.name }}
+{% if item.middleware is defined and item.middleware %}
+      middlewares:
+{% for middleware in item.middleware %}
+        - {{ middleware }}
+{% endfor %}
+{% endif %}
+      entryPoints:
+        - webtls
+      tls:
+        domains:
+          - main: "{{ item.name }}.{{ base_domain }}"
+{% endfor %}
+
+  services:
+{% for item in services %}
+    {{ item.name }}:
+      loadBalancer:
+        servers:
+{% for address in item.addresses %}
+          - url: "http://{{ address }}"
+{% endfor %}
+{% endfor %}
+
+tls:
+  certificates:
+    - certFile: "/opt/certificates/le-fullchain.pem"
+      keyFile: "/opt/certificates/le-key.pem"
+  stores:
+    default:
+      defaultCertificate:
+        certFile: "/opt/certificates/le-fullchain.pem"
+        keyFile: "/opt/certificates/le-key.pem"

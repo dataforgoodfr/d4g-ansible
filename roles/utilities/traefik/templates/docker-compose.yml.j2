@@ -1,0 +1,29 @@
+services:
+  app:
+    image: "traefik:v3.2"
+    command:
+      - --configFile=/opt/traefik/config/config.yml
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+    networks:
+      - d4g-internal
+    volumes:
+      - type: bind
+        source: /opt/traefik/config/
+        target: /opt/traefik/config/
+        consistency: consistent
+      - "/opt/certificates:/opt/certificates"
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  d4g-internal:
+    external: true

@@ -1,93 +1,49 @@
-## Common flags:
-# demo-users
-# email-verification
-# log-emails
-# log-invitation-tokens
-# login-with-github
-# login-with-gitlab
-# login-with-google
-# login-with-ldap
-# login-with-oidc
-# login-with-password
-# prepl-server
-# registration
-# secure-session-cookies
-# smtp
-# smtp-debug
-# telemetry
-# webhooks
-##
-## You can read more about all available flags and other
-## environment variables here:
-## https://help.penpot.app/technical-guide/configuration/#advanced-configuration
-#
-# WARNING: if you're exposing Penpot to the internet, you should remove the flags
-# 'disable-secure-session-cookies' and 'disable-email-verification'
-x-flags: &penpot-flags
-  PENPOT_FLAGS: enable-smtp enable-prepl-server
-
-x-uri: &penpot-public-uri
-  PENPOT_PUBLIC_URI: https://penpot.services.dataforgood.fr
-
-x-body-size: &penpot-http-body-size
-  # Max body size (30MiB); Used for plain requests, should never be
-  # greater than multi-part size
-  PENPOT_HTTP_SERVER_MAX_BODY_SIZE: 31457280
-
-  # Max multipart body size (350MiB)
-  PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE: 367001600
-
-volumes:
-  penpot_assets:
-
 services:
   app:
     image: "penpotapp/frontend:latest"
     restart: always
-    ports:
-      - 9001:8080
-
-    depends_on:
-      - penpot-backend
-      - penpot-exporter
-
+    env_file: './penpot.env'
     networks:
       - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
 
-    environment:
-      << : [*penpot-flags, *penpot-http-body-size]
-
-  penpot-backend:
+  backend:
     image: "penpotapp/backend:latest"
     env_file: './penpot.env'
-    environment:
-      << : [*penpot-flags, *penpot-public-uri, *penpot-http-body-size]
-
-    restart: always
-
-    depends_on:
-      - penpot-redis
-
     networks:
       - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
 
-  penpot-exporter:
+  exporter:
     image: "penpotapp/exporter:latest"
-    restart: always
     networks:
       - d4g-internal
-    
     environment:
-      # Don't touch it; this uses an internal docker network to
-      # communicate with the frontend.
-      PENPOT_PUBLIC_URI: http://penpot-frontend:8080
+      # Use swarm d4g-internal network for communication between services, not public internet
+      PENPOT_PUBLIC_URI: http://d4g-penpot_frontend:8080
+      # Redis is used for the websockets notifications.
+      PENPOT_REDIS_URI: redis://d4g-penpot_redis/0
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
 
-      ## Redis is used for the websockets notifications.
-      PENPOT_REDIS_URI: redis://penpot-redis/0
-
-  penpot-redis:
+  redis:
     image: redis:7.2
-    restart: always
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
     networks:
       - d4g-internal
 

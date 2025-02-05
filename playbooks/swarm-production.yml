@@ -52,7 +52,7 @@
     - import_role:
         name: roles/services/d4g-moodle
       vars:
-        host_node: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
       tags:
         - moodle
@@ -61,7 +61,7 @@
     - import_role:
         name: roles/services/d4g-outline
       vars:
-        host_node: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
       tags:
         - outline
@@ -70,7 +70,7 @@
     - import_role:
         name: roles/services/d4g-n8n
       vars:
-        host_node: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
         - n8n
@@ -79,7 +79,7 @@
     - import_role:
         name: roles/services/d4g-uptime-kuma
       vars:
-        host_node: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
       tags:
         - uptime-kuma
@@ -88,26 +88,16 @@
     - import_role:
         name: roles/services/d4g-vaultwarden
       vars:
-        host_node: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
         - vaultwarden
         - service
 
     - import_role:
-        name: roles/services/secondemain-metabase
-      vars:
-        host_node: "metal-1.dataforgood.fr"
-        replicas: 1
-      tags:
-        - saison12
-        - secondemain
-        - service
-
-    - import_role:
         name: roles/services/d4g-strapi
       vars:
-        host_node: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
         - strapi
@@ -116,7 +106,7 @@
     - import_role:
         name: roles/services/d4g-noco
       vars:
-        host_node: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
       tags:
         - noco
@@ -125,7 +115,7 @@
     - import_role:
         name: roles/services/d4g-penpot
       vars:
-        host_node: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
       tags:
         - penpot
@@ -134,7 +124,7 @@
     - import_role:
         name: roles/services/d4g-people
       vars:
-        host_node: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
         - people
@@ -144,7 +134,7 @@
     - import_role:
         name: roles/services/d4g-kano
       vars:
-        host_node: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
         - kano
@@ -163,8 +153,6 @@
             addresses: ["d4g-uptime-kuma_app"]
           - name: "outline"
             addresses: ["d4g-outline_app"]
-          - name: "secondemain"
-            addresses: ["secondemain-metabase_app:3000"]
           - name: "moodle"
             addresses: ["d4g-moodle_app:8080"]
           - name: "strapi"

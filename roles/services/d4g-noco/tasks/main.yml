@@ -23,7 +23,7 @@
     chdir: /opt/d4g-noco
   tags:
     - pull
-  when: inventory_hostname == host_node
+  when: inventory_hostname == deploy_on
 
 - name: Up
   command: docker stack deploy -c docker-compose.yml d4g-noco
@@ -41,4 +41,4 @@
   tags:
     - backup
     - service
-  when: inventory_hostname == host_node
+  when: inventory_hostname == deploy_on

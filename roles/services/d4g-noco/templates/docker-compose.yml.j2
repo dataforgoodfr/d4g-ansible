@@ -10,7 +10,7 @@ services:
       replicas: {{ replicas }}
       placement:
         constraints:
-          - node.hostname == {{ host_node }}
+          - node.hostname == {{ deploy_on }}
 
   redis:
     image: redis
@@ -26,7 +26,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - node.hostname == {{ host_node }}
+          - node.hostname == {{ deploy_on }}
 
 networks:
   d4g-internal:

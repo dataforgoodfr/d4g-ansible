@@ -20,7 +20,7 @@
     chdir: /opt/d4g-outline
   tags:
     - pull
-  when: inventory_hostname == host_node
+  when: inventory_hostname == deploy_on
 
 - name: Up
   command: docker stack deploy -c docker-compose.yml d4g-outline

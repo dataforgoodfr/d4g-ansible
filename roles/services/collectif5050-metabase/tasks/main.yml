@@ -1,0 +1,29 @@
+---
+- name: Create collectif5050-metabase directory
+  file:
+    path: /opt/collectif5050-metabase
+    state: directory
+
+- name: Create collectif5050-metabase files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/collectif5050-metabase/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - collectif5050-metabase.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/collectif5050-metabase
+  tags:
+    - pull
+  when: inventory_hostname == host_node
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml collectif5050-metabase
+  args:
+    chdir: /opt/collectif5050-metabase
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

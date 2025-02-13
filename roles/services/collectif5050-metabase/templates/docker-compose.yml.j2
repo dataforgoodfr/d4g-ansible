@@ -1,0 +1,15 @@
+services:
+  app:
+    image: metabase/metabase:latest
+    env_file: ./secondemain-metabase.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ host_node }}
+
+networks:
+  d4g-internal:
+    external: true

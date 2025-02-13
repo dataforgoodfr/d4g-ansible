@@ -141,6 +141,15 @@
         - service
 
     - import_role:
+        name: roles/services/c-metabase
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - collectif5050
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -167,6 +176,8 @@
             addresses: ["d4g-people_frontend"]
           - name: "kano"
             addresses: ["d4g-kano_app:8081"]
+          - name: "collectif5050"
+            addresses: ["collectif5050-metabase_app:3000"]
       tags:
         - proxy
         - traefik

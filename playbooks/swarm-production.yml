@@ -141,7 +141,7 @@
         - service
 
     - import_role:
-        name: roles/services/c-metabase
+        name: roles/services/collectif5050-metabase
       vars:
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1

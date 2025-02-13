@@ -18,7 +18,7 @@
     chdir: /opt/collectif5050-metabase
   tags:
     - pull
-  when: inventory_hostname == host_node
+  when: inventory_hostname == deploy_on
 
 - name: Up
   command: docker stack deploy -c docker-compose.yml collectif5050-metabase

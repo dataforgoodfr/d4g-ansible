@@ -26,3 +26,10 @@
 
 - include_tasks: swarm_worker.yml
   when: use_swarm and not is_swarm_leader
+
+- name: Add system prune cron every day
+  cron:
+    name: "Docker system prune"
+    minute: "0"
+    hour: "3"
+    job: "docker system prune -f"

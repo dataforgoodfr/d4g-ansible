@@ -1,0 +1,55 @@
+- name: Create d4g-mattermost directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/d4g-mattermost
+    - /opt/d4g-mattermost/data
+    - /opt/d4g-mattermost/data/config
+    - /opt/d4g-mattermost/data/data
+    - /opt/d4g-mattermost/data/logs
+    - /opt/d4g-mattermost/data/plugins
+    - /opt/d4g-mattermost/data/client/plugins
+    - /opt/d4g-mattermost/data/bleve-indexes
+
+- name: Recursively change ownership of data directory
+  file:
+    path: /opt/d4g-mattermost/data
+    state: directory
+    recurse: yes
+    owner: 2000
+    group: 2000
+
+- name: Create d4g-mattermost files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-mattermost/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - mattermost.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-mattermost
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-mattermost
+  args:
+    chdir: /opt/d4g-mattermost
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: mattermost
+    data_dir: /opt/d4g-mattermost/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

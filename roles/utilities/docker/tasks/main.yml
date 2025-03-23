@@ -33,3 +33,9 @@
     minute: "0"
     hour: "3"
     job: "docker system prune -f"
+
+- name: Create alias for debug container
+  lineinfile:
+    dest: /root/.bashrc
+    line: "alias debug='docker run -it --name=debug --rm --network d4g-internal ghcr.io/quickpipes/docktor:latest'"
+    create: yes

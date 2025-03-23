@@ -1,0 +1,36 @@
+services:
+  app:
+    image: mattermost/mattermost-enterprise-edition:9.11.6
+    tmpfs:
+      - /tmp
+    volumes:
+      - /opt/d4g-mattermost/data/config:/mattermost/config
+      - /opt/d4g-mattermost/data/data:/mattermost/data
+      - /opt/d4g-mattermost/data/logs:/mattermost/logs
+      - /opt/d4g-mattermost/data/plugins:/mattermost/plugins
+      - /opt/d4g-mattermost/data/client/plugins:/mattermost/client/plugins
+      - /opt/d4g-mattermost/data/bleve-indexes:/mattermost/bleve-indexes
+    env_file:
+      - mattermost.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true
+
+# If you use rolling image tags and feel lucky watchtower can automatically pull new images and
+# instantiate containers from it. https://containrrr.dev/watchtower/
+# Please keep in mind watchtower will have access on the docker socket. This can be a security risk.
+#
+#  watchtower:
+#    container_name: watchtower
+#    image: containrrr/watchtower:latest
+#    restart: unless-stopped
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock

@@ -1,0 +1,51 @@
+---
+- name: Create d4g-plausible directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/d4g-plausible
+    - /opt/d4g-plausible/events-config
+    - /opt/d4g-plausible/data
+    - /opt/d4g-plausible/data/event-data
+    - /opt/d4g-plausible/data/event-logs
+    - /opt/d4g-plausible/data/plausible
+
+- name: Chown plausible data dir
+  file:
+    path: /opt/d4g-plausible/data
+    owner: 999
+    group: 999
+    recurse: yes
+
+- name: Creating d4g-plausible templates
+  template:
+    src: "{{ item.src }}"
+    dest: "/opt/d4g-plausible/{{ item.dst }}"
+  with_items:
+    - { src: "docker-compose.yml.j2", dst: "docker-compose.yml" }
+    - { src: "plausible.env.j2", dst: "plausible.env" }
+    - {
+        src: "events-config/ipv4-only.xml.j2",
+        dst: "events-config/ipv4-only.xml",
+      }
+    - {
+        src: "events-config/low-resources.xml.j2",
+        dst: "events-config/low-resources.xml",
+      }
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-plausible
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-plausible
+  args:
+    chdir: /opt/d4g-plausible
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

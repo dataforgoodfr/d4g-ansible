@@ -1,0 +1,43 @@
+services:
+  events:
+    image: clickhouse/clickhouse-server:25.3-alpine
+    env_file:
+      - /opt/d4g-plausible/plausible.env
+    volumes:
+      - /opt/d4g-plausible/data/event-data:/var/lib/clickhouse
+      - /opt/d4g-plausible/events-config:/etc/clickhouse-server/config.d/
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - d4g-internal
+    user: "999:999"
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  app:
+    image: ghcr.io/plausible/community-edition:v2.1.5
+    env_file:
+      - /opt/d4g-plausible/plausible.env
+    command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
+    volumes:
+      - /opt/d4g-plausible/data/plausible:/var/lib/plausible
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

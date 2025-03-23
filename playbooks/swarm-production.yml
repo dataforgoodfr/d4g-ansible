@@ -150,6 +150,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-plausible
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - plausible
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -178,6 +187,8 @@
             addresses: ["d4g-kano_app:8081"]
           - name: "collectif5050"
             addresses: ["collectif5050-metabase_app:3000"]
+          - name: "plausible"
+            addresses: ["d4g-plausible_app:80"]
       tags:
         - proxy
         - traefik

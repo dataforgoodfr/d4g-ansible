@@ -168,6 +168,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-authentik
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - authentik
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -200,6 +209,8 @@
             addresses: ["d4g-plausible_app"]
           - name: "mattermost"
             addresses: ["d4g-mattermost_app:8065"]
+          - name: "authentik"
+            addresses: ["d4g-authentik_app"]
       tags:
         - proxy
         - traefik

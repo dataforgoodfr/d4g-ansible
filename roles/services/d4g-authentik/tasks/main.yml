@@ -1,0 +1,39 @@
+---
+- name: Create d4g-authentik directory
+  file:
+    path: /opt/d4g-authentik
+    state: directory
+
+- name: Create d4g-authentik files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-authentik/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - authentik.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-authentik
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-authentik
+  args:
+    chdir: /opt/d4g-authentik
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: authentik
+    data_dir: /opt/d4g-authentik/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

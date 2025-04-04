@@ -1,0 +1,31 @@
+---
+- name: Create ecoskills-outline directory
+  file:
+    path: /opt/ecoskills-outline
+    state: directory
+
+- name: Creating ecoskills-outline template
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/ecoskills-outline/docker-compose.yml
+
+- name: Create ecoskills-outline env file
+  template:
+    src: "outline.env.j2"
+    dest: /opt/ecoskills-outline/outline.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/ecoskills-outline
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml ecoskills-outline
+  args:
+    chdir: /opt/ecoskills-outline
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

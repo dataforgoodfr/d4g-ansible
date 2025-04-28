@@ -4,8 +4,6 @@ services:
     env_file: ./d4g-metabase.env
     networks:
       - d4g-internal
-    ports:
-      - 3000:3001
     deploy:
       replicas: {{ replicas }}
       placement:

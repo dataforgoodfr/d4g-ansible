@@ -177,6 +177,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-metabase
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4gmetabase
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -205,6 +214,8 @@
             addresses: ["d4g-kano_app:8081"]
           - name: "collectif5050"
             addresses: ["collectif5050-metabase_app:3000"]
+          - name: "metabase"
+            addresses: ["d4g-metabase_app:3001"]
           - name: "plausible"
             addresses: ["d4g-plausible_app"]
           - name: "mattermost"

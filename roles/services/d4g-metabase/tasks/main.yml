@@ -1,0 +1,29 @@
+---
+- name: Create d4g-metabase directory
+  file:
+    path: /opt/d4g-metabase
+    state: directory
+
+- name: Create d4g-metabase files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-metabase/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - d4g-metabase.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-metabase
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-metabase
+  args:
+    chdir: /opt/d4g-metabase
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

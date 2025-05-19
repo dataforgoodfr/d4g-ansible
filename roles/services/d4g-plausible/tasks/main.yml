@@ -50,12 +50,12 @@
     - up
   when: is_swarm_leader | default(false)
 
-- import_role:
-    name: roles/utilities/s3-backup
-  vars:
-    service_name: plausible
-    data_dir: /opt/d4g-plausible/data
-  tags:
-    - backup
-    - service
-  when: inventory_hostname == deploy_on
+# - import_role:
+#     name: roles/utilities/s3-backup
+#   vars:
+#     service_name: plausible
+#     data_dir: /opt/d4g-plausible/data
+#   tags:
+#     - backup
+#     - service
+#   when: inventory_hostname == deploy_on

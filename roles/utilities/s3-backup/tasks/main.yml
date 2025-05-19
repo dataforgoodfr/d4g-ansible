@@ -7,10 +7,16 @@
     group: root
     mode: 0600
 
+- name: Set backup start hour
+  set_fact:
+    start_hour: "{{ 2 + (5 | random(seed=service_name)) }}"
+  tags:
+    - always
+
 - name: Create cron to run the d4g-s3-backup docker image
   cron:
     name: "backup-{{ service_name }}"
     minute: "{{ 59 |random(seed=service_name) }}"
-    hour: 3
+    hour: "{{ start_hour }}"
     job: "((/usr/bin/docker run --rm --env-file=/opt/backups.env -v {{ data_dir }}:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --service-name={{ service_name }} && slack-notifier '💾 Successfully backed up {{ service_name }}') || slack-notifier '❌ An error occurred backing up {{ service_name }}' ) 2>&1 | logger -t backup_{{ service_name }}"
     state: present

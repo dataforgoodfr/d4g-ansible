@@ -42,3 +42,18 @@
     - backup
     - service
   when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-noco
+    service_dir: /opt/d4g-noco
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: noco
+    pgsql_password: "{{ lookup('env', 'NC_DB_PASSWORD') }}"
+    pgsql_database: noco
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

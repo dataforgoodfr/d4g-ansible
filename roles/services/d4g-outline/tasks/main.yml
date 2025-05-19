@@ -29,3 +29,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-outline
+    service_dir: /opt/d4g-outline
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: outline
+    pgsql_password: "{{ lookup('env', 'OUTLINE_DB_PASSWORD') }}"
+    pgsql_database: outline
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

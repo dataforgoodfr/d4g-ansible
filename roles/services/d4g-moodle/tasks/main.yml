@@ -46,3 +46,18 @@
     - backup
     - service
   when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-moodle
+    service_dir: /opt/d4g-moodle
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: moodle
+    pgsql_password: "{{ lookup('env', 'MOODLE_DATABASE_PASSWORD') }}"
+    pgsql_database: moodle
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

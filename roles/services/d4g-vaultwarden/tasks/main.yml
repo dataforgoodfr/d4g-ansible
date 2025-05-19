@@ -37,3 +37,18 @@
     - backup
     - service
   when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-vaultwarden
+    service_dir: /opt/d4g-vaultwarden
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: vaultwarden
+    pgsql_password: "{{ lookup('env', 'VAULTWARDEN_DB_PASSWORD') }}"
+    pgsql_database: vaultwarden
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

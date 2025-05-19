@@ -42,3 +42,18 @@
     - backup
     - service
   when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-n8n
+    service_dir: /opt/d4g-n8n
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: n8n
+    pgsql_password: "{{ lookup('env', 'N8N_DB_PASSWORD') }}"
+    pgsql_database: n8n
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SOURCE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+NEW_DIR="${SOURCE}/sql-backup-new"
+EXISTING_DIR="${SOURCE}/sql-backup"
+mkdir -p "$NEW_DIR"
+
+# PostgreSQL backup using Docker container
+docker run --rm \
+  -e PGPASSWORD="{{ pgsql_password }}" \
+  postgres:15 \
+  pg_dump \
+  -h {{ pgsql_host }} \
+  -p {{ pgsql_port }} \
+  -U {{ pgsql_user }} \
+  -d {{ pgsql_database }} \
+  --format=plain \
+  --if-exists \
+  --clean > "$NEW_DIR/backup-$(date +%Y-%m-%d).sql"
+
+# Only remove old backup if new backup succeeded
+rm -rf "$EXISTING_DIR"
+mv "$NEW_DIR" "$EXISTING_DIR"
+
+echo "Backup completed successfully"

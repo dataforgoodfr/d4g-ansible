@@ -1,0 +1,34 @@
+- name: Create SQL backup script
+  template:
+    src: "backup.sh.j2"
+    dest: "{{ service_dir }}/sql-backup.sh"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Set backup start hour
+  set_fact:
+    start_hour: "{{ 1 + (5 | random(seed=service)) }}"
+  tags:
+    - always
+
+- name: Create cron job for logical backup
+  cron:
+    name: "sql-backup-{{ service }}"
+    minute: "{{ 59 | random(seed=service) }}"
+    hour: "{{ start_hour }}"
+    job: "{{ service_dir }}/sql-backup.sh"
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: "{{ service }}-sql"
+    data_dir: "{{ service_dir }}/sql-backup"
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

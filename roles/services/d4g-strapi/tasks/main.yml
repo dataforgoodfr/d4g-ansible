@@ -27,3 +27,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-strapi
+    service_dir: /opt/d4g-strapi
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: strapi
+    pgsql_password: "{{ lookup('env', 'STRAPI_DB_PASSWORD') }}"
+    pgsql_database: strapi
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

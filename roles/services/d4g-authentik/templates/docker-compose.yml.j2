@@ -1,7 +1,7 @@
 ---
 
 services:
-  redis:
+  redisauthentik:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
     container_name: authentik-redis

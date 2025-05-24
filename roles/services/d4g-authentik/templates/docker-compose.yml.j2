@@ -4,6 +4,7 @@ services:
   redis:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
+    container_name: authentik-redis
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]

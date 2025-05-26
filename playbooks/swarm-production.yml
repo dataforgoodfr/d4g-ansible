@@ -113,6 +113,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-grist
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - grist
+        - service
+
+    - import_role:
         name: roles/services/d4g-penpot
       vars:
         deploy_on: "metal-2.dataforgood.fr"
@@ -213,6 +222,8 @@
             addresses: ["d4g-strapi_app:1337"]
           - name: "noco"
             addresses: ["d4g-noco_app"]
+          - name: "grist"
+            addresses: ["d4g-grist_app"]
           - name: "penpot"
             addresses: ["d4g-penpot_app:8080"]
           # - name: "people-api"

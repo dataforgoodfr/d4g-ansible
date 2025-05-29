@@ -20,7 +20,7 @@
 - name: Create d4g-authentik files
   template:
     src: "{{ item }}.j2"
-    dest: /opt/d4g-authentik/branding/{{ item }}
+    dest: /opt/d4g-authentik/branding/{{ item }}
   with_items:
     - logo-dfg.png
 

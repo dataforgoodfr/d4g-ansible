@@ -4,6 +4,11 @@
     path: /opt/d4g-authentik
     state: directory
 
+- name: Create d4g-authentik directory
+  file:
+    path: /opt/d4g-authentik/branding
+    state: directory
+
 - name: Create d4g-authentik files
   template:
     src: "{{ item }}.j2"
@@ -11,6 +16,13 @@
   with_items:
     - docker-compose.yml
     - authentik.env
+
+- name: Create d4g-authentik files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-authentik/branding/{{ item }}
+  with_items:
+    - logo-dfg.png
 
 - name: Pull
   command: docker compose pull

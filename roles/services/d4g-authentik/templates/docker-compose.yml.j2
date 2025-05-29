@@ -26,6 +26,8 @@ services:
     image: ghcr.io/goauthentik/server:2025.2.3
     command: server
     env_file: authentik.env
+    volumes:
+      - ./branding/d4g_icon.png:/web/dist/assets/icons/icon_left_brand.png # Add the brand icon in the ./branding folder next to your docker-compose
     networks:
       - d4g-internal
     deploy:

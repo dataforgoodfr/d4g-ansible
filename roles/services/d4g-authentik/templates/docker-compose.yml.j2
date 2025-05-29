@@ -27,7 +27,7 @@ services:
     command: server
     env_file: authentik.env
     volumes:
-      - ./branding/d4g_icon.png:/web/dist/assets/icons/icon_left_brand.png # Add the brand icon in the ./branding folder next to your docker-compose
+      - ./branding/logo-dfg.png:/web/dist/assets/icons/icon_left_brand.png # Add the brand icon in the ./branding folder next to your docker-compose
     networks:
       - d4g-internal
     deploy:

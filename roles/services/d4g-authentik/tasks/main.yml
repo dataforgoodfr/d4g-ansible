@@ -23,6 +23,7 @@
     dest: /opt/d4g-authentik/branding/{{ item }}
   with_items:
     - logo-dfg.png
+    - favicon.png
 
 - name: Pull
   command: docker compose pull

@@ -28,7 +28,7 @@ services:
     env_file: authentik.env
     volumes:
       - ./branding/logo-dfg.png:/web/dist/assets/icons/icon_left_brand.png # by default it's a .jpg
-      - ./branding/favicon.png:/static/dist/assets/icons/icon.png
+      - ./branding/favicon.png:/static/dist/assets/icons/d4gicon.png
     networks:
       - d4g-internal
     deploy:

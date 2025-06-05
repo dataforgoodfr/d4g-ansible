@@ -9,26 +9,26 @@
 - name: Set backup start hour
   set_fact:
     start_hour: "{{ 1 + (5 | random(seed=service)) }}"
+    s3_start_hour: "{{ 2 + (5 | random(seed=service)) }}"
   tags:
     - always
 
+# This creates {{ service_dir }}/sql-backup/backup-YYYY-MM-DD.sql
 - name: Create cron job for logical backup
   cron:
     name: "sql-backup-{{ service }}"
     minute: "{{ 59 | random(seed=service) }}"
     hour: "{{ start_hour }}"
-    job: "{{ service_dir }}/sql-backup.sh"
+    job: "({{ service_dir }}/sql-backup.sh || slack-notifier '❌ An error occurred creating SQL logical backup for {{ service }}' ) 2>&1 | logger -t sql_backup_{{ service }}"
   tags:
     - backup
     - service
   when: inventory_hostname == deploy_on
 
-- import_role:
-    name: roles/utilities/s3-backup
-  vars:
-    service_name: "{{ service }}-sql"
-    data_dir: "{{ service_dir }}/sql-backup"
-  tags:
-    - backup
-    - service
-  when: inventory_hostname == deploy_on
+- name: Create cron to run the d4g-s3-backup docker image
+  cron:
+    name: "sql-backup-{{ service }}-s3"
+    minute: "{{ 59 |random(seed=service) }}"
+    hour: "{{ s3_start_hour }}"
+    job: "((/usr/bin/docker run --rm --env-file=/opt/backups.env -v {{ service_dir }}/sql-backup:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --service-name={{ service }} && slack-notifier '💾 Successfully backed up {{ service }}-sql') || slack-notifier '❌ An error occurred uploading backup for {{ service }}-sql' ) 2>&1 | logger -t sql_backup_{{ service }}"
+    state: present

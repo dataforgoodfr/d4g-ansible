@@ -23,7 +23,7 @@ services:
           - node.hostname == {{ deploy_on }}
 
   app:
-    image: ghcr.io/goauthentik/server:2025.2.3
+    image: ghcr.io/goauthentik/server:2025.6.0
     command: server
     env_file: authentik.env
     volumes:

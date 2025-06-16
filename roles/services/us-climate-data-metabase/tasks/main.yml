@@ -1,0 +1,29 @@
+---
+- name: Create us-climate-data-metabase directory
+  file:
+    path: /opt/us-climate-data-metabase
+    state: directory
+
+- name: Create us-climate-data-metabase files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/us-climate-data-metabase/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - us-climate-data-metabase.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/us-climate-data-metabase
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml us-climate-data-metabase
+  args:
+    chdir: /opt/us-climate-data-metabase
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

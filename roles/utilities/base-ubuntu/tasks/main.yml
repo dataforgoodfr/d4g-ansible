@@ -60,7 +60,6 @@
       - "git"
       - "gpg"
       - "htop"
-      - "htop"
       - "jq"
       - "less"
       - "procps"

@@ -1,7 +1,6 @@
 ---
 - name: Initial configuration
   hosts: production_swarm_cluster_nodes
-  remote_user: ubuntu
   become: true
 
   tasks:
@@ -12,7 +11,6 @@
 
 - name: Create swarm workers
   hosts: production_swarm_cluster_nodes
-  remote_user: root
 
   tasks:
     - import_role:
@@ -34,7 +32,6 @@
 
 - name: Create swarm applications
   hosts: production_swarm_cluster_nodes
-  remote_user: root
 
   tasks:
     - import_role:
@@ -223,3 +220,54 @@
         - proxy
         - traefik
         - service
+
+    - import_role:
+        name: roles/utilities/pgbouncer
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+        databases:
+          - username: authentik
+            dbname: authentik
+            password: "{{ lookup('env', 'AUTHENTIK_DB_PASSWORD') }}"
+          - username: mattermost
+            dbname: mattermost
+            password: "{{ lookup('env', 'MATTERMOST_DB_PASSWORD') }}"
+            pool_size: 20
+            reserve_pool: 10
+          - username: vaultwarden
+            dbname: vaultwarden
+            password: "{{ lookup('env', 'VAULTWARDEN_DB_PASSWORD') }}"
+          - username: outline
+            dbname: outline
+            password: "{{ lookup('env', 'OUTLINE_DB_PASSWORD') }}"
+          - username: strapi
+            dbname: strapi
+            password: "{{ lookup('env', 'STRAPI_DB_PASSWORD') }}"
+          - username: noco
+            dbname: noco
+            password: "{{ lookup('env', 'NC_DB_PASSWORD') }}"
+          - username: moodle
+            dbname: moodle
+            password: "{{ lookup('env', 'MOODLE_DATABASE_PASSWORD') }}"
+          - username: penpot
+            dbname: penpot
+            password: "{{ lookup('env', 'PENPOT_DATABASE_PASSWORD') }}"
+          - username: us-climate-data
+            dbname: us-climate-data
+            password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
+          - username: reveler_inegalites_cinema
+            dbname: reveler_inegalites_cinema
+            password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
+          - username: reveler_inegalites_cinema
+            dbname: reveler_inegalites_cinema
+            password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
+          - username: d4g_analytics
+            dbname: d4g_analytics
+            password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
+          - username: odis
+            dbname: odis
+            password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
+      tags:
+        - pgbouncer
+        - utilities

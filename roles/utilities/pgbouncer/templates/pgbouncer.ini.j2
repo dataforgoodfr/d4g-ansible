@@ -1,0 +1,20 @@
+[pgbouncer]
+listen_addr = 0.0.0.0
+listen_port = 6432
+logfile = /dev/stdout
+pidfile = /dev/null
+admin_users = pgbouncer_admin
+max_client_conn = 500
+default_pool_size = 10
+reserve_pool_size = 5
+reserve_pool_timeout = 2.0
+pool_mode = transaction
+server_reset_query = DISCARD ALL
+auth_type = md5
+auth_file = /etc/pgbouncer/userlist.txt
+
+[databases]
+
+{% for db in databases %}
+{{ db.username }} = host={{ lookup('env', 'POLETECH_DB_HOST') }} port={{ lookup('env', 'POLETECH_DB_PORT') }} dbname={{ db.dbname }} user={{ db.username }} pool_size={{ db.pool_size if db.pool_size is defined else 10 }} reserve_pool={{ db.reserve_pool if db.reserve_pool is defined else 2 }}
+{% endfor %}

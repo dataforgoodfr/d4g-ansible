@@ -1,0 +1,17 @@
+services:
+  app:
+    image: bitnami/pgbouncer:latest
+    networks:
+      - d4g-internal
+    volumes:
+     - /opt/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+     - /opt/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

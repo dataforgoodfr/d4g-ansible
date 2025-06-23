@@ -1,0 +1,3 @@
+{% for db in databases %}
+"{{ db.username }}" "md5{{ db.password | hash('md5') }}"
+{% endfor %}

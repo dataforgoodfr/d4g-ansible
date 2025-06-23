@@ -3,6 +3,9 @@ services:
     image: bitnami/pgbouncer:latest
     networks:
       - d4g-internal
+    environment:
+      PGBOUNCER_CONF_FILE: /etc/pgbouncer/pgbouncer.ini
+      PGBOUNCER_AUTH_FILE: /etc/pgbouncer/userlist.txt
     volumes:
      - /opt/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
      - /opt/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt

@@ -259,9 +259,6 @@
           - username: reveler_inegalites_cinema
             dbname: reveler_inegalites_cinema
             password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
-          - username: reveler_inegalites_cinema
-            dbname: reveler_inegalites_cinema
-            password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
           - username: d4g_analytics
             dbname: d4g_analytics
             password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"

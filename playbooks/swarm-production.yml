@@ -224,7 +224,7 @@
     - import_role:
         name: roles/utilities/pgbouncer
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
         databases:
           - username: authentik

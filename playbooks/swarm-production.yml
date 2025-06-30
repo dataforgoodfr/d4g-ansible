@@ -185,6 +185,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-13-potentiel-solaire
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-13-potentiel-solaire
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -219,6 +228,8 @@
             addresses: ["d4g-authentik_app"]
           - name: "us-climate-data"
             addresses: ["us-climate-data-metabase_app:3000"]
+          - name: "d4g-13-potentiel-solaire"
+            addresses: ["d4g-13-potentiel-solaire_app:3000"]
       tags:
         - proxy
         - traefik

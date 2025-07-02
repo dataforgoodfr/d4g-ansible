@@ -1,0 +1,22 @@
+- name: Copy restore script
+  copy:
+    src: restore.sh
+    dest: /usr/local/bin/pg_restore_test.sh
+    mode: 0755
+
+- name: Run restore script
+  shell: |
+    PG_RESTORE_APPS="{{ pg_restore_apps | join(',') }}" \
+    S3_BUCKET="{{ pg_restore_bucket }}" \
+    /usr/local/bin/pg_restore_test.sh
+  environment:
+    AWS_REGION: eu-west-3
+
+- name: Ensure weekly PG restore test cron job
+  cron:
+    name: "Weekly PG restore test for Outline & NocoDB"
+    user: root
+    job: "/usr/local/bin/pg_restore_test.sh >> /var/log/pg_restore_test.log 2>&1"
+    weekday: 0
+    hour: 3
+    minute: 0

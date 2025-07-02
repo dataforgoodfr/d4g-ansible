@@ -32,6 +32,16 @@
         - datadog
         - utils
 
+- name: Run PG restore tests (Outline & NocoDB)
+  hosts: production_swarm_cluster_nodes
+  remote_user: root
+  tags:
+    - pg-restore-test
+
+  tasks:
+    - import_role:
+        name: roles/utilities/pg-restore-test
+
 - name: Create swarm applications
   hosts: production_swarm_cluster_nodes
   remote_user: root
@@ -47,8 +57,8 @@
         notification_mail_to: proxyd4g@quickpipes.io
       when: is_swarm_leader | default(false)
       tags:
-        - acme
-
+        - acme  
+         
     - import_role:
         name: roles/services/d4g-moodle
       vars:

@@ -1,0 +1,4 @@
+pg_restore_apps:
+  - outline
+  - nocodb
+pg_restore_bucket: d4g-backups-prod

@@ -1,0 +1,14 @@
+services:
+  app:
+    image: ghcr.io/dataforgoodfr/13_potentiel_solaire_app:latest
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

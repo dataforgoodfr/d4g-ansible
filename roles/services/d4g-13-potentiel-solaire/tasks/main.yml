@@ -1,0 +1,26 @@
+---
+- name: Create d4g-13-potentiel-solaire directory
+  file:
+    path: /opt/d4g-13-potentiel-solaire
+    state: directory
+
+- name: Creating d4g-13-potentiel-solaire template
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/d4g-13-potentiel-solaire/docker-compose.yml
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-13-potentiel-solaire
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-13-potentiel-solaire
+  args:
+    chdir: /opt/d4g-13-potentiel-solaire
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

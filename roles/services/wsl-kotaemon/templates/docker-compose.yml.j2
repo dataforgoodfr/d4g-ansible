@@ -1,0 +1,35 @@
+services:
+  kotaemon:
+    image:
+    pull_policy: if_not_present
+    entrypoint: ["/bin/sh", "-c", "pip install -e /app/taxonomy && tail -f /dev/null"]
+    environment:
+      GRADIO_SERVER_NAME: 0.0.0.0
+      GRADIO_SERVER_PORT: 7860
+      OLLAMA_DEPLOYMENT: docker
+      VECTOR_STORE_DEPLOYMENT: docker
+      # PDF_FOLDER:
+    ports:
+      - '7860:7860'
+    depends_on:
+      - ollama
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  ollama:
+    image : ollama/ollama
+    container_name: ollama
+    ports:
+      - '11434:11434'
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

@@ -192,14 +192,14 @@
       tags:
         - d4g-13-potentiel-solaire
         - service
-        -
+
     - import_role:
         name: roles/services/d4g-13-wsl-kotaemon
       vars:
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
-        - d4g-13-wsl
+        - 13-wsl
         - service
 
     - import_role:

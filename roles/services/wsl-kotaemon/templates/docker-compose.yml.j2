@@ -5,12 +5,8 @@ services:
     entrypoint: ["/bin/sh", "-c", "pip install -e /app/taxonomy && tail -f /dev/null"]
     environment:
       GRADIO_SERVER_NAME: 0.0.0.0
-      GRADIO_SERVER_PORT: 7860
+      GRADIO_SERVER_PORT: 8080
       OLLAMA_DEPLOYMENT: docker
-      VECTOR_STORE_DEPLOYMENT: docker
-      # PDF_FOLDER:
-    ports:
-      - '7860:7860'
     depends_on:
       - ollama
     deploy:

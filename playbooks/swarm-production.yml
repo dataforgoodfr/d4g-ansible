@@ -192,6 +192,15 @@
       tags:
         - d4g-13-potentiel-solaire
         - service
+        -
+    - import_role:
+        name: roles/services/d4g-13-wsl-kotaemon
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-13-wsl
+        - service
 
     - import_role:
         name: roles/utilities/traefik
@@ -230,6 +239,8 @@
             addresses: ["us-climate-data-metabase_app:3000"]
           - name: "d4g-13-potentiel-solaire"
             addresses: ["d4g-13-potentiel-solaire_app:3000"]
+          - name: "13-wsl"
+            addresses: ["wsl-kotaemon:8080"]
       tags:
         - proxy
         - traefik

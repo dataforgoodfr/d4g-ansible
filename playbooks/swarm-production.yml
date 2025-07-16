@@ -194,7 +194,7 @@
         - service
 
     - import_role:
-        name: roles/services/d4g-13-wsl-kotaemon
+        name: roles/services/wsl-kotaemon
       vars:
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1

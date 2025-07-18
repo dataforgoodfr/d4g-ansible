@@ -239,8 +239,8 @@
             addresses: ["us-climate-data-metabase_app:3000"]
           - name: "d4g-13-potentiel-solaire"
             addresses: ["d4g-13-potentiel-solaire_app:3000"]
-          - name: "13-wsl"
-            addresses: ["wsl-kotaemon:8080"]
+          - name: "wsl-kotaemon"
+            addresses: ["wsl-kotaemon_kotaemon:8080"]
       tags:
         - proxy
         - traefik

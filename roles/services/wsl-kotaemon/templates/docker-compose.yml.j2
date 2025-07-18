@@ -1,15 +1,14 @@
 services:
-  kotaemon:
-    image: ghcr.io/dataforgoodfr/13_democratiser_sobriete:latest
+  wsl-kotaemon:
+    image: ghcr.io/dataforgoodfr/13_democratiser_sobriete
     entrypoint: [ "/bin/bash", "/app/launch.sh" ]
     volumes:
-      - /opt/wsl-/data/ktem_app_data:/app/ktem_app_data
-    environment:
-      GRADIO_SERVER_NAME: 0.0.0.0
-      GRADIO_SERVER_PORT: 8080
-      OLLAMA_DEPLOYMENT: docker
+      - /opt/wsl-kotaemon/data/ktem_app_data:/app/ktem_app_data
+    env_file: ./wsl-kotaemon.env
     depends_on:
       - ollama
+    networks:
+      - d4g-internal
     deploy:
       replicas: {{ replicas }}
       placement:
@@ -19,8 +18,8 @@ services:
   ollama:
     image: ollama/ollama
     container_name: ollama
-    ports:
-      - '11434:11434'
+    networks:
+      - d4g-internal
     deploy:
       replicas: {{ replicas }}
       placement:

@@ -199,7 +199,7 @@
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
-        - 13-wsl
+        - wsl-kotaemon
         - service
 
     - import_role:

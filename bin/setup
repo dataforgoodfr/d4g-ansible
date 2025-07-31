@@ -6,8 +6,6 @@ SOURCE=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # This is the repository directory.
 ANSIBLE_DIR=$(dirname "$SOURCE")
 
-source "$ANSIBLE_DIR/lib/common"
-
 echo "Installing d4g-ansible requirements"
 # Start by making sure node is installed
 # we won't install because the user might have strong opinions about how to install node
@@ -41,6 +39,8 @@ for package in jq gum bitwarden-cli; do
       success "$package is already installed"
   fi
 done
+
+source "$ANSIBLE_DIR/lib/common"
 
 # Create .venv
 info "Done installing dependencies, setting up ansible environment"

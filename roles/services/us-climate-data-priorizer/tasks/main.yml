@@ -1,0 +1,29 @@
+---
+- name: Create us-climate-data-priorizer directory
+  file:
+    path: /opt/us-climate-data-priorizer
+    state: directory
+
+- name: Create us-climate-data-priorizer files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/us-climate-data-priorizer/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - us-climate-data-priorizer.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/us-climate-data-priorizer
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml us-climate-data-priorizer
+  args:
+    chdir: /opt/us-climate-data-priorizer
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

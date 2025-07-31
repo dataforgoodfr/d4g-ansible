@@ -1,0 +1,15 @@
+services:
+  app:
+    image: ghcr.io/dataforgoodfr/us_climate_data_priorizer:latest
+    env_file: ./us-climate-data-priorizer.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

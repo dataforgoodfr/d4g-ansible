@@ -214,6 +214,15 @@
         - service
 
     - import_role:
+        name: roles/services/wsl-kotaemon
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - wsl-kotaemon
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -254,6 +263,8 @@
             addresses: ["us-climate-data-priorizer_app:8082"]
           - name: "d4g-13-potentiel-solaire"
             addresses: ["d4g-13-potentiel-solaire_app:3000"]
+          - name: "wsl-kotaemon"
+            addresses: ["wsl-kotaemon_kotaemon:8080"]
       tags:
         - proxy
         - traefik

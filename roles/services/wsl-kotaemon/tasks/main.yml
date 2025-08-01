@@ -1,0 +1,29 @@
+---
+- name: Create wsl-kotaemon directory
+  file:
+    path: /opt/wsl-kotaemon
+    state: directory
+
+- name: Create wsl-kotaemon files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/wsl-kotaemon/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - wsl-kotaemon.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/wsl-kotaemon
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml wsl-kotaemon
+  args:
+    chdir: /opt/wsl-kotaemon
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

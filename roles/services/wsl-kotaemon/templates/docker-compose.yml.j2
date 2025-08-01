@@ -1,0 +1,31 @@
+services:
+  kotaemon:
+    image: ghcr.io/dataforgoodfr/13_democratiser_sobriete
+    entrypoint: [ "/bin/bash", "/app/launch.sh" ]
+    volumes:
+      - /opt/wsl-kotaemon/data/ktem_app_data:/app/ktem_app_data
+    env_file: ./wsl-kotaemon.env
+    depends_on:
+      - ollama
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

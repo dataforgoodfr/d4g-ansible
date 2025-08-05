@@ -104,6 +104,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-website
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4gwebsite
+        - service
+
+    - import_role:
         name: roles/services/d4g-noco
       vars:
         deploy_on: "metal-2.dataforgood.fr"
@@ -230,6 +239,8 @@
             addresses: ["d4g-moodle_app:8080"]
           - name: "strapi"
             addresses: ["d4g-strapi_app:1337"]
+          - name: "website"
+            addresses: ["d4g-website_app:3000"]
           - name: "noco"
             addresses: ["d4g-noco_app"]
           - name: "penpot"

@@ -109,7 +109,7 @@
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
-        - d4gwebsite
+        - d4g-website
         - service
 
     - import_role:

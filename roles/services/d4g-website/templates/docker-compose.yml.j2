@@ -1,0 +1,15 @@
+services:
+  app:
+    image: ghcr.io/dataforgoodfr/website:latest
+    env_file: './website.env'
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

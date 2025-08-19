@@ -1,0 +1,29 @@
+---
+- name: Create d4g-website directory
+  file:
+    path: /opt/d4g-website
+    state: directory
+
+- name: Create d4g-website files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-website/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - website.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-website
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-website
+  args:
+    chdir: /opt/d4g-website
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

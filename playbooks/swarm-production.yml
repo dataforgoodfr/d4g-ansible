@@ -104,6 +104,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-website
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-website
+        - service
+
+    - import_role:
         name: roles/services/d4g-noco
       vars:
         deploy_on: "metal-2.dataforgood.fr"
@@ -185,12 +194,41 @@
         - service
 
     - import_role:
+        name: roles/services/us-climate-data-dispatcher
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - us-climate-data
+        - us-climate-data-dispatcher
+        - service
+
+    - import_role:
+        name: roles/services/us-climate-data-priorizer
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - us-climate-data
+        - us-climate-data-priorizer
+        - service
+
+    - import_role:
         name: roles/services/d4g-13-potentiel-solaire
       vars:
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
       tags:
         - d4g-13-potentiel-solaire
+        - service
+
+    - import_role:
+        name: roles/services/d4g-community-manager
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-community-manager
         - service
 
     - import_role:
@@ -210,6 +248,8 @@
             addresses: ["d4g-moodle_app:8080"]
           - name: "strapi"
             addresses: ["d4g-strapi_app:1337"]
+          - name: "website"
+            addresses: ["d4g-website_app:3000"]
           - name: "noco"
             addresses: ["d4g-noco_app"]
           - name: "penpot"
@@ -228,6 +268,10 @@
             addresses: ["d4g-authentik_app"]
           - name: "us-climate-data"
             addresses: ["us-climate-data-metabase_app:3000"]
+          - name: "us-climate-data-dispatcher"
+            addresses: ["us-climate-data-dispatcher_app:8081"]
+          - name: "us-climate-data-priorizer"
+            addresses: ["us-climate-data-priorizer_app:8082"]
           - name: "d4g-13-potentiel-solaire"
             addresses: ["d4g-13-potentiel-solaire_app:3000"]
       tags:

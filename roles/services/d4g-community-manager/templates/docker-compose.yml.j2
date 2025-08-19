@@ -1,0 +1,16 @@
+services:
+  app:
+    image: ghcr.io/dataforgoodfr/d4g-community-manager:latest
+    env_file:
+      - community-manager.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

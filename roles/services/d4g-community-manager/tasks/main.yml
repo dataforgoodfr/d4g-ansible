@@ -1,0 +1,30 @@
+- name: Create d4g-community-manager directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/d4g-community-manager
+
+- name: Create d4g-community-manager files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-community-manager/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - community-manager.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-community-manager
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-community-manager
+  args:
+    chdir: /opt/d4g-community-manager
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

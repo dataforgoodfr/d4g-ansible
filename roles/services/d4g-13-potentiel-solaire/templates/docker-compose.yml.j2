@@ -1,6 +1,7 @@
 services:
   app:
     image: ghcr.io/dataforgoodfr/13_potentiel_solaire_app:latest
+    env_file: ./13_potentiel_solaire.env
     networks:
       - d4g-internal
     deploy:

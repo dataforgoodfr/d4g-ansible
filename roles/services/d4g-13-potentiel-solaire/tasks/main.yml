@@ -4,10 +4,13 @@
     path: /opt/d4g-13-potentiel-solaire
     state: directory
 
-- name: Creating d4g-13-potentiel-solaire template
+- name: Create d4g-13-potentiel-solaire files
   template:
-    src: "docker-compose.yml.j2"
-    dest: /opt/d4g-13-potentiel-solaire/docker-compose.yml
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-13-potentiel-solaire/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - 13_potentiel_solaire.env
 
 - name: Pull
   command: docker compose pull

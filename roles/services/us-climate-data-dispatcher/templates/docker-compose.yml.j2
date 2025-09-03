@@ -3,7 +3,9 @@ services:
     image: ghcr.io/dataforgoodfr/us_climate_data_dispatcher:latest
     env_file: ./us-climate-data-dispatcher.env
     networks:
-      - d4g-internal
+      d4g-internal:
+        aliases:
+          - us-climate-data-dispatcher
     deploy:
       replicas: {{ replicas }}
       placement:

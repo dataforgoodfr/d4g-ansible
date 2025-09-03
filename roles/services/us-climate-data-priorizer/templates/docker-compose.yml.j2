@@ -3,7 +3,9 @@ services:
     image: ghcr.io/dataforgoodfr/us_climate_data_priorizer:latest
     env_file: ./us-climate-data-priorizer.env
     networks:
-      - d4g-internal
+      d4g-internal:
+        aliases:
+          - us-climate-data-priorizer
     deploy:
       replicas: {{ replicas }}
       placement:

@@ -266,6 +266,8 @@
             addresses: ["d4g-mattermost_app:8065"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
+          - name: "wslauth"
+            addresses: ["d4g-authentik_app"]
           - name: "us-climate-data"
             addresses: ["us-climate-data-metabase_app:3000"]
           - name: "us-climate-data-dispatcher"

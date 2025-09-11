@@ -66,6 +66,15 @@
       tags:
         - outline
         - service
+  
+    - import_role:
+        name: roles/services/cartocampement-outline
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - cc-outline
+        - service
 
     - import_role:
         name: roles/services/d4g-n8n
@@ -128,15 +137,6 @@
         replicas: 1
       tags:
         - penpot
-        - service
-
-    - import_role:
-        name: roles/services/d4g-kano
-      vars:
-        deploy_on: "metal-1.dataforgood.fr"
-        replicas: 1
-      tags:
-        - kano
         - service
 
     - import_role:
@@ -244,6 +244,8 @@
             addresses: ["d4g-uptime-kuma_app"]
           - name: "outline"
             addresses: ["d4g-outline_app"]
+          - name: "cartocampement-outline"
+            addresses: ["cc-outline_app"]
           - name: "moodle"
             addresses: ["d4g-moodle_app:8080"]
           - name: "strapi"

@@ -1,0 +1,46 @@
+---
+- name: Create cc-outline directory
+  file:
+    path: /opt/cc-outline
+    state: directory
+
+- name: Creating cc-outline template
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/cc-outline/docker-compose.yml
+
+- name: Create cc-outline env file
+  template:
+    src: "outline.env.j2"
+    dest: /opt/cc-outline/outline.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/cc-outline
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml cc-outline
+  args:
+    chdir: /opt/cc-outline
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: cc-outline
+    service_dir: /opt/cc-outline
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: outline
+    pgsql_password: "{{ lookup('env', 'OUTLINE_DB_PASSWORD') }}"
+    pgsql_database: outline
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

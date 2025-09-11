@@ -1,0 +1,15 @@
+services:
+  app:
+    image: docker.getoutline.com/outlinewiki/outline:0.79.1
+    env_file: ./outline.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

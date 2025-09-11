@@ -10,6 +10,22 @@ services:
         constraints:
           - node.hostname == {{ deploy_on }}
 
+  redis:
+    image: redis
+    command: ["redis-server"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
 networks:
   d4g-internal:
     external: true

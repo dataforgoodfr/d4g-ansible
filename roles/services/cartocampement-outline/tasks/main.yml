@@ -37,9 +37,9 @@
     service_dir: /opt/cc-outline
     pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
     pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
-    pgsql_user: outline
+    pgsql_user: cc-outline
     pgsql_password: "{{ lookup('env', 'OUTLINE_DB_PASSWORD') }}"
-    pgsql_database: outline
+    pgsql_database: cc-outline
   tags:
     - backup
     - service

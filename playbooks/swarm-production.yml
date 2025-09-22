@@ -66,7 +66,7 @@
       tags:
         - outline
         - service
-  
+
     - import_role:
         name: roles/services/cartocampement-outline
       vars:
@@ -232,6 +232,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-ghost
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-ghost
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -280,6 +289,8 @@
             addresses: ["us-climate-data-priorizer_app:8082"]
           - name: "d4g-13-potentiel-solaire"
             addresses: ["d4g-13-potentiel-solaire_app:3000"]
+          - name: "ghost"
+            addresses: ["d4g-ghost_app:2368"]
       tags:
         - proxy
         - traefik

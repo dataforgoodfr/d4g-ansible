@@ -1,0 +1,24 @@
+services:
+  app:
+    image: ghcr.io/dataforgoodfr/d4g-ghost:main-fe9466c
+    networks:
+      - d4g-internal
+    volumes:
+      - ./data/data:/var/lib/ghost/content/data
+      - ./data/images:/var/lib/ghost/content/images
+      - ./data/media:/var/lib/ghost/content/media
+      - ./data/files:/var/lib/ghost/content/files
+      - ./data/public:/var/lib/ghost/content/public
+      - ./data/settings:/var/lib/ghost/content/settings
+      - ./data/logs:/var/lib/ghost/content/logs
+    env_file:
+      - ./d4g-ghost.env
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

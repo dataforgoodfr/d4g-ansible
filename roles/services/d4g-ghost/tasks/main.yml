@@ -1,0 +1,56 @@
+---
+- name: Create d4g-ghost directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /opt/d4g-ghost
+    - /opt/d4g-ghost/data
+
+- name: Create Ghost content subdirectories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: 1000
+    group: 1000
+    mode: "0755"
+  loop:
+    - /opt/d4g-ghost/data/data
+    - /opt/d4g-ghost/data/images
+    - /opt/d4g-ghost/data/media
+    - /opt/d4g-ghost/data/files
+    - /opt/d4g-ghost/data/public
+    - /opt/d4g-ghost/data/settings
+    - /opt/d4g-ghost/data/logs
+
+- name: Create d4g-ghost service definition
+  template:
+    src: "{{ item }}.j2"
+    dest: "/opt/d4g-ghost/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - docker-compose.yml
+    - d4g-ghost.env
+
+- name: Apply d4g-ghost service definition
+  command: docker stack deploy --with-registry-auth -c /opt/d4g-ghost/docker-compose.yml d4g-ghost
+  args:
+    chdir: /opt/d4g-ghost
+  when: is_swarm_leader | default(false)
+  register: d4g_ghost_stack_output
+  changed_when: d4g_ghost_stack_output.stdout != "d4g-ghost"
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: ghost
+    data_dir: /opt/d4g-ghost/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

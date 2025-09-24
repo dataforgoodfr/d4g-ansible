@@ -1,0 +1,4 @@
+---
+- name: traefik_rolling_update
+  command: docker service update --force traefik_app
+  listen: traefik_rolling_update

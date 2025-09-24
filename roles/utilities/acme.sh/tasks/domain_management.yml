@@ -1,0 +1,80 @@
+---
+# Domain management tasks for acme.sh
+# This file provides utilities to manage domains in SSL certificates
+
+- name: Validate domain list
+  assert:
+    that:
+      - domain_names is defined
+      - domain_names | length > 0
+      - domain_names is iterable
+    fail_msg: "domain_names must be defined and contain at least one domain"
+    success_msg: "Domain validation passed"
+
+- name: Create domains backup directory
+  file:
+    path: "{{ le_certs_dir }}/domains_backup"
+    state: directory
+    mode: "0755"
+
+- name: Save current domain list for rollback
+  copy:
+    content: "{{ domain_names | to_nice_yaml }}"
+    dest: "{{ le_certs_dir }}/domains_backup/domains_{{ ansible_date_time.epoch }}.yml"
+    mode: "0644"
+  when: certificate_exists.stat.exists
+
+- name: Get certificate expiry date
+  shell: |
+    if [ -f "{{ le_certs_dir }}/{{ le_fullchain_filename }}" ]; then
+      openssl x509 -in "{{ le_certs_dir }}/{{ le_fullchain_filename }}" -noout -enddate | cut -d= -f2
+    else
+      echo "No certificate found"
+    fi
+  register: cert_expiry
+  changed_when: false
+
+- name: Check certificate validity period remaining
+  shell: |
+    if [ -f "{{ le_certs_dir }}/{{ le_fullchain_filename }}" ]; then
+      exp_date=$(openssl x509 -in "{{ le_certs_dir }}/{{ le_fullchain_filename }}" -noout -enddate | cut -d= -f2)
+      exp_epoch=$(date -d "$exp_date" +%s 2>/dev/null || date -j -f "%b %d %H:%M:%S %Y %Z" "$exp_date" +%s)
+      now_epoch=$(date +%s)
+      days_remaining=$(( (exp_epoch - now_epoch) / 86400 ))
+      echo $days_remaining
+    else
+      echo "0"
+    fi
+  register: days_remaining
+  changed_when: false
+
+- name: Display certificate status
+  debug:
+    msg:
+      - "Certificate file exists: {{ certificate_exists.stat.exists }}"
+      - "Certificate expiry: {{ cert_expiry.stdout }}"
+      - "Days remaining: {{ days_remaining.stdout }}"
+      - "Domains to be included: {{ domain_names | sort }}"
+  when: ansible_verbosity >= 1
+
+- name: Get current domains from certificate for comparison
+  shell: |
+    if [ -f "{{ le_certs_dir }}/{{ le_fullchain_filename }}" ]; then
+      openssl x509 -in "{{ le_certs_dir }}/{{ le_fullchain_filename }}" -text -noout | grep -A1 "Subject Alternative Name" | tail -1 | sed 's/DNS://g' | tr -d ' ' | tr ',' '\n' | sort
+    else
+      echo ""
+    fi
+  register: current_cert_domains
+  changed_when: false
+
+- name: Check if domains have changed
+  set_fact:
+    domains_changed: "{{ (domain_names | sort | join('\n')) != current_cert_domains.stdout }}"
+
+- name: Warn about early renewal
+  debug:
+    msg: "WARNING: Certificate has {{ days_remaining.stdout }} days remaining. Early renewal will be performed due to domain changes."
+  when:
+    - certificate_exists.stat.exists
+    - days_remaining.stdout | int > 30
+    - domains_changed

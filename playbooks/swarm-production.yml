@@ -40,14 +40,14 @@
     - import_role:
         name: roles/utilities/acme.sh
       vars:
+        group_name: "production_swarm_cluster_nodes"
         domain_names:
           - "*.services.dataforgood.fr"
-        reload_cmd: docker exec d4g-proxy nginx -s reload
-        notification_mail_from: proxyd4g@dataforgood.fr
-        notification_mail_to: proxyd4g@quickpipes.io
-      when: is_swarm_leader | default(false)
+          - "dataforgood.fr"
+          - "*.dataforgood.fr"
       tags:
         - acme
+        - tls
 
     - import_role:
         name: roles/services/d4g-moodle
@@ -261,6 +261,9 @@
             addresses: ["d4g-strapi_app:1337"]
           - name: "website"
             addresses: ["d4g-website_app:3000"]
+          - name: "website_redir"
+            override_name: "dataforgood.fr"
+            addresses: ["http://dataforgoodfr.github.io"]
           - name: "noco"
             addresses: ["d4g-noco_app"]
           - name: "penpot"

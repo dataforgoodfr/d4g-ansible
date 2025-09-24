@@ -1,0 +1,4 @@
+---
+# Default configuration for Traefik role
+tcp_services: []
+tcp_entrypoints: []

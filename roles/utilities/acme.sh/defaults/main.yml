@@ -1,16 +1,17 @@
 ---
-reload_cmd: service nginx reload
+reload_cmd: docker service update --force traefik_app
 le_certs_dir: /opt/certificates
-le_key_filename: le-key.pem
+le_ca_filename: le-ca.pem
+le_cert_filename: le-cert.pem
 le_fullchain_filename: le-fullchain.pem
+le_key_filename: le-key.pem
 staging: False
+notification_mail_from: le+room303@quickpipes.io
+notification_mail_to: le+room303@quickpipes.io
+force: False
 prehook_command: ""
 posthook_command: ""
 issue_mode: "--standalone"
 issue_env_var: ""
 renew_via_webroot: True
-failover_setup: False
-is_failover_leader: False
-notification_mail_from: le@quickpipes.io
-notification_mail_to: le@quickpipes.io
 scaleway_api_token: "{{ lookup('env', 'ACME_SH_SCW_TOKEN') }}"

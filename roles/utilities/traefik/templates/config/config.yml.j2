@@ -45,11 +45,11 @@ http:
   routers:
 {% for item in services %}
     {{ item.name }}:
-      rule: "Host(`{{ item.name }}.{{ base_domain }}`)"
+      rule: "Host(`{% if item.override_name is defined %}{{ item.override_name }}{% else %}{{ item.name }}.{{ base_domain }}{% endif %}`)"
       service: {{ item.name }}
-{% if item.middleware is defined and item.middleware %}
+{% if item.middlewares is defined and item.middlewares %}
       middlewares:
-{% for middleware in item.middleware %}
+{% for middleware in item.middlewares %}
         - {{ middleware }}
 {% endfor %}
 {% endif %}
@@ -57,7 +57,7 @@ http:
         - webtls
       tls:
         domains:
-          - main: "{{ item.name }}.{{ base_domain }}"
+          - main: "{% if item.override_name is defined %}{{ item.override_name }}{% else %}{{ item.name }}.{{ base_domain }}{% endif %}"
 {% endfor %}
 
   services:

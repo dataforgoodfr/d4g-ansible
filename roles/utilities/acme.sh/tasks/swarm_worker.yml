@@ -1,0 +1,12 @@
+- name: Get Swarm leader from inventory
+  set_fact:
+    # This scans all hosts in group_name and extracts the host that has is_swarm_leader set to true
+    # swarm_leader: "{{ groups[group_names[0]] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}"
+    swarm_leader: "{{ groups[group_name] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}"
+
+- name: Synchronize /opt/certificates directory from swarm leader to all nodes
+  ansible.builtin.synchronize:
+    src: /opt/certificates/
+    dest: /opt/certificates/
+    mode: push
+  delegate_to: "{{ swarm_leader }}"

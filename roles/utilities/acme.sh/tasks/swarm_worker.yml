@@ -10,3 +10,5 @@
     dest: /opt/certificates/
     mode: push
   delegate_to: "{{ swarm_leader }}"
+  when:
+    - skip_acme is not defined or not skip_acme

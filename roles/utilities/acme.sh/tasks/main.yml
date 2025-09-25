@@ -41,3 +41,5 @@
     - "{{ le_cert_filename }}"
     - "{{ le_fullchain_filename }}"
     - "{{ le_key_filename }}"
+  when:
+    - skip_acme is not defined or not skip_acme

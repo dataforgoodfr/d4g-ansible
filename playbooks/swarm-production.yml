@@ -52,7 +52,7 @@
     - import_role:
         name: roles/services/d4g-moodle
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - moodle
@@ -61,7 +61,7 @@
     - import_role:
         name: roles/services/d4g-outline
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - outline
@@ -70,7 +70,7 @@
     - import_role:
         name: roles/services/cartocampement-outline
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - cc-outline
@@ -79,7 +79,7 @@
     - import_role:
         name: roles/services/d4g-n8n
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - n8n
@@ -88,7 +88,7 @@
     - import_role:
         name: roles/services/d4g-uptime-kuma
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - uptime-kuma
@@ -97,7 +97,7 @@
     - import_role:
         name: roles/services/d4g-vaultwarden
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - vaultwarden
@@ -106,7 +106,7 @@
     - import_role:
         name: roles/services/d4g-strapi
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - strapi
@@ -115,7 +115,7 @@
     - import_role:
         name: roles/services/d4g-website
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - d4g-website
@@ -124,7 +124,7 @@
     - import_role:
         name: roles/services/d4g-noco
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - noco
@@ -133,7 +133,7 @@
     - import_role:
         name: roles/services/d4g-penpot
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - penpot
@@ -142,7 +142,7 @@
     - import_role:
         name: roles/services/collectif5050-metabase
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - collectif5050
@@ -151,7 +151,7 @@
     - import_role:
         name: roles/services/d4g-plausible
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - plausible
@@ -160,7 +160,7 @@
     - import_role:
         name: roles/services/d4g-mattermost
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - mattermost
@@ -169,7 +169,7 @@
     - import_role:
         name: roles/services/d4g-authentik
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - authentik
@@ -178,7 +178,7 @@
     - import_role:
         name: roles/services/d4g-metabase
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - d4gmetabase
@@ -187,7 +187,7 @@
     - import_role:
         name: roles/services/us-climate-data-metabase
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - us-climate-data
@@ -196,7 +196,7 @@
     - import_role:
         name: roles/services/us-climate-data-dispatcher
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - us-climate-data
@@ -206,7 +206,7 @@
     - import_role:
         name: roles/services/us-climate-data-priorizer
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - us-climate-data
@@ -216,7 +216,7 @@
     - import_role:
         name: roles/services/d4g-13-potentiel-solaire
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - d4g-13-potentiel-solaire
@@ -225,7 +225,7 @@
     - import_role:
         name: roles/services/d4g-community-manager
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
+        deploy_on: "metal-1.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - d4g-community-manager
@@ -234,7 +234,7 @@
     - import_role:
         name: roles/services/d4g-ghost
       vars:
-        deploy_on: "metal-2.dataforgood.fr"
+        deploy_on: "metal-2.dataforgood.{{ env_suffix | default('fr') }}"
         replicas: 1
       tags:
         - d4g-ghost

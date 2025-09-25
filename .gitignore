@@ -15,3 +15,5 @@ roles/test-role
 !*.env.j2
 
 .vscode
+
+.vagrant

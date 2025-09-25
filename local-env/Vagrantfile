@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  [
+    { name: "metal-1", hostname: "metal-1.dataforgood.local", ip: "192.168.56.11", forwarded_port: 2221 },
+    { name: "metal-2", hostname: "metal-2.dataforgood.local", ip: "192.168.56.12", forwarded_port: 2222 }
+  ].each do |vm|
+    config.vm.define vm[:name] do |node|
+      node.vm.hostname = vm[:hostname]
+      node.vm.provider "virtualbox" do |vb|
+        vb.memory = 512
+        vb.cpus = 1
+      end
+      
+      node.vm.network "private_network", ip: vm[:ip]
+      node.vm.network "forwarded_port", guest: 22, host: vm[:forwarded_port], id: "ssh"
+      node.ssh.host = ENV['VAGRANT_SSH_HOST'] || "127.0.0.1"
+      
+      node.ssh.insert_key = false
+      node.ssh.username = "vagrant"
+      node.ssh.password = "vagrant"
+      node.ssh.private_key_path = nil
+      
+      node.vm.provision "shell", inline: <<-SHELL     
+        echo "root:root" | sudo chpasswd
+        sudo sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+        sudo systemctl enable ssh
+        sudo systemctl reload ssh
+        sudo systemctl start ssh
+
+        echo "192.168.56.11 metal-1.dataforgood.local metal-1" | sudo tee -a /etc/hosts
+        echo "192.168.56.12 metal-2.dataforgood.local metal-2" | sudo tee -a /etc/hosts
+        
+        # Mimic prod server based on Ansible role assumptions
+        sudo adduser --disabled-password --gecos "" ubuntu
+        echo "ubuntu:ubuntu" | sudo chpasswd
+        sudo usermod -aG sudo ubuntu
+        
+        sudo mkdir /home/ubuntu/.ssh
+        sudo touch /home/ubuntu/.ssh/authorized_keys
+        chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+
+        sudo touch /etc/default/motd-news
+        sudo touch /etc/update-motd.d/10-help-text /etc/update-motd.d/90-updates-available /etc/update-motd.d/98-reboot-required
+      SHELL
+    end
+  end
+end

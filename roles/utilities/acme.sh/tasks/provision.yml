@@ -8,3 +8,5 @@
         SCALEWAY_API_TOKEN: "{{ scaleway_api_token }}"
     - name: Installing certificate (nginx format)
       shell: /root/.acme.sh/acme.sh --install-cert --log -d {{domain_names | join(' -d ')}} --key-file {{ le_certs_dir }}/{{ le_key_filename }} --fullchain-file {{ le_certs_dir }}/{{ le_fullchain_filename }}
+  when:
+    - skip_acme is not defined or not skip_acme

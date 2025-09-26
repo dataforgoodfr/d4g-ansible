@@ -30,5 +30,5 @@
     name: "sql-backup-{{ service }}-s3"
     minute: "{{ 59 |random(seed=service) }}"
     hour: "{{ s3_start_hour }}"
-    job: "((/usr/bin/docker run --rm --env-file=/opt/backups.env -v {{ service_dir }}/sql-backup:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --service-name={{ service }} && slack-notifier '💾 Successfully backed up {{ service }}-sql') || slack-notifier '❌ An error occurred uploading backup for {{ service }}-sql' ) 2>&1 | logger -t sql_backup_{{ service }}"
+    job: "((/usr/bin/docker run --rm --env-file=/opt/backups.env -v {{ service_dir }}/sql-backup:/data -v /opt/backups:/backups ghcr.io/dataforgoodfr/d4g-s3-backup:latest --service-name={{ service }}-sql && slack-notifier '💾 Successfully backed up {{ service }}-sql') || slack-notifier '❌ An error occurred uploading backup for {{ service }}-sql' ) 2>&1 | logger -t sql_backup_{{ service }}"
     state: present

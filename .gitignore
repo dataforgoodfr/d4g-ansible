@@ -12,6 +12,7 @@ roles/test-role
 *.TEST
 .venv
 *.env*
+!.env.local
 !*.env.j2
 
 .vscode

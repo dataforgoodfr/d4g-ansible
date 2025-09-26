@@ -37,3 +37,38 @@ You can also limit the apply to a specific host in the inventory using the `--li
 ```bash
 bin/d4g-ansible playbook playbooks/swarm-production.yml --diff --verbose --limit=metal-1.dataforgood.fr
 ```
+
+## Local environment
+
+Follow the following steps to start to work locally:
+
+1. Overwrite or create a `.env` file by running: 
+    ```bash
+    cp .env.local .env
+    ```
+
+2. Install the following softwares: 
+    - Virtualbox and its Extension pack (https://www.virtualbox.org/wiki/Downloads)
+    - Vagrant (https://developer.hashicorp.com/vagrant/install)
+
+3. **Windows + WSL2 only:** If you're using WSL2 with Windows, your network configuration may not allow your WSL instance to connect via SSH to VMs with the IP address 127.0.0.1. Here a quick fix with socat:
+    ```bash
+    # If socat is not installed
+    sudo apt update
+    sudo apt install socat
+
+    # To be launched each time
+    socat TCP-LISTEN:2222,bind=127.0.0.1,reuseaddr,fork TCP:<YOUR WINDOWS PRIVATE IP>:2221 &
+    socat TCP-LISTEN:2222,bind=127.0.0.1,reuseaddr,fork TCP:<YOUR WINDOWS PRIVATE IP>:2222 &
+    ```
+
+4. Launch the VMs:
+    ```bash
+    cp local-env
+    vagrant up
+    ```
+
+5. When running /bin/d4g-ansible:
+    - Use `--skip-secrets` to avoid overwriting your local dotenv file
+    - Use `-i local-env/hosts-local.yml` Ansible parameter to use your local VMs
+    - Example: `bin/d4g-ansible --skip-git-checks --skip-secrets="true" playbook -i local-env/hosts-local.yml playbooks/swarm-production.yml`

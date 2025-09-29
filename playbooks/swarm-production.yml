@@ -250,9 +250,9 @@
             addresses: ["d4g-strapi_app:1337"]
           - name: "website"
             addresses: ["d4g-website_app:3000"]
-          - name: "website_redir"
+          - name: "website_new"
+            addresses: ["d4g-website_app:3000"]
             override_name: "dataforgood.fr"
-            addresses: ["http://dataforgoodfr.github.io"]
           - name: "noco"
             addresses: ["d4g-noco_app"]
           - name: "penpot"

@@ -1,0 +1,29 @@
+---
+- name: Create watchtower directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /opt/watchtower
+
+- name: Create watchtower service definition
+  template:
+    src: "{{ item }}.j2"
+    dest: "/opt/watchtower/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - docker-compose.yml
+    - watchtower.env
+
+- name: Apply watchtower service definition
+  command: docker stack deploy --with-registry-auth -c /opt/watchtower/docker-compose.yml watchtower
+  args:
+    chdir: /opt/watchtower
+  when: is_swarm_leader | default(false)
+  register: watchtower_stack_output
+  changed_when: watchtower_stack_output.stdout != "watchtower"

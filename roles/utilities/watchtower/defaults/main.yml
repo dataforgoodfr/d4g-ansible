@@ -1,0 +1,17 @@
+---
+# Watchtower configuration defaults
+watchtower_notifications_level: info
+
+# Services to monitor - can be overridden in playbook
+# Can use service names, container names, or use labels
+watchtower_scope: []
+# Example:
+# watchtower_scope:
+#   - api_app
+#   - api_nginx
+
+# Alternative: use label-based monitoring
+watchtower_label_enable: false
+
+# Slack notifications
+watchtower_slack_identifier: "Watchtower"

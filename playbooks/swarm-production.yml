@@ -232,6 +232,15 @@
         - service
 
     - import_role:
+        name: roles/utilities/watchtower
+      vars:
+        watchtower_scope:
+          - d4g-website_app
+      tags:
+        - watchtower
+        - utilities
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr

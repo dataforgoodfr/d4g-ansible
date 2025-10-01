@@ -106,8 +106,7 @@
     - import_role:
         name: roles/services/d4g-website
       vars:
-        deploy_on: "metal-1.dataforgood.fr"
-        replicas: 1
+        replicas: 3
       tags:
         - d4g-website
         - service

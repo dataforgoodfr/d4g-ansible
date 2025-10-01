@@ -18,7 +18,6 @@
     chdir: /opt/d4g-website
   tags:
     - pull
-  when: inventory_hostname == deploy_on
 
 - name: Up
   command: docker stack deploy -c docker-compose.yml d4g-website

@@ -4,9 +4,9 @@
     path: "/opt/d4g-decidim"
     state: directory
 
-- name: Create d4g-decidim data directory
+- name: Create d4g-decidim scripts directory
   file:
-    path: "/opt/d4g-decidim/data"
+    path: "/opt/d4g-decidim/scripts"
     state: directory
 
 - name: Creating d4g-decidim template

@@ -17,6 +17,14 @@
     - docker-compose.yml
     - decidim.env
 
+- name: Creating d4g-decidim scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-decidim/scripts/{{ item }}
+  with_items:
+    - entrypoint.sh
+    - hello-world.sh
+
 - name: Pull
   command: docker compose pull
   args:

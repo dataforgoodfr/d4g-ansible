@@ -24,6 +24,15 @@
   with_items:
     - entrypoint.sh
     - hello-world.sh
+    
+- name: Make d4g-decidim scripts executable
+  file:
+    path: "/opt/d4g-decidim/scripts/{{ item }}"
+    mode: '0755'
+    state: file
+  with_items:
+    - entrypoint.sh
+    - hello-world.sh
 
 - name: Pull
   command: docker compose pull

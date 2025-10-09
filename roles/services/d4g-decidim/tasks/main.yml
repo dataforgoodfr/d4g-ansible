@@ -1,0 +1,59 @@
+---
+- name: Create d4g-decidim directory
+  file:
+    path: "/opt/d4g-decidim"
+    state: directory
+
+- name: Create d4g-decidim data directory
+  file:
+    path: "/opt/d4g-decidim/data"
+    state: directory
+
+- name: Creating d4g-decidim template
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-decidim/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - decidim.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-decidim
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-decidim
+  args:
+    chdir: /opt/d4g-decidim
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: decidim
+    data_dir: /opt/d4g-decidim/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-decidim
+    service_dir: /opt/d4g-decidim
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: decidim
+    pgsql_password: "{{ lookup('env', 'NC_DB_PASSWORD') }}"
+    pgsql_database: decidim
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

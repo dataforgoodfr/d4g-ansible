@@ -231,6 +231,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-decidim
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-decidim
+        - service
+
+    - import_role:
         name: roles/utilities/watchtower
       vars:
         watchtower_scope:
@@ -263,6 +272,8 @@
             override_name: "dataforgood.fr"
           - name: "noco"
             addresses: ["d4g-noco_app"]
+          - name: "decidim"
+            addresses: ["d4g-decidim_app"]
           - name: "penpot"
             addresses: ["d4g-penpot_app:8080"]
           - name: "kano"

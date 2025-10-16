@@ -273,7 +273,7 @@
           - name: "noco"
             addresses: ["d4g-noco_app"]
           - name: "decidim"
-            addresses: ["d4g-decidim_app"]
+            addresses: ["d4g-decidim_app:3000"]
           - name: "penpot"
             addresses: ["d4g-penpot_app:8080"]
           - name: "kano"

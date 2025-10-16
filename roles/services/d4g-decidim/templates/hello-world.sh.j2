@@ -7,6 +7,6 @@ set -e
 # been run yet.
 bundle exec rake db:migrate:reset
 # Adds basic system, admin and user accounts, and lorem ipsum content.
-#bundle exec rake db:seed
+bundle exec rake db:seed
 
 exec "$@"

@@ -1,5 +1,6 @@
 services:
   app:
+    entrypoint: ["/code/vendor/hello-world.sh"]
     command: ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
     env_file: ./decidim.env
     image: decidim/decidim:latest

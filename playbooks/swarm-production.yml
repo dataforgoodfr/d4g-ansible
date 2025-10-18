@@ -106,6 +106,8 @@
     - import_role:
         name: roles/services/d4g-website
       vars:
+        stack_name: d4g-website
+        docker_image_tag: latest
         replicas: 3
       tags:
         - d4g-website

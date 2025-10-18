@@ -1,0 +1,70 @@
+---
+- name: Initial configuration
+  hosts: production_swarm_cluster_nodes
+  remote_user: ubuntu
+  become: true
+
+  tasks:
+    - import_role:
+        name: roles/utilities/base-ubuntu
+      tags:
+        - base
+
+- name: Create swarm workers
+  hosts: production_swarm_cluster_nodes
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/utilities/docker
+      vars:
+        use_swarm: true
+        group_name: "production_swarm_cluster_nodes"
+      tags:
+        - docker
+        - utils
+
+    - import_role:
+        name: roles/utilities/datadog
+      vars:
+        dd_env: staging
+      tags:
+        - datadog
+        - utils
+
+- name: Create swarm applications
+  hosts: production_swarm_cluster_nodes
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/services/d4g-website
+      vars:
+        stack_name: d4g-website-staging
+        docker_image_tag: staging
+        replicas: 1
+        staging_mode: true
+      tags:
+        - d4g-website-staging
+        - service
+
+    - import_role:
+        name: roles/utilities/watchtower
+      vars:
+        watchtower_scope:
+          - d4g-website-staging_app
+      tags:
+        - watchtower
+        - utilities
+
+    - import_role:
+        name: roles/utilities/traefik
+      vars:
+        base_domain: services.dataforgood.fr
+        services:
+          - name: "website-staging"
+            addresses: ["d4g-website-staging_app:3000"]
+      tags:
+        - proxy
+        - traefik
+        - service

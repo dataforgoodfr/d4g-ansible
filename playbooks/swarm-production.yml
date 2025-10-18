@@ -106,9 +106,21 @@
     - import_role:
         name: roles/services/d4g-website
       vars:
+        stack_name: d4g-website
+        docker_image_tag: latest
         replicas: 3
       tags:
         - d4g-website
+        - service
+
+    - import_role:
+        name: roles/services/d4g-website
+      vars:
+        stack_name: d4g-website-staging
+        docker_image_tag: staging
+        replicas: 1
+      tags:
+        - d4g-website-staging
         - service
 
     - import_role:
@@ -244,6 +256,7 @@
       vars:
         watchtower_scope:
           - d4g-website_app
+          - d4g-website-staging_app
       tags:
         - watchtower
         - utilities
@@ -267,6 +280,8 @@
             addresses: ["d4g-strapi_app:1337"]
           - name: "website"
             addresses: ["d4g-website_app:3000"]
+          - name: "website-staging"
+            addresses: ["d4g-website-staging_app:3000"]
           - name: "website_new"
             addresses: ["d4g-website_app:3000"]
             override_name: "dataforgood.fr"

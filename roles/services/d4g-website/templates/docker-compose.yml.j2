@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/dataforgoodfr/website-frontend:latest
+    image: ghcr.io/dataforgoodfr/website-frontend:{{ docker_image_tag | default('latest') }}
     env_file: './website.env'
     networks:
       - d4g-internal

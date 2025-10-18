@@ -1,0 +1,6 @@
+---
+# Default production values
+stack_name: d4g-website
+docker_image_tag: latest
+traefik_service_name: website
+replicas: 3

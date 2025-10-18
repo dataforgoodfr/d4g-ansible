@@ -1,0 +1,6 @@
+---
+# Staging-specific values
+stack_name: d4g-website-staging
+docker_image_tag: staging
+traefik_service_name: website-staging
+replicas: 1

@@ -1,0 +1,31 @@
+- name: Create pgbouncer directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/pgbouncer
+
+- name: Create pgbouncer files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/pgbouncer/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - pgbouncer.ini
+    - userlist.txt
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/pgbouncer
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml pgbouncer
+  args:
+    chdir: /opt/pgbouncer
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

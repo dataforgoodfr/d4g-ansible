@@ -1,0 +1,89 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+  log_level: info
+
+# Common config for all components
+common:
+  path_prefix: /loki
+  storage:
+    s3:
+      endpoint: s3.fr-par.scw.cloud
+      bucketnames: poletech-logs-s3
+      region: fr-par
+      s3forcepathstyle: true
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+# Schema configuration
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: s3
+      schema: v13
+      index:
+        prefix: loki_index_
+        period: 24h
+
+# Storage configuration
+storage_config:
+  tsdb_shipper:
+    active_index_directory: /loki/tsdb-index
+    cache_location: /loki/tsdb-cache
+
+# Compactor for retention
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 150
+  delete_request_store: s3
+
+# Limits and retention
+limits_config:
+  retention_period: 90d
+  reject_old_samples: false
+  creation_grace_period: 168h  # Allow logs up to 7 days old
+  ingestion_rate_mb: 50
+  ingestion_burst_size_mb: 100
+  per_stream_rate_limit: 10MB
+  per_stream_rate_limit_burst: 20MB
+  max_entries_limit_per_query: 10000
+  max_query_series: 1000
+
+# Query optimization
+query_range:
+  align_queries_with_step: true
+  cache_results: true
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 500
+        ttl: 24h
+
+# Chunk cache
+chunk_store_config:
+  chunk_cache_config:
+    embedded_cache:
+      enabled: true
+      max_size_mb: 1024
+      ttl: 1h
+
+# Ruler for alerting
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules-temp
+  ring:
+    kvstore:
+      store: inmemory
+  enable_api: true

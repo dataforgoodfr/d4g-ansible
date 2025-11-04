@@ -1,6 +1,13 @@
 log:
   level: "INFO"
 
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    entryPoint: metrics
+
 accessLog:
   format: "json"
   filters:
@@ -29,6 +36,9 @@ entrypoints:
 
   webtls:
     address: ":443"
+
+  metrics:
+    address: ":8082"
 
 providers:
   file:

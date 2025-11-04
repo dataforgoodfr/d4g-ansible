@@ -1,0 +1,54 @@
+#!/bin/bash
+# Script to discover node-exporter container IPs and generate static targets file
+# This runs on the swarm leader to map overlay network IPs to hostnames
+
+set -e
+
+OUTPUT_FILE="/opt/observability/config/node-exporters.json"
+TEMP_FILE="${OUTPUT_FILE}.tmp"
+
+# Start JSON array
+echo '[' > "$TEMP_FILE"
+
+first=true
+{% for host in groups[group_name] %}
+# Get node-exporter container info for {{ host }}
+# Get the task ID which we can inspect via docker inspect
+task_id=$(docker service ps observability_node-exporter \
+    --filter "desired-state=running" \
+    --filter "node={{ host }}" \
+    --format "{{ '{{' }}.ID{{ '}}' }}" 2>/dev/null | head -1)
+
+if [ -n "$task_id" ]; then
+    # Get the container's IP directly from the task's NetworksAttachments
+    # This works across all nodes in the swarm
+    container_ip=$(docker inspect --type task "$task_id" \
+        --format '{{ '{{' }}range .NetworksAttachments{{ '}}' }}{{ '{{' }}range .Addresses{{ '}}' }}{{ '{{' }}.{{ '}}' }}{{ '{{' }}end{{ '}}' }}{{ '{{' }}end{{ '}}' }}' 2>/dev/null | cut -d'/' -f1 | head -1)
+
+    if [ -n "$container_ip" ]; then
+        if [ "$first" = false ]; then
+            echo "," >> "$TEMP_FILE"
+        fi
+        first=false
+
+        cat >> "$TEMP_FILE" << EOF
+  {
+    "targets": ["${container_ip}:9100"],
+    "labels": {
+      "instance": "{{ host }}",
+      "node": "{{ host }}",
+      "job": "node-exporter"
+    }
+  }
+EOF
+    fi
+fi
+{% endfor %}
+
+echo '' >> "$TEMP_FILE"
+echo ']' >> "$TEMP_FILE"
+
+# Atomic move
+mv "$TEMP_FILE" "$OUTPUT_FILE"
+
+echo "Updated node-exporter targets file with $(jq length "$OUTPUT_FILE") targets"

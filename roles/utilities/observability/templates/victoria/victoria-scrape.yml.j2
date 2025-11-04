@@ -1,0 +1,68 @@
+global:
+  scrape_interval: 30s
+  scrape_timeout: 10s
+  external_labels:
+    cluster: {{ observability_cluster_name }}
+    environment: {{ observability_environment }}
+
+scrape_configs:
+  # Node Exporter - System metrics from all swarm nodes
+  - job_name: 'node-exporter'
+    file_sd_configs:
+      - files:
+          - /etc/victoria-metrics/node-exporters.json
+    metric_relabel_configs:
+      # Copy node label to hostname for display
+      - source_labels: [node]
+        target_label: hostname
+        action: replace
+
+  # OTEL Collector - Application metrics via OTLP
+  - job_name: 'otel-collector'
+    dns_sd_configs:
+      - names:
+          - 'tasks.observability_otel-collector'
+        type: 'A'
+        port: 8889
+    relabel_configs:
+      - source_labels: [__meta_dns_name]
+        target_label: job
+        replacement: otel-collector
+
+  # VictoriaMetrics self-monitoring
+  - job_name: 'victoria-metrics'
+    static_configs:
+      - targets: ['localhost:8428']
+        labels:
+          service: victoria-metrics
+
+  # vmalert self-monitoring
+  - job_name: 'vmalert'
+    static_configs:
+      - targets: ['vmalert:8880']
+        labels:
+          service: vmalert
+
+  # Traefik metrics
+  - job_name: 'traefik'
+    dns_sd_configs:
+      - names:
+          - 'tasks.traefik_app'
+        type: 'A'
+        port: 8082
+    relabel_configs:
+      - source_labels: [__meta_dns_name]
+        target_label: job
+        replacement: traefik
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres-exporter'
+    dns_sd_configs:
+      - names:
+          - 'tasks.observability_postgres-exporter'
+        type: 'A'
+        port: 9187
+    relabel_configs:
+      - source_labels: [__meta_dns_name]
+        target_label: job
+        replacement: postgres-exporter

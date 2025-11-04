@@ -1,0 +1,134 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info
+
+# Position file to track which logs have been read
+positions:
+  filename: /promtail/positions.yaml
+
+clients:
+  - url: http://observability_loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Docker container logs via service discovery
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: status
+            values: [running]
+
+    relabel_configs:
+      # Set __path__ to the container's log file
+      - source_labels: [__meta_docker_container_id]
+        target_label: __path__
+        replacement: /var/lib/docker/containers/$1/$1-json.log
+
+      # Set Swarm service name directly as Loki label
+      - source_labels: [__meta_docker_container_label_com_docker_swarm_service_name]
+        target_label: service_name
+
+      - source_labels: [__meta_docker_container_label_com_docker_swarm_service_name]
+        target_label: swarm_service
+
+      # Set Swarm stack name
+      - source_labels: [__meta_docker_container_label_com_docker_stack_namespace]
+        target_label: swarm_stack
+
+      # Set container name
+      - source_labels: [__meta_docker_container_name]
+        target_label: container
+        regex: '/(.*)'
+        replacement: '$1'
+
+      # Set job label
+      - replacement: docker
+        target_label: job
+
+      # Set cluster label
+      - replacement: {{ observability_cluster_name }}
+        target_label: cluster
+
+      # Set environment label
+      - replacement: {{ observability_environment }}
+        target_label: environment
+
+    pipeline_stages:
+      # Parse Docker JSON log format
+      - docker: {}
+
+      # Try to parse the log field as JSON for level extraction
+      - json:
+          expressions:
+            level: level
+            msg: message
+            message: msg
+          source: output
+
+      # Remove ANSI color codes
+      - replace:
+          expression: '(\x1b\[[0-9;]*m)'
+          replace: ''
+
+      # Group multi-line logs (stack traces, etc)
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}|\[.*\]|^[A-Z]|^{"'
+          max_wait_time: 3s
+          max_lines: 128
+
+      # Output the cleaned log line
+      - output:
+          source: output
+
+  # Systemd journal logs for system-level logs
+  - job_name: systemd-journal
+    journal:
+      max_age: 12h
+      path: /var/log/journal
+      labels:
+        job: systemd-journal
+        cluster: {{ observability_cluster_name }}
+        environment: {{ observability_environment }}
+
+    relabel_configs:
+      # Drop Docker container logs - they're collected via Docker SD
+      - source_labels: ['__journal_container_name']
+        action: drop
+        regex: '.+'
+
+      # Extract systemd unit name
+      - source_labels: ['__journal__systemd_unit']
+        target_label: unit
+
+      # Extract hostname
+      - source_labels: ['__journal__hostname']
+        target_label: hostname
+
+      # Extract priority
+      - source_labels: ['__journal_priority']
+        target_label: priority
+
+    pipeline_stages:
+      # Map priority to level
+      - labels:
+          priority:
+
+      # Try to parse as JSON
+      - json:
+          expressions:
+            level: level
+            msg: message
+          source: message
+
+      # Remove ANSI codes
+      - replace:
+          expression: '(\x1b\[[0-9;]*m)'
+          replace: ''
+
+      # Group multi-line logs
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2}|\[.*\]|^[A-Z]'
+          max_wait_time: 3s
+          max_lines: 128

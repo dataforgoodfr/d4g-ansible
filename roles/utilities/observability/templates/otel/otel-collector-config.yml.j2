@@ -1,0 +1,65 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 400
+    spike_limit_mib: 100
+
+  resource:
+    attributes:
+      - key: cluster
+        value: {{ observability_cluster_name }}
+        action: upsert
+      - key: environment
+        value: {{ observability_environment }}
+        action: upsert
+
+  # Resource detection to add host information
+  resourcedetection:
+    detectors: [docker, system]
+    timeout: 5s
+
+exporters:
+  # Export to VictoriaMetrics via remote write
+  prometheusremotewrite:
+    endpoint: http://victoria-metrics:8428/api/v1/write
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Also expose metrics in Prometheus format for VictoriaMetrics to scrape
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: otel
+    const_labels:
+      cluster: {{ observability_cluster_name }}
+      environment: {{ observability_environment }}
+
+  # Debug exporter for troubleshooting (can be disabled in production)
+  debug:
+    verbosity: normal
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, resource, batch]
+      exporters: [prometheusremotewrite, prometheus]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: detailed

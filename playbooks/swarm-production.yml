@@ -24,14 +24,6 @@
         - docker
         - utils
 
-    - import_role:
-        name: roles/utilities/datadog
-      vars:
-        dd_env: production
-      tags:
-        - datadog
-        - utils
-
 - name: Create swarm applications
   hosts: production_swarm_cluster_nodes
   remote_user: root
@@ -262,6 +254,16 @@
         - utilities
 
     - import_role:
+        name: roles/utilities/observability
+      vars:
+        group_name: production_swarm_cluster_nodes
+        observability_cluster_name: d4g-production
+        observability_environment: production
+      tags:
+        - observability
+        - utils
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -315,6 +317,8 @@
             addresses: ["d4g-13-potentiel-solaire_app:3000"]
           - name: "ghost"
             addresses: ["d4g-ghost_app:2368"]
+          - name: "grafana"
+            addresses: ["observability_grafana:3000"]
       tags:
         - proxy
         - traefik

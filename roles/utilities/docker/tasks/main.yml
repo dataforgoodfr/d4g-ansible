@@ -15,6 +15,28 @@
     state: present
     update_cache: yes
 
+- name: Configure Docker daemon for log rotation
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+  register: docker_daemon_config
+
+- name: Notify if Docker daemon config changed
+  debug:
+    msg: |
+      ⚠️  WARNING: Docker daemon configuration has been updated!
+      A rolling restart of Docker on each node is required for changes to take effect.
+      This should be done manually to avoid service disruption.
+
+      To apply on each node:
+      1. Drain the node: docker node update --availability drain <node-name>
+      2. Restart Docker: systemctl restart docker
+      3. Reactivate the node: docker node update --availability active <node-name>
+  when: docker_daemon_config.changed
+
 - name: Ensure Docker is running
   service:
     name: docker
@@ -33,6 +55,13 @@
     minute: "0"
     hour: "3"
     job: "docker system prune -f"
+
+- name: Add cron job to clean up old container logs
+  cron:
+    name: "Docker log cleanup"
+    minute: "30"
+    hour: "3"
+    job: "find /var/lib/docker/containers/ -name '*.log' -mtime +3 -delete 2>/dev/null"
 
 - name: Create alias for debug container
   lineinfile:

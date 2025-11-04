@@ -1,0 +1,135 @@
+groups:
+  # Downsampling rules - creates 5-minute averages for long-term retention
+  # These downsampled metrics use less storage and are suitable for historical analysis
+  # Dashboards should query these for time ranges > 90 days
+
+  - name: downsampling_node_metrics
+    interval: 5m
+    rules:
+      # CPU metrics - 5-minute averages
+      - record: node_cpu_seconds_total:5m_avg
+        expr: avg_over_time(node_cpu_seconds_total[5m])
+
+      - record: node_load1:5m_avg
+        expr: avg_over_time(node_load1[5m])
+
+      - record: node_load5:5m_avg
+        expr: avg_over_time(node_load5[5m])
+
+      - record: node_load15:5m_avg
+        expr: avg_over_time(node_load15[5m])
+
+      # Memory metrics - 5-minute averages
+      - record: node_memory_MemTotal_bytes:5m_avg
+        expr: avg_over_time(node_memory_MemTotal_bytes[5m])
+
+      - record: node_memory_MemAvailable_bytes:5m_avg
+        expr: avg_over_time(node_memory_MemAvailable_bytes[5m])
+
+      - record: node_memory_MemFree_bytes:5m_avg
+        expr: avg_over_time(node_memory_MemFree_bytes[5m])
+
+      - record: node_memory_Cached_bytes:5m_avg
+        expr: avg_over_time(node_memory_Cached_bytes[5m])
+
+      - record: node_memory_Buffers_bytes:5m_avg
+        expr: avg_over_time(node_memory_Buffers_bytes[5m])
+
+      # Disk metrics - 5-minute averages
+      - record: node_filesystem_size_bytes:5m_avg
+        expr: avg_over_time(node_filesystem_size_bytes[5m])
+
+      - record: node_filesystem_avail_bytes:5m_avg
+        expr: avg_over_time(node_filesystem_avail_bytes[5m])
+
+      - record: node_filesystem_files:5m_avg
+        expr: avg_over_time(node_filesystem_files[5m])
+
+      # Network metrics - 5-minute rates (not averages, rates of counters)
+      - record: node_network_receive_bytes_total:5m_rate
+        expr: rate(node_network_receive_bytes_total[5m])
+
+      - record: node_network_transmit_bytes_total:5m_rate
+        expr: rate(node_network_transmit_bytes_total[5m])
+
+      - record: node_network_receive_errs_total:5m_rate
+        expr: rate(node_network_receive_errs_total[5m])
+
+      - record: node_network_transmit_errs_total:5m_rate
+        expr: rate(node_network_transmit_errs_total[5m])
+
+      # Disk I/O metrics - 5-minute rates
+      - record: node_disk_read_bytes_total:5m_rate
+        expr: rate(node_disk_read_bytes_total[5m])
+
+      - record: node_disk_written_bytes_total:5m_rate
+        expr: rate(node_disk_written_bytes_total[5m])
+
+      - record: node_disk_io_time_seconds_total:5m_rate
+        expr: rate(node_disk_io_time_seconds_total[5m])
+
+  - name: downsampling_application_metrics
+    interval: 5m
+    rules:
+      # Application counters - keep rates not raw values for downsampling
+      # Pattern: <metric_name>:5m_rate for all counter types
+
+      # HTTP request metrics (if exposed via OTEL)
+      - record: http_requests_total:5m_rate
+        expr: rate(http_requests_total[5m])
+
+  - name: downsampling_database_metrics
+    interval: 5m
+    rules:
+      # PostgreSQL metrics - 5-minute averages and rates
+
+      # Connection metrics
+      - record: pg_stat_activity_count:5m_avg
+        expr: avg_over_time(pg_stat_activity_count[5m])
+
+      # Transaction metrics
+      - record: pg_stat_database_xact_commit:5m_rate
+        expr: rate(pg_stat_database_xact_commit[5m])
+
+      - record: pg_stat_database_xact_rollback:5m_rate
+        expr: rate(pg_stat_database_xact_rollback[5m])
+
+      # Database size
+      - record: pg_database_size_bytes:5m_avg
+        expr: avg_over_time(pg_database_size_bytes[5m])
+
+      # Buffer cache metrics
+      - record: pg_stat_database_blks_hit:5m_rate
+        expr: rate(pg_stat_database_blks_hit[5m])
+
+      - record: pg_stat_database_blks_read:5m_rate
+        expr: rate(pg_stat_database_blks_read[5m])
+
+      # Row operations
+      - record: pg_stat_database_tup_returned:5m_rate
+        expr: rate(pg_stat_database_tup_returned[5m])
+
+      - record: pg_stat_database_tup_fetched:5m_rate
+        expr: rate(pg_stat_database_tup_fetched[5m])
+
+      - record: pg_stat_database_tup_inserted:5m_rate
+        expr: rate(pg_stat_database_tup_inserted[5m])
+
+      - record: pg_stat_database_tup_updated:5m_rate
+        expr: rate(pg_stat_database_tup_updated[5m])
+
+      - record: pg_stat_database_tup_deleted:5m_rate
+        expr: rate(pg_stat_database_tup_deleted[5m])
+
+  - name: downsampling_traefik_metrics
+    interval: 5m
+    rules:
+      # Traefik request metrics
+      - record: traefik_entrypoint_requests_total:5m_rate
+        expr: rate(traefik_entrypoint_requests_total[5m])
+
+      - record: traefik_entrypoint_request_duration_seconds_sum:5m_rate
+        expr: rate(traefik_entrypoint_request_duration_seconds_sum[5m])
+
+      - record: traefik_entrypoint_request_duration_seconds_count:5m_rate
+        expr: rate(traefik_entrypoint_request_duration_seconds_count[5m])

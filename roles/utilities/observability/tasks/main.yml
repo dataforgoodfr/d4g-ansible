@@ -1,0 +1,240 @@
+---
+- name: Create observability directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - /opt/observability
+    - /opt/observability/data
+    - /opt/observability/data/victoria
+    - /opt/observability/data/grafana
+    - /opt/observability/data/node-exporter-textfile
+    - /opt/observability/data/loki
+    - /opt/observability/data/loki/chunks
+    - /opt/observability/data/loki/rules
+    - /opt/observability/data/loki/tsdb-index
+    - /opt/observability/data/loki/tsdb-cache
+    - /opt/observability/data/loki/compactor
+    - /opt/observability/data/promtail
+    - /opt/observability/config
+    - /opt/observability/config/vmalert-rules
+    - /opt/observability/config/grafana/provisioning/datasources
+    - /opt/observability/config/grafana/provisioning/dashboards
+    - /opt/observability/scripts
+
+- name: Set correct ownership for Grafana data directory
+  file:
+    path: /opt/observability/data/grafana
+    owner: "472"
+    group: "472"
+    state: directory
+    recurse: yes
+
+- name: Set correct ownership for Loki data directory
+  file:
+    path: /opt/observability/data/loki
+    owner: "10001"
+    group: "10001"
+    state: directory
+    recurse: yes
+
+- name: Create observability service definition
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - {
+        src: "docker/docker-compose.yml.j2",
+        dest: "/opt/observability/config/docker-compose.yml",
+      }
+    - {
+        src: "otel/otel-collector-config.yml.j2",
+        dest: "/opt/observability/config/otel-collector-config.yml",
+      }
+    - {
+        src: "victoria/victoria-scrape.yml.j2",
+        dest: "/opt/observability/config/victoria-scrape.yml",
+      }
+    - {
+        src: "vmalert/vmalert-rules-downsampling.yml.j2",
+        dest: "/opt/observability/config/vmalert-rules/downsampling.yml",
+      }
+    - {
+        src: "loki/loki-config.yml.j2",
+        dest: "/opt/observability/config/loki-config.yml",
+      }
+    - {
+        src: "promtail/promtail-config.yml.j2",
+        dest: "/opt/observability/config/promtail-config.yml",
+      }
+
+- name: Copy Grafana dashboards
+  copy:
+    src: "grafana/"
+    dest: "/opt/observability/config/grafana"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Initialize node-exporters.json file
+  copy:
+    content: "[]"
+    dest: /opt/observability/config/node-exporters.json
+    owner: root
+    group: root
+    mode: "0644"
+    force: no
+
+- name: Deploy node-exporter discovery script
+  template:
+    src: scripts/discover-node-exporters.sh.j2
+    dest: /opt/observability/scripts/discover-node-exporters.sh
+    owner: root
+    group: root
+    mode: "0755"
+  when: is_swarm_leader | default(false)
+
+- name: Deploy docker services exporter script
+  template:
+    src: scripts/export-docker-services.sh.j2
+    dest: /opt/observability/scripts/export-docker-services.sh
+    owner: root
+    group: root
+    mode: "0755"
+  when: is_swarm_leader | default(false)
+
+# We use this to interactively discover the nodes in the cluster so VictoriaMetrics
+# knows what hosts to scrape and what their hostnames are.
+- name: Create systemd service for node-exporter discovery
+  copy:
+    dest: /etc/systemd/system/discover-node-exporters.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Discover node-exporter containers for VictoriaMetrics
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/opt/observability/scripts/discover-node-exporters.sh
+      StandardOutput=journal
+      StandardError=journal
+
+      [Install]
+      WantedBy=multi-user.target
+  when: is_swarm_leader | default(false)
+
+- name: Create systemd timer for node-exporter discovery
+  copy:
+    dest: /etc/systemd/system/discover-node-exporters.timer
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Run node-exporter discovery every minute
+      Requires=discover-node-exporters.service
+
+      [Timer]
+      OnBootSec=1min
+      OnUnitActiveSec=1min
+      Unit=discover-node-exporters.service
+
+      [Install]
+      WantedBy=timers.target
+  when: is_swarm_leader | default(false)
+
+- name: Enable and start discovery timer
+  systemd:
+    name: discover-node-exporters.timer
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  when: is_swarm_leader | default(false)
+
+- name: Run discovery script once immediately
+  command: /opt/observability/scripts/discover-node-exporters.sh
+  when: is_swarm_leader | default(false)
+  changed_when: false
+
+- name: Create systemd service for docker services exporter
+  copy:
+    dest: /etc/systemd/system/export-docker-services.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Export Docker Swarm service status for Prometheus
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/opt/observability/scripts/export-docker-services.sh
+      StandardOutput=journal
+      StandardError=journal
+
+      [Install]
+      WantedBy=multi-user.target
+  when: is_swarm_leader | default(false)
+
+- name: Create systemd timer for docker services exporter
+  copy:
+    dest: /etc/systemd/system/export-docker-services.timer
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Run docker services exporter every minute
+      Requires=export-docker-services.service
+
+      [Timer]
+      OnBootSec=1min
+      OnUnitActiveSec=1min
+      Unit=export-docker-services.service
+
+      [Install]
+      WantedBy=timers.target
+  when: is_swarm_leader | default(false)
+
+- name: Enable and start docker services exporter timer
+  systemd:
+    name: export-docker-services.timer
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  when: is_swarm_leader | default(false)
+
+- name: Run docker services exporter once immediately
+  command: /opt/observability/scripts/export-docker-services.sh
+  when: is_swarm_leader | default(false)
+  changed_when: false
+
+- name: Apply observability stack
+  command: docker stack deploy -c /opt/observability/config/docker-compose.yml observability
+  args:
+    chdir: /opt/observability/config
+  when: is_swarm_leader | default(false)
+  register: observability_stack_output
+  changed_when: observability_stack_output.stdout != "observability"
+
+- name: Setup S3 backup for VictoriaMetrics data
+  include_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: "victoria-metrics"
+    data_dir: /opt/observability/data/victoria
+  when: is_swarm_leader | default(false)
+  tags:
+    - backup

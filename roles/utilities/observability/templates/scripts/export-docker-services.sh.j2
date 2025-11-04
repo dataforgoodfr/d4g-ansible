@@ -1,0 +1,53 @@
+#!/bin/bash
+# Export Docker Swarm service replica status as Prometheus metrics
+# This runs on the swarm leader to expose service health information
+
+set -e
+
+TEXTFILE_DIR="/opt/observability/data/node-exporter-textfile"
+OUTPUT_FILE="${TEXTFILE_DIR}/docker_services.prom.$$"
+FINAL_FILE="${TEXTFILE_DIR}/docker_services.prom"
+
+# Create temp file with all HELP/TYPE declarations first
+cat > "$OUTPUT_FILE" << 'EOF'
+# HELP docker_service_replicas_running Number of running replicas for a service
+# TYPE docker_service_replicas_running gauge
+# HELP docker_service_replicas_expected Number of expected replicas for a service
+# TYPE docker_service_replicas_expected gauge
+# HELP docker_service_replicas_deficit Deficit between expected and running replicas
+# TYPE docker_service_replicas_deficit gauge
+EOF
+
+# Get service status
+docker service ls --format "{% raw %}{{.Name}} {{.Mode}} {{.Replicas}}{% endraw %}" | while read -r line; do
+    name=$(echo "$line" | awk '{print $1}')
+    mode=$(echo "$line" | awk '{print $2}')
+    replicas=$(echo "$line" | awk '{print $3}')
+
+    # Parse replicas
+    # Format: "X/Y" for replicated services
+    # Format: "X/Y (max Y per node)" for replicated with max_replicas_per_node
+    # Format: "X (max Y per node)" for global services
+
+    if [[ "$replicas" =~ ^([0-9]+)/([0-9]+)$ ]]; then
+        # Replicated service: X/Y format
+        running="${BASH_REMATCH[1]}"
+        expected="${BASH_REMATCH[2]}"
+        deficit=$((expected - running))
+    elif [[ "$replicas" =~ ^([0-9]+)$ ]]; then
+        # Global service: just a number
+        running="${BASH_REMATCH[1]}"
+        expected=$running
+        deficit=0
+    else
+        # Unparseable format, skip
+        continue
+    fi
+
+    echo "docker_service_replicas_running{service=\"$name\",mode=\"$mode\"} $running" >> "$OUTPUT_FILE"
+    echo "docker_service_replicas_expected{service=\"$name\",mode=\"$mode\"} $expected" >> "$OUTPUT_FILE"
+    echo "docker_service_replicas_deficit{service=\"$name\",mode=\"$mode\"} $deficit" >> "$OUTPUT_FILE"
+done
+
+# Atomic move
+mv "$OUTPUT_FILE" "$FINAL_FILE"

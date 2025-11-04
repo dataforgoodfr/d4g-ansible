@@ -1,0 +1,15 @@
+# This file pre-populates all the dashboards tracked in this repository
+# and prevents them from being edited manually by users.
+apiVersion: 1
+
+providers:
+  - name: 'D4g Dashboards'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false

@@ -1,0 +1,7 @@
+---
+# Cluster identification
+observability_cluster_name: "swarm-production"
+observability_environment: "production"
+
+# Base domain for Grafana URL
+base_domain: "services.dataforgood.fr"

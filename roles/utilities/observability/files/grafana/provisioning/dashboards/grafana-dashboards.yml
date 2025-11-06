@@ -6,7 +6,8 @@ providers:
   # Default dashboards - private, only visible to logged-in users
   - name: 'D4g Dashboards'
     orgId: 1
-    folder: ''
+    folder: 'General'
+    folderUid: 'general'
     type: file
     disableDeletion: true
     updateIntervalSeconds: 30
@@ -19,6 +20,7 @@ providers:
   - name: 'Public Dashboards'
     orgId: 1
     folder: 'Public'
+    folderUid: 'public'
     type: file
     disableDeletion: true
     updateIntervalSeconds: 30

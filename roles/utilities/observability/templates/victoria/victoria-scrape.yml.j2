@@ -66,3 +66,16 @@ scrape_configs:
       - source_labels: [__meta_dns_name]
         target_label: job
         replacement: postgres-exporter
+
+  # Chat Exporter - Slack and Mattermost metrics
+  - job_name: 'chat-exporter'
+    dns_sd_configs:
+      - names:
+          - 'tasks.observability_chat-exporter'
+        type: 'A'
+        port: 9090
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__meta_dns_name]
+        target_label: job
+        replacement: chat-exporter

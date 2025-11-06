@@ -85,8 +85,15 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD={{ lookup("env", "GRAFANA_ADMIN_PASSWORD") }}
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_AUTH_ANONYMOUS_HIDE_VERSION=true
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SERVER_ROOT_URL=https://grafana.{{ base_domain }}
+      - GF_SERVER_DOMAIN=grafana.{{ base_domain }}
+      - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/dashboards/dashboard-chat-analytics.json
     volumes:
       - /opt/observability/data/grafana:/var/lib/grafana
       - /opt/observability/config/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -142,6 +149,25 @@ services:
         limits:
           memory: 128M
           cpus: '0.1'
+
+  # Chat Exporter - Slack and Mattermost metrics
+  chat-exporter:
+    image: ghcr.io/dataforgoodfr/d4g-chat-exporter:latest
+    env_file: ./chat-exporter.env
+    networks:
+      - d4g-internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.2'
+        reservations:
+          memory: 128M
 
   # Loki - Log aggregation system
   loki:

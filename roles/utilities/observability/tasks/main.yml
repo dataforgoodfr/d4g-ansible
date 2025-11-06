@@ -54,6 +54,10 @@
         dest: "/opt/observability/config/docker-compose.yml",
       }
     - {
+        src: "docker/chat-exporter.env.j2",
+        dest: "/opt/observability/config/chat-exporter.env",
+      }
+    - {
         src: "otel/otel-collector-config.yml.j2",
         dest: "/opt/observability/config/otel-collector-config.yml",
       }

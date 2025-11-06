@@ -3,6 +3,7 @@
 apiVersion: 1
 
 providers:
+  # Default dashboards - private, only visible to logged-in users
   - name: 'D4g Dashboards'
     orgId: 1
     folder: ''
@@ -12,4 +13,16 @@ providers:
     allowUiUpdates: false
     options:
       path: /etc/grafana/dashboards
+      foldersFromFilesStructure: false
+
+  # Public dashboards - visible to anonymous viewers
+  - name: 'Public Dashboards'
+    orgId: 1
+    folder: 'Public'
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/dashboards/public
       foldersFromFilesStructure: false

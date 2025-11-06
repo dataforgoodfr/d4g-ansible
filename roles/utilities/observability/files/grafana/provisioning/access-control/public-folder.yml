@@ -1,0 +1,8 @@
+apiVersion: 2
+
+policies:
+  - name: 'Public folder viewer access'
+    scopes:
+      - 'folders:uid:public'
+    role: 'Viewer'
+    orgId: 1

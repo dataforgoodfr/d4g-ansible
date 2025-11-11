@@ -34,6 +34,11 @@ entrypoints:
           scheme: "https"
           permanent: true
 
+{% for entrypoint in tcp_entrypoints %}
+  {{ entrypoint.name }}:
+    address: ":{{ entrypoint.port }}"
+{% endfor %}
+
   webtls:
     address: ":443"
 
@@ -79,6 +84,28 @@ http:
           - url: "http://{{ address }}"
 {% endfor %}
 {% endfor %}
+
+{% if tcp_services %}
+tcp:
+  routers:
+{% for service in tcp_services %}
+    {{ service.name }}:
+      rule: "HostSNI(`*`)"
+      service: {{ service.name }}
+      entryPoints:
+        - {{ service.entrypoint }}
+{% endfor %}
+
+  services:
+{% for service in tcp_services %}
+    {{ service.name }}:
+      loadBalancer:
+        servers:
+{% for address in service.addresses %}
+          - address: "{{ address }}"
+{% endfor %}
+{% endfor %}
+{% endif %}
 
 tls:
   certificates:

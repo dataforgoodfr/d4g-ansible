@@ -280,7 +280,7 @@
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
           - name: "stalwart"
-            addresses: ["d4g-stalwart_app"]
+            addresses: ["d4g-stalwart_app:8080"]
           - name: "n8n"
             addresses: ["d4g-n8n_app"]
           - name: "uptime"

@@ -1,0 +1,17 @@
+services:
+  app:
+    env_file: ./stalwart.env
+    image: stalwartlabs/stalwart:v0.14.1-alpine
+    volumes:
+      - ./stalwart:/opt/stalwart
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

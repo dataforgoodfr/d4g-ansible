@@ -124,7 +124,7 @@
             "type": "prometheus",
             "uid": "VictoriaMetrics"
           },
-          "expr": "sum(pg_stat_activity_count)",
+          "expr": "sum(pg_stat_database_numbackends)",
           "legendFormat": "Active Connections",
           "refId": "A"
         },

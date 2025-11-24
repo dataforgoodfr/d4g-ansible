@@ -1,7 +1,6 @@
 services:
   app:
     image: stalwartlabs/stalwart:v0.14
-    # TODO: do we persist logs ?
     volumes:
       - ./config.toml:/opt/stalwart/etc/config.toml:ro
     env_file: ./stalwart.env

@@ -128,7 +128,7 @@ compression = "lz4"
 max-retries = 5
 timeout = "30s"
 
-[store.minio.purge]
+[store.s3.purge]
 frequency = "0 3 *"  # every day at 3AM
 
 
@@ -136,13 +136,10 @@ frequency = "0 3 *"  # every day at 3AM
 ### Logging config ###
 ######################
 
-[tracer.log]
-type = "log"
+[tracer.console]
+type = "console"
+level = "%{env:CONSOLE_LOG_LEVEL}%"
 enable = true
-level = "info"
-path = "/opt/stalwart/logs"
-prefix = "stalwart.log"
-rotate = "hourly"
 ansi = false
 
 

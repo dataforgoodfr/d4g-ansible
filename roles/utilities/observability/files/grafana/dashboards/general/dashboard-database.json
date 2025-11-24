@@ -200,7 +200,7 @@
             "type": "prometheus",
             "uid": "VictoriaMetrics"
           },
-          "expr": "(sum(pg_stat_activity_count) / max(pg_settings_max_connections)) * 100",
+          "expr": "(sum(pg_stat_database_numbackends) / max(pg_settings_max_connections)) * 100",
           "refId": "A"
         }
       ],
@@ -255,7 +255,7 @@
             "type": "prometheus",
             "uid": "VictoriaMetrics"
           },
-          "expr": "pg_stat_activity_count by (state)",
+          "expr": "pg_stat_database_numbackends by (state)",
           "legendFormat": "{{state}}",
           "refId": "A"
         }

@@ -1,30 +1,32 @@
-# This file pre-populates all the dashboards tracked in this repository
-# and prevents them from being edited manually by users.
+# This file pre-populates all the dashboards tracked in this repository.
+# allowUiUpdates is set to true to enable automatic reloading when files change.
+# Note: Users can temporarily edit dashboards, but changes are overwritten
+# when the file is updated (checked every 30 seconds).
 apiVersion: 1
 
 providers:
   # Default dashboards - private, only visible to logged-in users
   - name: 'D4g Dashboards'
     orgId: 1
-    folder: 'General'
-    folderUid: 'general'
+    folder: ''
+    folderUid: ''
     type: file
     disableDeletion: true
     updateIntervalSeconds: 30
-    allowUiUpdates: false
+    allowUiUpdates: true
     options:
-      path: /etc/grafana/dashboards
+      path: /etc/grafana/dashboards/general
       foldersFromFilesStructure: false
 
   # Public dashboards - visible to anonymous viewers
   - name: 'Public Dashboards'
     orgId: 1
     folder: 'Public'
-    folderUid: 'public'
+    folderUid: ''
     type: file
     disableDeletion: true
     updateIntervalSeconds: 30
-    allowUiUpdates: false
+    allowUiUpdates: true
     options:
       path: /etc/grafana/dashboards/public
       foldersFromFilesStructure: false

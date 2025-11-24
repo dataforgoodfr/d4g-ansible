@@ -84,8 +84,8 @@ groups:
       # PostgreSQL metrics - 5-minute averages and rates
 
       # Connection metrics
-      - record: pg_stat_activity_count:5m_avg
-        expr: avg_over_time(pg_stat_activity_count[5m])
+      - record: pg_stat_database_numbackends:5m_avg
+        expr: avg_over_time(pg_stat_database_numbackends[5m])
 
       # Transaction metrics
       - record: pg_stat_database_xact_commit:5m_rate

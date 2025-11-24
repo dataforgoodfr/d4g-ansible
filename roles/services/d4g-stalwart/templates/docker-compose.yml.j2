@@ -1,8 +1,10 @@
 services:
   app:
     image: stalwartlabs/stalwart:v0.14
+    # TODO: do we persist logs ?
     volumes:
-      - ./stalwart:/opt/stalwart
+      - ./config.toml:/opt/stalwart/etc/config.toml:ro
+    env_file: ./stalwart.env
     networks:
       - d4g-internal
     deploy:

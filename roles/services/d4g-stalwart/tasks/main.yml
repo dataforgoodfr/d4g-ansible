@@ -4,16 +4,12 @@
     path: "/opt/d4g-stalwart"
     state: directory
 
-- name: Create d4g-stalwart directory
-  file:
-    path: "/opt/d4g-stalwart/stalwart"
-    state: directory
-
 - name: Creating d4g-stalwart template
   template:
     src: "{{ item }}.j2"
     dest: /opt/d4g-stalwart/{{ item }}
   with_items:
+    - config.toml
     - docker-compose.yml
     - stalwart.env
 
@@ -33,6 +29,7 @@
     - up
   when: is_swarm_leader | default(false)
 
+# TODO: update backups
 - import_role:
     name: roles/utilities/s3-backup
   vars:

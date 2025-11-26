@@ -21,7 +21,7 @@
     dest: /etc/docker/daemon.json
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   register: docker_daemon_config
 
 - name: Notify if Docker daemon config changed
@@ -43,6 +43,13 @@
     state: started
     enabled: yes
 
+- name: Login to GitHub Container Registry (ghcr.io)
+  community.docker.docker_login:
+    registry_url: ghcr.io
+    username: "{{ lookup('env', 'GITHUB_USER') }}"
+    password: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    reauthorize: yes
+
 - include_tasks: swarm_leader.yml
   when: use_swarm and is_swarm_leader
 
@@ -55,13 +62,6 @@
     minute: "0"
     hour: "3"
     job: "docker system prune -f"
-
-- name: Add cron job to clean up old container logs
-  cron:
-    name: "Docker log cleanup"
-    minute: "30"
-    hour: "3"
-    job: "find /var/lib/docker/containers/ -name '*.log' -mtime +3 -delete 2>/dev/null"
 
 - name: Create alias for debug container
   lineinfile:

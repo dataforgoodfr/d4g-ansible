@@ -1,0 +1,29 @@
+---
+- name: Create oxfam-metabase directory
+  file:
+    path: /opt/oxfam-metabase
+    state: directory
+
+- name: Create oxfam-metabase files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/oxfam-metabase/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - oxfam-metabase.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/oxfam-metabase
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml oxfam-metabase
+  args:
+    chdir: /opt/oxfam-metabase
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

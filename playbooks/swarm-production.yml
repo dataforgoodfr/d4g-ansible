@@ -253,6 +253,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-stalwart
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-stalwart
+        - service
+
+    - import_role:
         name: roles/utilities/watchtower
       vars:
         watchtower_scope:
@@ -279,6 +288,8 @@
         services:
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
+          - name: "stalwart"
+            addresses: ["d4g-stalwart_app:8080"]
           - name: "n8n"
             addresses: ["d4g-n8n_app"]
           - name: "uptime"
@@ -330,6 +341,30 @@
             addresses: ["d4g-ghost_app:2368"]
           - name: "grafana"
             addresses: ["observability_grafana:3000"]
+        tcp_entrypoints:
+          - name: stalwart-smtp
+            port: 25
+          - name: stalwart-smtps
+            port: 465
+          - name: stalwart-imaps
+            port: 993
+        # TODO: current traefik config for tcp service rules is HostSNI(`*`) and ignore provided `domain` ?
+        tcp_services:
+          - name: stalwart-smtp-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-smtp
+            addresses:
+              - "d4g-stalwart_app:25"
+          - name: stalwart-smtps-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-smtps
+            addresses:
+              - "d4g-stalwart_app:465"
+          - name: stalwart-imaps-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-imaps
+            addresses:
+              - "d4g-stalwart_app:993"
       tags:
         - proxy
         - traefik

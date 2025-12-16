@@ -2,6 +2,16 @@
 # currently does not rely on jinja templating directly but loads env variables
 
 
+# The following configuration are kept in this TOML as single source of truth
+# cf https://stalw.art/docs/configuration/overview#local-and-database-settings
+
+[config]
+local-keys = [ "store.*", "directory.*", "tracer.*", "!server.blocked-ip.*", "!server.allowed-ip.*", "server.*",
+    "authentication.fallback-admin.*", "cluster.*",   "config.local-keys.*",
+    "storage.data", "storage.blob", "storage.lookup", "storage.fts", "storage.directory", "certificate.*",
+    "authentication.master.*", "http.*" ]
+
+
 #####################
 ### Server config ###
 #####################
@@ -73,6 +83,20 @@ implicit = true
 
 
 #############################
+### Network configuration ###
+#############################
+
+# cf https://stalw.art/docs/http/settings
+
+[http]
+url = "'https://' + config_get('server.hostname')"
+use-x-forwarded = true
+
+[http.rate-limit]
+account = "1000/1m"
+anonymous = "100/1m"
+
+#############################
 ### Storage configuration ###
 #############################
 
@@ -136,17 +160,23 @@ frequency = "0 3 *"  # every day at 3AM
 ### Logging config ###
 ######################
 
-[tracer.console]
-type = "console"
+[tracer.stdout]
+type = "stdout"
 level = "%{env:CONSOLE_LOG_LEVEL}%"
 enable = true
 ansi = false
 
 
 #########################
-### Global admin user ###
+### Global admin users ###
 #########################
 
+# cf https://stalw.art/docs/auth/authorization/administrator/
+
 [authentication.fallback-admin]
-user = "%{env:ADMIN_USER}%"
-secret = "%{env:ADMIN_PASSWORD}%"
+user = "d4gadmin"
+secret = "%{env:FALLBACK_ADMIN_PASSWORD}%"
+
+[authentication.master]
+user = "master"
+secret = "%{env:MASTER_PASSWORD}%"

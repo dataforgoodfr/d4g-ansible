@@ -143,6 +143,15 @@
         - service
 
     - import_role:
+        name: roles/services/oxfam-metabase
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - oxfam
+        - service
+
+    - import_role:
         name: roles/services/d4g-plausible
       vars:
         deploy_on: "metal-1.dataforgood.fr"
@@ -306,6 +315,8 @@
             addresses: ["d4g-penpot_app:8080"]
           - name: "collectif5050"
             addresses: ["collectif5050-metabase_app:3000"]
+          - name: "oxfam"
+            addresses: ["oxfam-metabase_app:3000"]
           - name: "metabase"
             addresses: ["d4g-metabase_app:3001"]
           - name: "plausible"

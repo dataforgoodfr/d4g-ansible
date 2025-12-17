@@ -344,27 +344,54 @@
         tcp_entrypoints:
           - name: stalwart-smtp
             port: 25
-          - name: stalwart-smtps
-            port: 465
           - name: stalwart-imaps
             port: 993
-        # TODO: current traefik config for tcp service rules is HostSNI(`*`) and ignore provided `domain` ?
+          - name: stalwart-imap
+            port: 143
+          - name: stalwart-pop3s
+            port: 995
+          - name: stalwart-pop3
+            port: 110
+          - name: stalwart-submissions
+            port: 465
+          - name: stalwart-submission
+            port: 587
         tcp_services:
           - name: stalwart-smtp-service
             domain: stalwart.services.dataforgood.fr
             entrypoint: stalwart-smtp
             addresses:
               - "d4g-stalwart_app:25"
-          - name: stalwart-smtps-service
-            domain: stalwart.services.dataforgood.fr
-            entrypoint: stalwart-smtps
-            addresses:
-              - "d4g-stalwart_app:465"
           - name: stalwart-imaps-service
             domain: stalwart.services.dataforgood.fr
             entrypoint: stalwart-imaps
             addresses:
               - "d4g-stalwart_app:993"
+          - name: stalwart-imap-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-imap
+            addresses:
+              - "d4g-stalwart_app:143"
+          - name: stalwart-submissions-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-submissions
+            addresses:
+              - "d4g-stalwart_app:465"
+          - name: stalwart-pop3s-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-pop3s
+            addresses:
+              - "d4g-stalwart_app:995"
+          - name: stalwart-pop3-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-pop3
+            addresses:
+              - "d4g-stalwart_app:110"
+          - name: stalwart-submission-service
+            domain: stalwart.services.dataforgood.fr
+            entrypoint: stalwart-submission
+            addresses:
+              - "d4g-stalwart_app:587"
       tags:
         - proxy
         - traefik

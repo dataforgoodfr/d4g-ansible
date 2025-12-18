@@ -1,0 +1,27 @@
+---
+- name: Create {{ stack_name }} directory
+  file:
+    path: /opt/{{ stack_name }}
+    state: directory
+
+- name: Create {{ stack_name }} files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/{{ stack_name }}/{{ item }}
+  with_items:
+    - docker-compose.yml
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/{{ stack_name }}
+  tags:
+    - pull
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml {{ stack_name }}
+  args:
+    chdir: /opt/{{ stack_name }}
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

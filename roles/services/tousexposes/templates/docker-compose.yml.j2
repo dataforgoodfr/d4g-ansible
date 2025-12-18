@@ -1,0 +1,11 @@
+services:
+  app:
+    image: ghcr.io/dataforgoodfr/offseason_vive_les_pesticides:{{ docker_image_tag | default('latest') }}
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+
+networks:
+  d4g-internal:
+    external: true

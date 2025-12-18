@@ -106,6 +106,12 @@
         - service
 
     - import_role:
+        name: roles/services/tousexposes
+      tags:
+        - tousexposes
+        - service
+
+    - import_role:
         name: roles/services/d4g-website
       vars:
         stack_name: d4g-website-staging
@@ -341,6 +347,8 @@
             addresses: ["d4g-ghost_app:2368"]
           - name: "grafana"
             addresses: ["observability_grafana:3000"]
+          - name: "tousexposes"
+            addresses: ["tousexposes_app:3000"]
         tcp_entrypoints:
           - name: stalwart-smtp
             port: 25

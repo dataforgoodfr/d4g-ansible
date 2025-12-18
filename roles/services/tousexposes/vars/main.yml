@@ -1,0 +1,5 @@
+---
+# Default production values
+stack_name: tousexposes
+docker_image_tag: latest
+replicas: 2

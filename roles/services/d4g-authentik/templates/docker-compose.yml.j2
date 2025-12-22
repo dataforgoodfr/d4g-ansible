@@ -23,7 +23,7 @@ services:
           - node.hostname == {{ deploy_on }}
 
   app:
-    image: ghcr.io/goauthentik/server:2025.6
+    image: ghcr.io/goauthentik/server:2025.10
     command: server
     env_file: authentik.env
     volumes:
@@ -38,7 +38,7 @@ services:
           - node.hostname == {{ deploy_on }}
 
   worker:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.6.0}
+    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.10}
     restart: unless-stopped
     command: worker
     env_file: authentik.env

@@ -331,8 +331,6 @@
             addresses: ["d4g-mattermost_app:8065"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
-          - name: "wslauth"
-            addresses: ["d4g-authentik_app"]
           - name: "cartocampement"
             addresses: ["d4g-authentik_app"]
           - name: "us-climate-data"

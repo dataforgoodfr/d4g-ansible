@@ -259,6 +259,15 @@
         - service
 
     - import_role:
+        name: roles/services/biolit-labelstudio
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - biolit
+        - service
+
+    - import_role:
         name: roles/services/d4g-stalwart
       vars:
         deploy_on: "metal-2.dataforgood.fr"

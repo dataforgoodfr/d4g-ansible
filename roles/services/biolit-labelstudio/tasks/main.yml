@@ -1,0 +1,55 @@
+- name: Create biolit-label directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/biolit-labelstudio
+
+- name: Create biolit-labelstudio files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/biolit-labelstudio/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - biolit.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/biolit-labelstudio
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml biolit-labelstudio
+  args:
+    chdir: /opt/biolit-labelstudio
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: mattermost
+    data_dir: /opt/biolit-labelstudio/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: biolit-labelstudio
+    service_dir: /opt/biolit-labelstudio
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: biolit
+    pgsql_password: "{{ lookup('env', 'BIOLIT_DB_PASSWORD') }}"
+    pgsql_database: biolit
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

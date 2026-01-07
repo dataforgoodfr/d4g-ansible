@@ -294,6 +294,8 @@
         services:
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
+          - name: "biolitlabel"
+            addresses: ["biolit-labelstudio_app:8080"]
           - name: "stalwart"
             addresses: ["d4g-stalwart_app:8080"]
           - name: "n8n"

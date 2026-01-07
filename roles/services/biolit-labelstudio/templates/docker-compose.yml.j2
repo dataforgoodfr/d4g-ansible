@@ -1,0 +1,16 @@
+services:
+  app:
+    image: heartexlabs/label-studio:latest
+    env_file:
+      - biolit.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

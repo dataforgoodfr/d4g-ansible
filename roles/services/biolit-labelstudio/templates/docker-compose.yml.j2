@@ -1,8 +1,8 @@
 services:
   app:
     image: heartexlabs/label-studio:latest
-    env_file:
-      - biolit.env
+    volumes:
+      - /opt/biolit-labelstudio/biolit.env:/label-studio/data/.env
     networks:
       - d4g-internal
     deploy:

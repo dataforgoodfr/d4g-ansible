@@ -1,0 +1,95 @@
+---
+- name: Initial configuration
+  hosts: staging_swarm_cluster_nodes
+  remote_user: ubuntu
+  become: true
+
+  tasks:
+    - import_role:
+        name: roles/utilities/base-ubuntu
+      tags:
+        - base
+
+- name: Create swarm workers
+  hosts: staging_swarm_cluster_nodes
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/utilities/docker
+      vars:
+        use_swarm: true
+        group_name: "staging_swarm_cluster_nodes"
+      tags:
+        - docker
+        - utils
+
+- name: Create swarm applications
+  hosts: staging_swarm_cluster_nodes
+  remote_user: root
+
+  tasks:
+    - import_role:
+        name: roles/utilities/acme.sh
+      vars:
+        group_name: "staging_swarm_cluster_nodes"
+        domain_names:
+          - "*.services.d4g.fr"
+          - "d4g.fr"
+          - "*.d4g.fr"
+      tags:
+        - acme
+        - tls
+
+    - import_role:
+        name: roles/services/d4g-outline
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - outline
+        - service
+
+    - import_role:
+        name: roles/services/d4g-mattermost
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - mattermost
+        - service
+
+    - import_role:
+        name: roles/services/d4g-community-manager
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - d4g-community-manager
+        - service
+
+    - import_role:
+        name: roles/utilities/observability
+      vars:
+        group_name: staging_swarm_cluster_nodes
+        observability_cluster_name: d4g-production
+        observability_environment: production
+      tags:
+        - observability
+        - utils
+
+    - import_role:
+        name: roles/utilities/traefik
+      vars:
+        base_domain: services.d4g.fr
+        services:
+          - name: "outline"
+            addresses: ["d4g-outline_app"]
+          - name: "mattermost"
+            addresses: ["d4g-mattermost_app:8065"]
+          - name: "grafana"
+            addresses: ["observability_grafana:3000"]
+      tags:
+        - proxy
+        - traefik
+        - service

@@ -84,12 +84,20 @@ parse_params() {
   [[ -z "$ANSIBLE_PARAMS" ]] && die "Missing ansible parameters."
   shift
 
+  # Detect environment from playbook name
+  if [[ "$ANSIBLE_PARAMS" == *"staging"* ]]; then
+    ANSIBLE_ENV="staging"
+  else
+    ANSIBLE_ENV="production"
+  fi
+
   debug "DEBUG: $DEBUG"
   debug "SKIP_GIT_CHECKS: $SKIP_GIT_CHECKS"
   debug "SOURCE: $SOURCE"
   debug "ANSIBLE_DIR: $ANSIBLE_DIR"
   debug "ANSIBLE_COMMAND: $ANSIBLE_COMMAND"
   debug "ANSIBLE_PARAMS: $ANSIBLE_PARAMS"
+  debug "ANSIBLE_ENV: $ANSIBLE_ENV"
 
   return 0
 }
@@ -104,7 +112,7 @@ if [ "$SKIP_GIT_CHECKS" == "false" ]; then
 fi
 
 if [ "$SKIP_SECRETS" == "false" ]; then
-  refresh_vaultwarden_secrets
+  refresh_vaultwarden_secrets "$ANSIBLE_ENV"
 fi
 
 source .env

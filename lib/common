@@ -32,8 +32,15 @@ die() {
 }
 
 refresh_vaultwarden_secrets() {
-  BW_SECRET_ID="0be4cad8-9a8a-44a2-bbb6-d652d0ace220"
-  info "Logging into Vaultwarden, you may be prompted for your master password."
+  local env="${1:-production}"
+
+  if [ "$env" == "staging" ]; then
+    BW_SECRET_ID="PLACEHOLDER_STAGING_SECRET_ID"
+  else
+    BW_SECRET_ID="0be4cad8-9a8a-44a2-bbb6-d652d0ace220"
+  fi
+
+  info "Logging into Vaultwarden ($env), you may be prompted for your master password."
   get_bw_session
   [[ -z "$BW_SESSION" ]] && die "Missing bw session."
   # Syncing distant secrets to local vault

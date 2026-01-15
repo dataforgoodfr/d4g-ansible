@@ -22,23 +22,28 @@ if [ "$(echo $NODE_VERSION | cut -c 2-3)" -lt 18 ]; then
     exit 1
 fi
 
-# Install brew if not installed.
-# We will use brew to install dependencies on macOS and linux
-if ! command -v brew &> /dev/null
-then
-    echo "Please install brew before running this script. Brew is compatible with macOS, linux, and WSL2 (https://docs.brew.sh/Homebrew-on-Linux)."
-    exit 1
-fi
-
-for package in jq gum bitwarden-cli; do
-  if ! command -v $package &> /dev/null
-  then
-      echo "Installing $package"
-      brew install $package
-  else
-      echo "$package is already installed"
+# Check which packages are missing
+PACKAGES="jq gum bitwarden-cli"
+MISSING_PACKAGES=""
+for package in $PACKAGES; do
+  if ! command -v $package &> /dev/null; then
+    MISSING_PACKAGES="$MISSING_PACKAGES $package"
   fi
 done
+
+# If any packages are missing, we need brew to install them
+if [ -n "$MISSING_PACKAGES" ]; then
+  if ! command -v brew &> /dev/null; then
+    echo "Missing packages:$MISSING_PACKAGES"
+    echo "Please install brew to install missing dependencies, or install them manually."
+    echo "Brew is compatible with macOS, linux, and WSL2 (https://docs.brew.sh/Homebrew-on-Linux)."
+    exit 1
+  fi
+  for package in $MISSING_PACKAGES; do
+    echo "Installing $package"
+    brew install $package
+  done
+fi
 
 source "$ANSIBLE_DIR/lib/common"
 

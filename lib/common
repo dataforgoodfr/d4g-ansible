@@ -35,7 +35,7 @@ refresh_vaultwarden_secrets() {
   local env="${1:-production}"
 
   if [ "$env" == "staging" ]; then
-    BW_SECRET_ID="PLACEHOLDER_STAGING_SECRET_ID"
+    BW_SECRET_ID="1e2e9902-e4f9-45cc-af5b-00e9ea1658d1"
   else
     BW_SECRET_ID="0be4cad8-9a8a-44a2-bbb6-d652d0ace220"
   fi

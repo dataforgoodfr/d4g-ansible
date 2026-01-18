@@ -1,0 +1,557 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# d4gctl - Data For Good Cluster Control Tool
+# Manage Docker Swarm services and cluster operations
+
+VERSION="1.0.0"
+ENVIRONMENT="{{ d4gctl_environment | default('unknown') }}"
+VERBOSE=false
+SHOW_ALL=false
+
+# SSH options for cluster communication
+SSH_OPTS="-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR"
+
+# Label used to identify application services (vs infrastructure)
+APP_LABEL="d4g.service.type=application"
+
+# Colors and styling helpers
+info() { gum style --foreground=4 "$@"; }
+success() { gum style --bold --foreground=2 "$@"; }
+error() { gum style --bold --foreground=1 "$@"; }
+dim() { gum style --faint "$@"; }
+bold() { gum style --bold "$@"; }
+
+die() {
+  error "$1"
+  exit "${2:-1}"
+}
+
+usage() {
+  cat <<'LOGO'
+     _  _              _   _
+  __| || |  __ _  ___ | |_| |
+ / _` || |_/ _` |/ __|| __| |
+| (_| ||__| (_| | (__ | |_| |
+ \__,_|   \__, |\___| \__|_|
+          |___/
+LOGO
+  cat <<EOF
+  Data For Good Cluster Control Tool v${VERSION}
+
+USAGE
+  d4gctl [options] <command> [arguments]
+
+COMMANDS
+  status [filter]     Show cluster and services status (filter by name)
+  deploy <service>    Deploy a service (pull image on all nodes + rolling update)
+  update <service>    Force update a service (rolling restart)
+  backup [name]       Trigger backup jobs (all or specific)
+  backup-list         List all configured backup jobs
+
+OPTIONS
+  -h, --help          Show this help message
+  --version           Show version
+  -v, --verbose       Enable verbose SSH output
+  -a, --all           Show all services (including infrastructure)
+
+EXAMPLES
+  d4gctl status                 Show application services status
+  d4gctl status -a              Show all services (including infra)
+  d4gctl status n8n             Show services matching 'n8n'
+  d4gctl status -a postgres     Show all services matching 'postgres'
+  d4gctl deploy api_app         Deploy a specific service
+  d4gctl deploy                 Interactive service selector
+  d4gctl update api_app         Force restart a service
+  d4gctl -v deploy api_app      Deploy with verbose SSH output
+  d4gctl backup                 Trigger all backup jobs
+  d4gctl backup vaultwarden     Trigger specific backup job
+  d4gctl backup-list            List all backup jobs with schedule
+EOF
+  exit 0
+}
+
+{% raw %}
+# Get list of services (filtered by label unless SHOW_ALL is true)
+get_services() {
+  if [ "$SHOW_ALL" = true ]; then
+    docker service ls --format '{{.Name}}' | sort
+  else
+    docker service ls --filter "label=$APP_LABEL" --format '{{.Name}}' | sort
+  fi
+}
+
+# Select a service interactively or validate provided service name
+select_service() {
+  local service_name="${1:-}"
+
+  if [ -z "$service_name" ]; then
+    service_name=$(get_services | gum choose --header "Select a service:")
+    if [ -z "$service_name" ]; then
+      die "No service selected"
+    fi
+  else
+    if ! docker service inspect "$service_name" &>/dev/null; then
+      error "Service '$service_name' not found"
+      echo ""
+      echo "Available services:"
+      get_services | sed 's/^/  /'
+      exit 1
+    fi
+  fi
+
+  echo "$service_name"
+}
+
+# STATUS COMMAND
+cmd_status() {
+  local filter="${1:-}"
+
+  # If a filter is provided, always search all services
+  if [ -n "$filter" ]; then
+    SHOW_ALL=true
+  fi
+
+  bold "Cluster Status"
+  echo ""
+
+  # Node information
+  info "Nodes"
+  docker node ls --format "table {{.Hostname}}\t{{.Status}}\t{{.Availability}}\t{{.ManagerStatus}}"
+  echo ""
+
+  # Services overview
+  local filter_msg=""
+  if [ -n "$filter" ]; then
+    filter_msg=" matching '$filter'"
+  fi
+  if [ "$SHOW_ALL" = true ] && [ -z "$filter" ]; then
+    info "Services (all)"
+  elif [ -n "$filter" ]; then
+    info "Services${filter_msg}"
+  else
+    info "Services (applications only, use -a for all)"
+  fi
+  echo ""
+
+  # Get services with their details, optionally filtered
+  get_services | grep -i "${filter:-.}" | while read -r service; do
+    # Get service info
+    replicas=$(docker service ls --filter "name=$service" --format '{{.Replicas}}')
+    image=$(docker service inspect "$service" --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' | cut -d'@' -f1 | cut -d'/' -f2-)
+
+    # Get running tasks and their nodes
+    tasks=$(docker service ps "$service" --filter "desired-state=running" --format '{{.Node}}:{{.CurrentState}}' 2>/dev/null | head -5)
+
+    # Determine status color
+    running=$(echo "$replicas" | cut -d'/' -f1)
+    desired=$(echo "$replicas" | cut -d'/' -f2)
+
+    if [ "$running" == "$desired" ] && [ "$desired" != "0" ]; then
+      status_icon="●"
+      status_color="2"
+    elif [ "$running" == "0" ]; then
+      status_icon="○"
+      status_color="1"
+    else
+      status_icon="◐"
+      status_color="3"
+    fi
+
+    # Print service line
+    gum style --foreground="$status_color" --bold "$status_icon $service"
+    dim "  Image: $image"
+    dim "  Replicas: $replicas"
+
+    # Print task locations
+    if [ -n "$tasks" ]; then
+      echo "$tasks" | while read -r task; do
+        node=$(echo "$task" | cut -d':' -f1)
+        state=$(echo "$task" | cut -d':' -f2-)
+        dim "  └─ $node ($state)"
+      done
+    fi
+    echo ""
+  done
+}
+
+# DEPLOY COMMAND
+cmd_deploy() {
+  local start_time
+  start_time=$(date +%s)
+
+  local service_name
+  service_name=$(select_service "${1:-}")
+
+  # Get the image name from the service
+  local image
+  image=$(docker service inspect "$service_name" --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' | cut -d'@' -f1)
+
+  if [ -z "$image" ]; then
+    die "Could not determine image for service '$service_name'"
+  fi
+
+  bold "Deploying $service_name"
+  dim "Image: $image"
+  echo ""
+
+  # Get all nodes in the cluster
+  local nodes
+  nodes=$(docker node ls --format '{{.Hostname}}')
+
+  # Pull image on all nodes
+  local image_sha=""
+  for node in $nodes; do
+    if [ "$VERBOSE" = true ]; then
+      info "Pulling on $node..."
+      ssh $SSH_OPTS "root@$node" "docker pull '$image'" || {
+        die "Failed to pull on $node"
+      }
+    else
+      gum spin --spinner dot --title "Pulling on $node..." -- \
+        ssh $SSH_OPTS "root@$node" "docker pull '$image'" >/dev/null 2>&1 || {
+          die "Failed to pull on $node"
+        }
+    fi
+    # Get the SHA from the first node
+    if [ -z "$image_sha" ]; then
+      image_sha=$(ssh $SSH_OPTS "root@$node" "docker inspect '$image' --format '{{index .RepoDigests 0}}'" 2>/dev/null | cut -d'@' -f2 || echo "unknown")
+    fi
+    success "✓ Pulled on $node"
+  done
+
+  echo ""
+
+  # Pull image locally to ensure we have fresh labels for inspection
+  gum spin --spinner dot --title "Refreshing local image..." -- \
+    docker pull "$image" >/dev/null 2>&1 || true
+
+  # Display image details
+  info "Image Details"
+  dim "  SHA: ${image_sha:-unknown}"
+
+  # Try to get labels (commit info) from the image
+  local commit_sha=""
+  local ref_name=""
+  commit_sha=$(docker inspect "$image" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' 2>/dev/null || echo "")
+  ref_name=$(docker inspect "$image" --format '{{index .Config.Labels "org.opencontainers.image.ref.name"}}' 2>/dev/null || echo "")
+
+  if [ -n "$commit_sha" ] && [ "$commit_sha" != "<no value>" ]; then
+    dim "  Commit: $commit_sha"
+  fi
+  if [ -n "$ref_name" ] && [ "$ref_name" != "<no value>" ]; then
+    dim "  Ref: $ref_name"
+  fi
+
+  echo ""
+
+  # Force update the service
+  gum spin --spinner dot --title "Updating service..." -- \
+    docker service update --force "$service_name" >/dev/null 2>&1
+
+  # Calculate duration
+  local end_time duration
+  end_time=$(date +%s)
+  duration=$((end_time - start_time))
+
+  success "✓ Service $service_name deployed successfully in ${duration}s"
+
+  # Notify Slack with proper formatting
+  local slack_message
+  slack_message="🚀 *${service_name}* deployed to *${ENVIRONMENT}*"
+  if [ -n "$ref_name" ] && [ "$ref_name" != "<no value>" ]; then
+    slack_message="${slack_message} (${ref_name})"
+  fi
+  slack_message="${slack_message} in ${duration}s"
+
+  local slack_details=""
+  if [ -n "$commit_sha" ] && [ "$commit_sha" != "<no value>" ]; then
+    slack_details="Commit: \`${commit_sha:0:8}\`"
+  fi
+  slack_details="${slack_details}  •  Host: \`$(hostname)\`"
+
+  # Use printf to handle the message properly
+  printf -v slack_payload '{"blocks":[{"type":"section","text":{"type":"mrkdwn","text":"%s"}},{"type":"context","elements":[{"type":"mrkdwn","text":"%s"}]}]}' "$slack_message" "$slack_details"
+
+  slack-notifier --raw-data "$slack_payload" >/dev/null 2>&1 || true
+}
+
+# UPDATE COMMAND
+cmd_update() {
+  local service_name
+  service_name=$(select_service "${1:-}")
+
+  bold "Updating $service_name"
+  echo ""
+
+  # Force update the service (rolling restart without pulling new image)
+  gum spin --spinner dot --title "Forcing service update..." -- \
+    docker service update --force "$service_name" >/dev/null 2>&1
+
+  success "✓ Service $service_name updated successfully"
+}
+
+# BACKUP COMMAND
+cmd_backup() {
+  local backup_filter="${1:-}"
+
+  bold "Backup Jobs"
+  echo ""
+
+  # Get all nodes in the cluster
+  local nodes
+  nodes=$(docker node ls --format '{{.Hostname}}' 2>/dev/null || echo "$(hostname)")
+
+  # Collect backup jobs from all nodes
+  local backup_names=()
+  local backup_cmds=()
+  local backup_nodes=()
+
+  for node in $nodes; do
+    local cron_jobs
+    if [ "$node" = "$(hostname)" ]; then
+      cron_jobs=$(crontab -l 2>/dev/null | grep -E "docker run.*--name=backup-" || true)
+    else
+      cron_jobs=$(ssh $SSH_OPTS "root@$node" "crontab -l 2>/dev/null | grep -E 'docker run.*--name=backup-'" 2>/dev/null || true)
+    fi
+
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      local name
+      name=$(echo "$line" | grep -oP '(?<=--name=)[^ ]+' | head -1)
+      if [ -n "$name" ]; then
+        backup_names+=("$name")
+        backup_nodes+=("$node")
+        local cmd
+        cmd=$(echo "$line" | grep -oP '/usr/bin/docker run[^)]+' | head -1)
+        backup_cmds+=("$cmd")
+      fi
+    done <<< "$cron_jobs"
+  done
+
+  if [ ${#backup_names[@]} -eq 0 ]; then
+    error "No backup jobs found in crontab on any node"
+    echo ""
+    dim "Make sure backup crons are deployed with your ansible playbook"
+    exit 1
+  fi
+
+  # Helper to run backup on correct node
+  run_backup() {
+    local idx=$1
+    local node="${backup_nodes[$idx]}"
+    local cmd="${backup_cmds[$idx]}"
+
+    if [ "$node" = "$(hostname)" ]; then
+      eval "$cmd"
+    else
+      ssh $SSH_OPTS "root@$node" "$cmd"
+    fi
+  }
+
+  # If filter provided, run specific backup
+  if [ -n "$backup_filter" ]; then
+    local found=false
+    for i in "${!backup_names[@]}"; do
+      if [[ "${backup_names[$i]}" == *"$backup_filter"* ]]; then
+        found=true
+        info "Running backup: ${backup_names[$i]} (on ${backup_nodes[$i]})"
+        echo ""
+        if run_backup "$i"; then
+          success "✓ ${backup_names[$i]} completed"
+        else
+          error "✗ ${backup_names[$i]} failed"
+        fi
+        echo ""
+      fi
+    done
+    if [ "$found" = false ]; then
+      error "No backup matching '$backup_filter' found"
+      echo ""
+      echo "Available backups:"
+      for i in "${!backup_names[@]}"; do
+        printf '  %s (on %s)\n' "${backup_names[$i]}" "${backup_nodes[$i]}"
+      done
+      exit 1
+    fi
+  else
+    # Show available backups and let user choose
+    info "Available backup jobs:"
+    echo ""
+    for i in "${!backup_names[@]}"; do
+      dim "  • ${backup_names[$i]} (on ${backup_nodes[$i]})"
+    done
+    echo ""
+
+    # Build choice list with node info
+    local choices=("Run ALL backups")
+    for i in "${!backup_names[@]}"; do
+      choices+=("${backup_names[$i]} (${backup_nodes[$i]})")
+    done
+
+    local choice
+    choice=$(printf '%s\n' "${choices[@]}" | gum choose --header "Select backup to run:")
+
+    if [ -z "$choice" ]; then
+      die "No backup selected"
+    fi
+
+    if [ "$choice" = "Run ALL backups" ]; then
+      bold "Running all backups..."
+      echo ""
+      for i in "${!backup_names[@]}"; do
+        info "Running: ${backup_names[$i]} (on ${backup_nodes[$i]})"
+        if run_backup "$i"; then
+          success "✓ ${backup_names[$i]} completed"
+        else
+          error "✗ ${backup_names[$i]} failed"
+        fi
+        echo ""
+      done
+      success "✓ All backups completed"
+    else
+      # Run selected backup - match by name and node
+      for i in "${!backup_names[@]}"; do
+        if [ "${backup_names[$i]} (${backup_nodes[$i]})" = "$choice" ]; then
+          info "Running backup: ${backup_names[$i]} (on ${backup_nodes[$i]})"
+          echo ""
+          if run_backup "$i"; then
+            success "✓ ${backup_names[$i]} completed"
+          else
+            error "✗ ${backup_names[$i]} failed"
+          fi
+          break
+        fi
+      done
+    fi
+  fi
+}
+
+# BACKUP-LIST COMMAND
+cmd_backup_list() {
+  bold "Configured Backup Jobs"
+  echo ""
+
+  # Get all nodes in the cluster
+  local nodes
+  nodes=$(docker node ls --format '{{.Hostname}}' 2>/dev/null || echo "$(hostname)")
+
+  local found_any=false
+
+  for node in $nodes; do
+    local cron_jobs
+    if [ "$node" = "$(hostname)" ]; then
+      cron_jobs=$(crontab -l 2>/dev/null | grep -E "docker run.*--name=backup-" || true)
+    else
+      cron_jobs=$(ssh $SSH_OPTS "root@$node" "crontab -l 2>/dev/null | grep -E 'docker run.*--name=backup-'" 2>/dev/null || true)
+    fi
+
+    [ -z "$cron_jobs" ] && continue
+
+    # Parse and display each backup job
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      found_any=true
+
+      # Extract schedule (first 5 fields)
+      local schedule
+      schedule=$(echo "$line" | awk '{print $1, $2, $3, $4, $5}')
+
+      # Extract the container name
+      local name
+      name=$(echo "$line" | grep -oP '(?<=--name=)[^ ]+' | head -1)
+
+      # Extract service name from --service-name
+      local service
+      service=$(echo "$line" | grep -oP '(?<=--service-name=)[^ ]+' | head -1)
+
+      if [ -n "$name" ]; then
+        info "$name"
+        dim "  Node:     $node"
+        dim "  Schedule: $schedule"
+        if [ -n "$service" ]; then
+          dim "  Service:  $service"
+        fi
+        echo ""
+      fi
+    done <<< "$cron_jobs"
+  done
+
+  if [ "$found_any" = false ]; then
+    error "No backup jobs found in crontab on any node"
+    echo ""
+    dim "Make sure backup crons are deployed with your ansible playbook"
+    exit 1
+  fi
+}
+
+# Parse options from arguments
+parse_options() {
+  while [[ $# -gt 0 ]]; do
+    case "${1}" in
+      -h|--help)
+        usage
+        ;;
+      --version)
+        echo "d4gctl v${VERSION}"
+        exit 0
+        ;;
+      -v|--verbose)
+        VERBOSE=true
+        SSH_OPTS="$SSH_OPTS -v"
+        ;;
+      -a|--all)
+        SHOW_ALL=true
+        ;;
+      -*)
+        error "Unknown option: $1"
+        echo ""
+        usage
+        ;;
+      *)
+        # Not an option, collect as positional arg
+        ARGS+=("$1")
+        ;;
+    esac
+    shift
+  done
+}
+
+# Main entry point
+main() {
+  ARGS=()
+  parse_options "$@"
+
+  if [ "${#ARGS[@]}" -eq 0 ]; then
+    usage
+  fi
+
+  local cmd="${ARGS[0]}"
+  local arg="${ARGS[1]:-}"
+
+  case "$cmd" in
+    status)
+      cmd_status "$arg"
+      ;;
+    deploy)
+      cmd_deploy "$arg"
+      ;;
+    update)
+      cmd_update "$arg"
+      ;;
+    backup)
+      cmd_backup "$arg"
+      ;;
+    backup-list)
+      cmd_backup_list
+      ;;
+    *)
+      error "Unknown command: $cmd"
+      echo ""
+      usage
+      ;;
+  esac
+}
+
+main "$@"
+{% endraw %}

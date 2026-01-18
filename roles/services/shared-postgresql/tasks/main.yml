@@ -1,0 +1,92 @@
+---
+- name: Create shared-postgresql directory
+  file:
+    path: /opt/shared-postgresql
+    state: directory
+
+- name: Create shared-postgresql data directory
+  file:
+    path: /opt/shared-postgresql/data
+    state: directory
+    owner: 70
+    group: 70
+    mode: '0700'
+  when: inventory_hostname == deploy_on
+
+- name: Generate init-databases.sql from template
+  template:
+    src: init-databases.sql.j2
+    dest: /opt/shared-postgresql/init-databases.sql
+    owner: root
+    group: root
+    mode: '0600'
+  when: inventory_hostname == deploy_on
+
+- name: Create docker-compose.yml from template
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/shared-postgresql/docker-compose.yml
+  when: inventory_hostname == deploy_on
+
+- name: Pull PostgreSQL image
+  command: docker compose pull
+  args:
+    chdir: /opt/shared-postgresql
+  tags:
+    - pull
+    - postgresql
+  when: inventory_hostname == deploy_on
+
+- name: Check if PostgreSQL data is initialized
+  stat:
+    path: /opt/shared-postgresql/data/PG_VERSION
+  register: pg_initialized
+  when: inventory_hostname == deploy_on
+
+- name: Set data directory ownership before initialization
+  file:
+    path: /opt/shared-postgresql/data
+    state: directory
+    owner: 70
+    group: 70
+    mode: '0700'
+  when: inventory_hostname == deploy_on and not pg_initialized.stat.exists
+
+- name: Deploy PostgreSQL stack
+  command: docker stack deploy -c docker-compose.yml postgres
+  args:
+    chdir: /opt/shared-postgresql
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- name: Wait for PostgreSQL to be ready
+  shell: |
+    docker exec $(docker ps -q -f name=postgres_app) pg_isready -U postgres
+  register: pg_ready
+  retries: 30
+  delay: 2
+  until: pg_ready.rc == 0
+  when: inventory_hostname == deploy_on
+  tags:
+    - up
+    - db-init
+
+- name: Execute database initialization script idempotently
+  shell: |
+    docker exec -i $(docker ps -q -f name=postgres_app) psql -U postgres < /opt/shared-postgresql/init-databases.sql
+  when: inventory_hostname == deploy_on
+  tags:
+    - db-init
+  register: db_init_result
+  changed_when: "'CREATE DATABASE' in db_init_result.stdout or 'CREATE USER' in db_init_result.stdout"
+
+- name: Setup S3 backup for PostgreSQL data
+  include_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: "shared-postgresql"
+    data_dir: /opt/shared-postgresql/data
+  when: inventory_hostname == deploy_on
+  tags:
+    - backup

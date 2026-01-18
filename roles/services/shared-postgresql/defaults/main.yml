@@ -1,0 +1,24 @@
+---
+# Default variables for shared-postgresql role
+# Override these in your playbook
+
+# Root password for PostgreSQL
+postgres_root_password: "changeme"
+
+# Observability user for PostgreSQL exporter
+observability_user: "postgres_exporter"
+observability_password: "changeme_exporter"
+
+# Host to deploy PostgreSQL on
+deploy_on: "{{ groups['staging_swarm_cluster_nodes'][0] }}"
+
+# List of databases to create
+# Example:
+# databases:
+#   - db: myapp_db
+#     user: myapp_user
+#     password: securepassword123
+#   - db: another_db
+#     user: another_user
+#     password: anotherpassword456
+databases: []

@@ -55,7 +55,6 @@
       - "ca-certificates"
       - "cron"
       - "curl"
-      - "curl"
       - "file"
       - "git"
       - "gpg"
@@ -70,6 +69,35 @@
       - "vim"
       - "wget"
 
+- name: Create APT keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Add Charm GPG key
+  shell: |
+    curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+    chmod 644 /etc/apt/keyrings/charm.gpg
+  args:
+    creates: /etc/apt/keyrings/charm.gpg
+
+- name: Add Charm repository
+  apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *"
+    state: present
+    filename: charm
+
+- name: Update apt cache after adding Charm repo
+  apt:
+    update_cache: yes
+
+- name: Install gum from Charm repository
+  apt:
+    state: present
+    name:
+      - gum
+
 - name: Create d4g tools
   template:
     src: "{{ item }}.j2"
@@ -77,3 +105,23 @@
     mode: "0755"
   with_items:
     - slack-notifier
+    - d4gctl
+
+- name: Create SSH config directory
+  file:
+    path: /root/.ssh
+    state: directory
+    mode: "0700"
+
+- name: Configure SSH for cluster nodes
+  blockinfile:
+    path: /root/.ssh/config
+    create: yes
+    mode: "0644"
+    marker: "# {mark} ANSIBLE MANAGED - Cluster SSH Config"
+    block: |
+      Host *.dataforgood.fr *.d4g.fr
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+        LogLevel ERROR
+        ForwardAgent yes

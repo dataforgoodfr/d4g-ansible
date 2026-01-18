@@ -11,7 +11,7 @@ common:
   storage:
     s3:
       endpoint: https://s3.fr-par.scw.cloud
-      bucketnames: poletech-logs-s3
+      bucketnames: {{ loki_s3_bucket }}
       region: fr-par
       s3forcepathstyle: true
   replication_factor: 1

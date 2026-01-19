@@ -1,0 +1,125 @@
+
+services:
+  coolify-init:
+    # Image minimale pour executer les commandes d'initialisation
+    image: alpine:3.20
+    container_name: coolify-init
+    restart: "no"
+    user: "0:0"
+    # Creation des dossiers et correction des proprietaires
+    command:
+      [
+        "sh",
+        "-c",
+        "mkdir -p /var/www/html/storage/app/ssh/keys && chown -R 9999:9999 /var/www/html/storage/app/ssh /var/www/html/storage/app/applications /var/www/html/storage/app/databases /var/www/html/storage/app/services /var/www/html/storage/app/backups",
+      ]
+    # Volumes a corriger avant le demarrage de Coolify
+    volumes:
+      - coolify_ssh:/var/www/html/storage/app/ssh
+      - coolify_applications:/var/www/html/storage/app/applications
+      - coolify_databases:/var/www/html/storage/app/databases
+      - coolify_services:/var/www/html/storage/app/services
+      - coolify_backups:/var/www/html/storage/app/backups
+
+  coolify:
+    # Image officielle Coolify, pas de version fixee
+    image: "ghcr.io/coollabsio/coolify:latest"
+    container_name: coolify
+    restart: unless-stopped
+    ports:
+      - "8000:8080"
+    env_file:
+      - ./.env.production
+    volumes:
+      - type: bind
+        source: ./.env.production
+        target: /var/www/html/.env
+        read_only: true
+      - coolify_ssh:/var/www/html/storage/app/ssh
+      - coolify_applications:/var/www/html/storage/app/applications
+      - coolify_databases:/var/www/html/storage/app/databases
+      - coolify_services:/var/www/html/storage/app/services
+      - coolify_backups:/var/www/html/storage/app/backups
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      coolify-init:
+        condition: service_completed_successfully
+      coolify-db:
+        condition: service_healthy
+      coolify-redis:
+        condition: service_healthy
+      coolify-realtime:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://127.0.0.1:8080/api/health || exit 1"]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - coolify
+
+  coolify-db:
+    image: postgres:15-alpine
+    container_name: coolify-db
+    restart: unless-stopped
+    env_file:
+      - ./.env.production
+    volumes:
+      - coolify_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - coolify
+
+  coolify-redis:
+    image: redis:7-alpine
+    container_name: coolify-redis
+    restart: unless-stopped
+    command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    env_file:
+      - ./.env.production
+    volumes:
+      - coolify_redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - coolify
+
+  coolify-realtime:
+    image: "ghcr.io/coollabsio/coolify-realtime:1.0.10"
+    container_name: coolify-realtime
+    restart: unless-stopped
+    ports:
+      - "6001:6001"
+      - "6002:6002"
+    env_file:
+      - ./.env.production
+    volumes:
+      - coolify_ssh:/var/www/html/storage/app/ssh
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:6001/ready && wget -qO- http://127.0.0.1:6002/ready || exit 1"]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - coolify
+
+volumes:
+  coolify_ssh:
+  coolify_applications:
+  coolify_databases:
+  coolify_services:
+  coolify_backups:
+  coolify_db:
+  coolify_redis:
+
+networks:
+  coolify:
+    name: coolify
+    driver: bridge

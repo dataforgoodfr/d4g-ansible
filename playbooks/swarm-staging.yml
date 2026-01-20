@@ -36,6 +36,8 @@
     backup_s3_bucket: poletech-backups-staging
     loki_s3_bucket: poletech-logs-staging
     outline_s3_bucket: outline-uploads-staging
+    authentik_s3_bucket: authentik-uploads-staging
+
 
   tasks:
     - import_role:
@@ -63,6 +65,9 @@
           - db: mattermost
             user: mattermost
             password: "{{ lookup('env', 'MATTERMOST_DB_PASSWORD') }}"
+          - db: authentik
+            user: authentik
+            password: "{{ lookup('env', 'AUTHENTIK_DB_PASSWORD') }}"
       tags:
         - postgresql
         - database
@@ -84,6 +89,15 @@
         replicas: 1
       tags:
         - mattermost
+        - service
+
+    - import_role:
+        name: roles/services/d4g-authentik
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - authentik
         - service
 
     - import_role:
@@ -111,6 +125,8 @@
         services:
           - name: "outline"
             addresses: ["d4g-outline_app"]
+          - name: "authentik"
+            addresses: ["d4g-authentik_app"]
           - name: "mattermost"
             addresses: ["d4g-mattermost_app:8065"]
           - name: "grafana"

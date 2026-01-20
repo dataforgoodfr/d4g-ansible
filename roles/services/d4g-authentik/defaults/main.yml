@@ -1,0 +1,3 @@
+---
+base_domain: services.dataforgood.fr
+authentik_s3_bucket: authentik-uploads

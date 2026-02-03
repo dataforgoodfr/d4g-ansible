@@ -29,10 +29,10 @@ services:
     ports:
       - "8000:8080"
     env_file:
-      - ./.env.production
+      - .env.production
     volumes:
       - type: bind
-        source: ./.env.production
+        source: .env.production
         target: /var/www/html/.env
         read_only: true
       - coolify_ssh:/var/www/html/storage/app/ssh
@@ -63,7 +63,7 @@ services:
     container_name: coolify-db
     restart: unless-stopped
     env_file:
-      - ./.env.production
+      - .env.production
     volumes:
       - coolify_db:/var/lib/postgresql/data
     healthcheck:
@@ -80,7 +80,7 @@ services:
     restart: unless-stopped
     command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
     env_file:
-      - ./.env.production
+      - .env.production
     volumes:
       - coolify_redis:/data
     healthcheck:
@@ -99,7 +99,7 @@ services:
       - "6001:6001"
       - "6002:6002"
     env_file:
-      - ./.env.production
+      - .env.production
     volumes:
       - coolify_ssh:/var/www/html/storage/app/ssh
     healthcheck:

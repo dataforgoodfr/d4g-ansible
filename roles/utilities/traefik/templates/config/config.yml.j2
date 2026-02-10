@@ -109,10 +109,12 @@ tcp:
 
 tls:
   certificates:
-    - certFile: "/opt/certificates/le-fullchain.pem"
-      keyFile: "/opt/certificates/le-key.pem"
+{% for cert in certificates %}
+    - certFile: "/opt/certificates/{{ cert.name }}/fullchain.pem"
+      keyFile: "/opt/certificates/{{ cert.name }}/key.pem"
+{% endfor %}
   stores:
     default:
       defaultCertificate:
-        certFile: "/opt/certificates/le-fullchain.pem"
-        keyFile: "/opt/certificates/le-key.pem"
+        certFile: "/opt/certificates/{{ certificates[0].name }}/fullchain.pem"
+        keyFile: "/opt/certificates/{{ certificates[0].name }}/key.pem"

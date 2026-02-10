@@ -44,10 +44,14 @@
         name: roles/utilities/acme.sh
       vars:
         group_name: "staging_swarm_cluster_nodes"
-        domain_names:
-          - "*.services.d4g.fr"
-          - "d4g.fr"
-          - "*.d4g.fr"
+        certificates:
+          - name: services.d4g.fr
+            domains:
+              - "*.services.d4g.fr"
+          - name: d4g.fr
+            domains:
+              - "d4g.fr"
+              - "*.d4g.fr"
       tags:
         - acme
         - tls
@@ -122,6 +126,14 @@
     - import_role:
         name: roles/utilities/traefik
       vars:
+        certificates:
+          - name: services.d4g.fr
+            domains:
+              - "*.services.d4g.fr"
+          - name: d4g.fr
+            domains:
+              - "d4g.fr"
+              - "*.d4g.fr"
         services:
           - name: "outline"
             addresses: ["d4g-outline_app"]

@@ -1,57 +1,34 @@
 ---
-- name: Check if certificates already exists
-  stat:
-    path: "{{ le_certs_dir }}/{{ le_fullchain_filename }}"
-  register: certificate_exists
+# Process each certificate in the certificates list
+- name: Process certificates
+  include_tasks: certificate.yml
+  loop: "{{ certificates }}"
+  loop_control:
+    loop_var: cert
+    label: "{{ cert.name }}"
 
-- include_tasks: domain_management.yml
-
-# Get current domains from existing certificate for comparison
-- name: Get current domains from existing certificate
-  shell: |
-    if [ -f "{{ le_certs_dir }}/{{ le_fullchain_filename }}" ]; then
-      openssl x509 -in "{{ le_certs_dir }}/{{ le_fullchain_filename }}" -text -noout | grep -A1 "Subject Alternative Name" | tail -1 | sed 's/DNS://g' | tr -d ' ' | tr ',' '\n' | sort
-    else
-      echo ""
-    fi
-  register: current_domains
-  changed_when: false
-
-- name: Sort and normalize domain list for comparison
+# Cleanup stale acme.sh domain folders that are no longer in our certificates list
+- name: Build list of expected acme.sh domain folders
   set_fact:
-    sorted_new_domains: "{{ domain_names | sort }}"
-    sorted_current_domains: "{{ current_domains.stdout.split('\n') | select | sort if current_domains.stdout else [] }}"
+    expected_acme_folders: "{{ certificates | map(attribute='domains') | map('first') | map('regex_replace', '$', '_ecc') | list }}"
 
-- name: Determine if certificate needs re-issuance
-  set_fact:
-    needs_reissuance: "{{ force | default(false) or not certificate_exists.stat.exists or sorted_new_domains != sorted_current_domains }}"
+- name: Find existing acme.sh domain folders
+  find:
+    paths: /root/.acme.sh
+    file_type: directory
+    patterns: "*_ecc"
+  register: existing_acme_folders
 
-- name: Display domain comparison when verbose
-  debug:
-    msg:
-      - "Certificate exists: {{ certificate_exists.stat.exists }}"
-      - "Force flag: {{ force | default(false) }}"
-      - "Current domains (sorted): {{ sorted_current_domains }}"
-      - "New domains (sorted): {{ sorted_new_domains }}"
-      - "Domains match: {{ sorted_new_domains == sorted_current_domains }}"
-      - "Needs re-issuance: {{ needs_reissuance }}"
-  when: ansible_verbosity >= 1
+- name: Remove stale acme.sh domain folders
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ existing_acme_folders.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  when: (item.path | basename) not in expected_acme_folders
 
-# We try to generate a cert from acme.sh and install it to our directory
-- name: Provision a certificate using acme.sh
-  block:
-    - name: Provisioning certificate
-      shell: /root/.acme.sh/acme.sh --issue --server {{ ' letsencrypt_test ' if staging else ' letsencrypt ' }}--log -d {{domain_names | join(' -d ')}} --dns dns_scaleway --debug --force
-      environment:
-        SCALEWAY_API_TOKEN: "{{ scaleway_api_token }}"
-      when: needs_reissuance
-      notify: traefik_rolling_update
-
-    - name: Installing certificate to disk
-      shell: /root/.acme.sh/acme.sh --install-cert --log -d {{domain_names | join(' -d ')}} --key-file {{ le_certs_dir }}/{{ le_key_filename }} --fullchain-file {{ le_certs_dir }}/{{ le_fullchain_filename }} --cert-file {{ le_certs_dir }}/{{ le_cert_filename }} --ca-file {{ le_certs_dir }}/{{ le_ca_filename }}
-      when: needs_reissuance
-      notify: traefik_rolling_update
-
+# Email notifications (configure once)
 - name: Check if notify needs to be enabled
   lineinfile:
     dest: /root/.acme.sh/account.conf
@@ -66,15 +43,7 @@
     MAIL_TO: "{{ notification_mail_to }}"
   when: notify_enabled.changed == True
 
-# If the certificate exists, we still update the reload command that might change over time
-- name: Update renewal config for reload command hook
-  replace:
-    path: /root/.acme.sh/{{domain_names | first}}_ecc/{{domain_names | first}}.conf
-    regexp: "Le_ReloadCmd='(.*)'"
-    replace: "Le_ReloadCmd='{{reload_cmd}}'"
-    backup: true
-
-# And we make sure the ansible managed cron for renewals is present
+# Cron job for automatic renewal (runs once, renews all certs)
 - name: Creating ansible-managed acme.sh renewal cronjob
   cron:
     name: "acme.sh ansible-managed crontab"

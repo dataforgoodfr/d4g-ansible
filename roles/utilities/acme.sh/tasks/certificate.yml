@@ -1,0 +1,84 @@
+---
+# Handle a single certificate issuance/renewal
+# Expected variables: cert (with .name and .domains)
+
+- name: "{{ cert.name }} - Ensure certificate directory exists"
+  file:
+    path: "{{ le_certs_dir }}/{{ cert.name }}"
+    state: directory
+    mode: "0755"
+
+- name: "{{ cert.name }} - Check if certificate already exists"
+  stat:
+    path: "{{ le_certs_dir }}/{{ cert.name }}/fullchain.pem"
+  register: certificate_exists
+
+- name: "{{ cert.name }} - Get current domains from existing certificate"
+  shell: |
+    if [ -f "{{ le_certs_dir }}/{{ cert.name }}/fullchain.pem" ]; then
+      openssl x509 -in "{{ le_certs_dir }}/{{ cert.name }}/fullchain.pem" -text -noout | grep -A1 "Subject Alternative Name" | tail -1 | sed 's/DNS://g' | tr -d ' ' | tr ',' '\n' | sort
+    else
+      echo ""
+    fi
+  register: current_domains
+  changed_when: false
+
+- name: "{{ cert.name }} - Sort and normalize domain list for comparison"
+  set_fact:
+    sorted_new_domains: "{{ cert.domains | sort }}"
+    sorted_current_domains: "{{ current_domains.stdout.split('\n') | select | sort if current_domains.stdout else [] }}"
+
+- name: "{{ cert.name }} - Determine if certificate needs re-issuance"
+  set_fact:
+    needs_reissuance: "{{ force | default(false) or not certificate_exists.stat.exists or sorted_new_domains != sorted_current_domains }}"
+
+- name: "{{ cert.name }} - Display domain comparison when verbose"
+  debug:
+    msg:
+      - "Certificate: {{ cert.name }}"
+      - "Certificate exists: {{ certificate_exists.stat.exists }}"
+      - "Force flag: {{ force | default(false) }}"
+      - "Current domains (sorted): {{ sorted_current_domains }}"
+      - "New domains (sorted): {{ sorted_new_domains }}"
+      - "Domains match: {{ sorted_new_domains == sorted_current_domains }}"
+      - "Needs re-issuance: {{ needs_reissuance }}"
+  when: ansible_verbosity >= 1
+
+- name: "{{ cert.name }} - Provision certificate using acme.sh"
+  block:
+    - name: "{{ cert.name }} - Issuing certificate"
+      shell: /root/.acme.sh/acme.sh --issue --server {{ ' letsencrypt_test ' if staging else ' letsencrypt ' }}--log -d {{ cert.domains | join(' -d ') }} --dns dns_scaleway --debug --force
+      environment:
+        SCALEWAY_API_TOKEN: "{{ scaleway_api_token }}"
+      when: needs_reissuance
+      notify: traefik_rolling_update
+
+    - name: "{{ cert.name }} - Installing certificate to disk"
+      shell: >
+        /root/.acme.sh/acme.sh --install-cert --log
+        -d {{ cert.domains | join(' -d ') }}
+        --key-file {{ le_certs_dir }}/{{ cert.name }}/key.pem
+        --fullchain-file {{ le_certs_dir }}/{{ cert.name }}/fullchain.pem
+        --cert-file {{ le_certs_dir }}/{{ cert.name }}/cert.pem
+        --ca-file {{ le_certs_dir }}/{{ cert.name }}/ca.pem
+      when: needs_reissuance
+      notify: traefik_rolling_update
+
+- name: "{{ cert.name }} - Update renewal config for reload command hook"
+  replace:
+    path: /root/.acme.sh/{{ cert.domains | first }}_ecc/{{ cert.domains | first }}.conf
+    regexp: "Le_ReloadCmd='(.*)'"
+    replace: "Le_ReloadCmd='{{ reload_cmd }}'"
+    backup: true
+  when: certificate_exists.stat.exists or needs_reissuance
+
+- name: "{{ cert.name }} - Set permissions on certificate files"
+  file:
+    path: "{{ le_certs_dir }}/{{ cert.name }}/{{ item }}"
+    mode: "0644"
+  with_items:
+    - ca.pem
+    - cert.pem
+    - fullchain.pem
+    - key.pem
+  when: certificate_exists.stat.exists or needs_reissuance

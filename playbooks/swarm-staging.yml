@@ -123,7 +123,7 @@
         - service
 
     - import_role:
-        name: roles/services/d4g-community-manager
+        name: roles/services/d4g-coolify
       vars:
         deploy_on: "d4g-staging-01.d4g.fr"
         replicas: 1

@@ -155,6 +155,8 @@
         services:
           - name: "outline"
             addresses: ["d4g-outline_app"]
+          - name: "coolify"
+            addresses: ["d4g-coolify_app:8000"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
           - name: "mattermost"

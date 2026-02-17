@@ -157,8 +157,6 @@
             addresses: ["d4g-outline_app"]
           - name: "coolify"
             addresses: ["d4g-coolify_coolify:8080"]
-          - name: "coolify"
-            addresses: ["d4g-coolify_coolify-realtime:6001"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
           - name: "mattermost"

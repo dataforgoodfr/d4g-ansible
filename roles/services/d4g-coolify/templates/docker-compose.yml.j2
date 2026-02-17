@@ -26,13 +26,11 @@ services:
     image: "ghcr.io/coollabsio/coolify:latest"
     container_name: coolify
     restart: unless-stopped
-    ports:
-      - "8000:8080"
     env_file:
-      - .env.production
+      - coolify.env
     volumes:
       - type: bind
-        source: .env.production
+        source: coolify.env
         target: /var/www/html/.env
         read_only: true
       - coolify_ssh:/var/www/html/storage/app/ssh
@@ -44,8 +42,6 @@ services:
     depends_on:
       coolify-init:
         condition: service_completed_successfully
-      coolify-db:
-        condition: service_healthy
       coolify-redis:
         condition: service_healthy
       coolify-realtime:
@@ -55,24 +51,6 @@ services:
       interval: 5s
       retries: 10
       timeout: 2s
-    networks:
-      - coolify
-
-  coolify-db:
-    image: postgres:15-alpine
-    container_name: coolify-db
-    restart: unless-stopped
-    env_file:
-      - .env.production
-    volumes:
-      - coolify_db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
-      interval: 5s
-      retries: 10
-      timeout: 2s
-    networks:
-      - coolify
 
   coolify-redis:
     image: redis:7-alpine
@@ -80,7 +58,7 @@ services:
     restart: unless-stopped
     command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
     env_file:
-      - .env.production
+      - coolify.env
     volumes:
       - coolify_redis:/data
     healthcheck:
@@ -88,18 +66,13 @@ services:
       interval: 5s
       retries: 10
       timeout: 2s
-    networks:
-      - coolify
 
   coolify-realtime:
     image: "ghcr.io/coollabsio/coolify-realtime:1.0.10"
     container_name: coolify-realtime
     restart: unless-stopped
-    ports:
-      - "6001:6001"
-      - "6002:6002"
     env_file:
-      - .env.production
+      - coolify.env
     volumes:
       - coolify_ssh:/var/www/html/storage/app/ssh
     healthcheck:
@@ -107,8 +80,7 @@ services:
       interval: 5s
       retries: 10
       timeout: 2s
-    networks:
-      - coolify
+
 
 volumes:
   coolify_ssh:
@@ -116,10 +88,4 @@ volumes:
   coolify_databases:
   coolify_services:
   coolify_backups:
-  coolify_db:
   coolify_redis:
-
-networks:
-  coolify:
-    name: coolify
-    driver: bridge

@@ -1,0 +1,49 @@
+---
+- name: Create d4g-coolify directory
+  file:
+    path: /opt/d4g-coolify
+    state: directory
+
+- name: Create d4g-coolify directory
+  file:
+    path: /opt/d4g-coolify/branding
+    state: directory
+
+- name: Create d4g-coolify files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-coolify/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - coolify.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-coolify
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-coolify
+  args:
+    chdir: /opt/d4g-coolify
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-coolify
+    service_dir: /opt/d4g-coolify
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: coolify
+    pgsql_password: "{{ lookup('env', 'coolify_DB_PASSWORD') }}"
+    pgsql_database: coolify
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

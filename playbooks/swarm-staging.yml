@@ -114,6 +114,24 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-community-manager
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - d4g-community-manager
+        - service
+
+    - import_role:
+        name: roles/services/d4g-community-manager
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - d4g-coolify
+        - service
+
+    - import_role:
         name: roles/utilities/observability
       vars:
         group_name: staging_swarm_cluster_nodes

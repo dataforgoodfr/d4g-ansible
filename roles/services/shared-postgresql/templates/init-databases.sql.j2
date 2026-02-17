@@ -1,0 +1,56 @@
+-- Idempotent database and user creation script
+-- This script runs every time the playbook is executed
+
+-- Create observability user for PostgreSQL exporter
+DO
+$$
+BEGIN
+  IF NOT EXISTS (
+    SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ observability_user }}'
+  ) THEN
+    CREATE USER "{{ observability_user }}" WITH PASSWORD '{{ observability_password }}';
+  END IF;
+END
+$$;
+
+-- Grant monitoring privileges to observability user
+ALTER USER "{{ observability_user }}" WITH CONNECTION LIMIT -1;
+GRANT pg_monitor TO "{{ observability_user }}";
+GRANT CONNECT ON DATABASE postgres TO "{{ observability_user }}";
+
+{% for db_config in databases %}
+-- Create user {{ db_config.user }} if not exists
+DO
+$$
+BEGIN
+  IF NOT EXISTS (
+    SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ db_config.user }}'
+  ) THEN
+    CREATE USER "{{ db_config.user }}" WITH PASSWORD '{{ db_config.password }}';
+  END IF;
+END
+$$;
+
+-- Create database {{ db_config.db }} if not exists
+SELECT 'CREATE DATABASE "{{ db_config.db }}" OWNER "{{ db_config.user }}"'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ db_config.db }}')\gexec
+
+-- Grant all privileges on database {{ db_config.db }} to user {{ db_config.user }}
+GRANT ALL PRIVILEGES ON DATABASE "{{ db_config.db }}" TO "{{ db_config.user }}";
+
+-- Connect to the database and grant schema privileges
+\c {{ db_config.db }}
+GRANT ALL ON SCHEMA public TO "{{ db_config.user }}";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO "{{ db_config.user }}";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO "{{ db_config.user }}";
+
+-- Grant observability user read access to this database
+GRANT CONNECT ON DATABASE "{{ db_config.db }}" TO "{{ observability_user }}";
+GRANT USAGE ON SCHEMA public TO "{{ observability_user }}";
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO "{{ observability_user }}";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO "{{ observability_user }}";
+
+-- Switch back to postgres database
+\c postgres
+
+{% endfor %}

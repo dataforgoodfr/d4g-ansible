@@ -31,13 +31,3 @@
 
 - include_tasks: swarm_worker.yml
   when: not is_swarm_leader | default(false)
-
-- name: Change permissions on installed key
-  file:
-    path: "{{ le_certs_dir }}/{{ item }}"
-    mode: "0644"
-  with_items:
-    - "{{ le_ca_filename }}"
-    - "{{ le_cert_filename }}"
-    - "{{ le_fullchain_filename }}"
-    - "{{ le_key_filename }}"

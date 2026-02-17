@@ -5,3 +5,6 @@ observability_environment: "production"
 
 # Base domain for Grafana URL
 base_domain: "services.dataforgood.fr"
+
+# S3 bucket for Loki logs
+loki_s3_bucket: "poletech-logs-s3"

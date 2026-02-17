@@ -1,0 +1,43 @@
+services:
+  app:
+    image: "postgres:16-alpine"
+    environment:
+      POSTGRES_PASSWORD: {{ postgres_root_password }}
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - d4g-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  exporter:
+    image: "prometheuscommunity/postgres-exporter:latest"
+    environment:
+      DATA_SOURCE_NAME: "postgresql://{{ observability_user }}:{{ observability_password }}@app:5432/postgres?sslmode=disable"
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+      labels:
+        - "prometheus.io/scrape=true"
+        - "prometheus.io/port=9187"
+        - "prometheus.io/path=/metrics"
+    depends_on:
+      - app
+
+networks:
+  d4g-internal:
+    external: true

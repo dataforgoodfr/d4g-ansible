@@ -36,8 +36,8 @@
   when: inventory_hostname == deploy_on
 
 - name: Up
-  # Source .env before deploy (variables must be interpolated in compose file)
-  command: source ./nextcloud.env && docker stack deploy -c docker-compose.yml d4g-nextcloud
+  # Source .env before deploy (set -a to enable propagate env variables, +a to disable): variables must be interpolated in compose file
+  command: set -a && source ./nextcloud.env && set +a && docker stack deploy -c docker-compose.yml d4g-nextcloud
   args:
     chdir: /opt/d4g-nextcloud
   tags:

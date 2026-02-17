@@ -20,6 +20,8 @@ services:
       - coolify_databases:/var/www/html/storage/app/databases
       - coolify_services:/var/www/html/storage/app/services
       - coolify_backups:/var/www/html/storage/app/backups
+    networks:
+      - d4g-internal
 
   coolify:
     # Image officielle Coolify, pas de version fixee
@@ -44,6 +46,8 @@ services:
       interval: 5s
       retries: 10
       timeout: 2s
+    networks:
+      - d4g-internal
 
   coolify-redis:
     image: redis:7-alpine
@@ -59,6 +63,8 @@ services:
       interval: 5s
       retries: 10
       timeout: 2s
+    networks:
+      - d4g-internal
 
   coolify-realtime:
     image: "ghcr.io/coollabsio/coolify-realtime:1.0.10"
@@ -73,6 +79,8 @@ services:
       interval: 5s
       retries: 10
       timeout: 2s
+    networks:
+      - d4g-internal
 
 
 volumes:
@@ -82,3 +90,7 @@ volumes:
   coolify_services:
   coolify_backups:
   coolify_redis:
+
+networks:
+  d4g-internal:
+   external: true

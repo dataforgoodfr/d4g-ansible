@@ -88,6 +88,9 @@ volumes:
   coolify_redis:
 
 networks:
-  d4g-internal:
+  d4g-coolify:
     driver: overlay
     attachable: true
+  
+  d4g-internal:
+    external: true

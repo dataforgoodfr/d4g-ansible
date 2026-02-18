@@ -35,9 +35,9 @@ refresh_vaultwarden_secrets() {
   local env="${1:-production}"
 
   if [ "$env" == "staging" ]; then
-    BW_SECRET_ID="1e2e9902-e4f9-45cc-af5b-00e9ea1658d1"
+    BW_FOLDER_ID="2871d276-d56e-4433-8c12-15c6e6873ef9"
   else
-    BW_SECRET_ID="0be4cad8-9a8a-44a2-bbb6-d652d0ace220"
+    BW_FOLDER_ID="f982a0fd-2a58-4893-8f8d-0f8f4bb45fea"
   fi
 
   info "Logging into Vaultwarden ($env), you may be prompted for your master password."
@@ -45,7 +45,8 @@ refresh_vaultwarden_secrets() {
   [[ -z "$BW_SESSION" ]] && die "Missing bw session."
   # Syncing distant secrets to local vault
   bw sync
-  SECRETS=$(bw get item ${BW_SECRET_ID} --raw --session "${BW_SESSION}" | jq -r .notes)
+  # merge secure notes (item type 2)
+  SECRETS=$(bw list items --folderid ${BW_FOLDER_ID} --raw --session "${BW_SESSION}" | jq -r '.[] | select( .type == 2 ) | .notes')
   echo "$SECRETS" > .env
   success "Vaultwarden secrets saved to .env"
 

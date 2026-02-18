@@ -3,6 +3,7 @@ services:
   coolify:
     # Image officielle Coolify, pas de version fixee
     image: "ghcr.io/coollabsio/coolify:latest"
+    working_dir: /var/www/html
     restart: unless-stopped
     env_file:
       - coolify.env
@@ -17,6 +18,8 @@ services:
       - coolify_services:/var/www/html/storage/app/services
       - coolify_backups:/var/www/html/storage/app/backups
       - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+        - host.docker.internal:host-gateway
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://127.0.0.1:8080/api/health || exit 1"]
       interval: 5s
@@ -48,6 +51,8 @@ services:
       - coolify.env
     volumes:
       - ./data/coolify/ssh:/var/www/html/storage/app/ssh
+    extra_hosts:
+        - host.docker.internal:host-gateway
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:6001/ready && wget -qO- http://127.0.0.1:6002/ready || exit 1"]
       interval: 5s

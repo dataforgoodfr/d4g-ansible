@@ -11,7 +11,7 @@ services:
         source: coolify.env
         target: /var/www/html/.env
         read_only: true
-      - /data/coolify/ssh:/var/www/html/storage/app/ssh
+      - ./data/coolify/ssh:/var/www/html/storage/app/ssh
       - coolify_applications:/var/www/html/storage/app/applications
       - coolify_databases:/var/www/html/storage/app/databases
       - coolify_services:/var/www/html/storage/app/services
@@ -47,7 +47,7 @@ services:
     env_file:
       - coolify.env
     volumes:
-      - /data/coolify/ssh:/var/www/html/storage/app/ssh
+      - ./data/coolify/ssh:/var/www/html/storage/app/ssh
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:6001/ready && wget -qO- http://127.0.0.1:6002/ready || exit 1"]
       interval: 5s

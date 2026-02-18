@@ -43,11 +43,15 @@ refresh_vaultwarden_secrets() {
   info "Logging into Vaultwarden ($env), you may be prompted for your master password."
   get_bw_session
   [[ -z "$BW_SESSION" ]] && die "Missing bw session."
+
   # Syncing distant secrets to local vault
   bw sync
+
   # merge secure notes (item type 2)
-  SECRETS=$(bw list items --folderid ${BW_FOLDER_ID} --raw --session "${BW_SESSION}" | jq -r '.[] | select( .type == 2 ) | .notes')
-  echo "$SECRETS" > .env
+  SECRETS=$(bw list items --folderid ${BW_FOLDER_ID} --raw --session "${BW_SESSION}" | jq -r '.[] | select(.type == 2) | .notes')
+
+  echo -e '#!/usr/bin/env bash\n' > .env
+  echo "$SECRETS" >> .env
   success "Vaultwarden secrets saved to .env"
 
   source .env

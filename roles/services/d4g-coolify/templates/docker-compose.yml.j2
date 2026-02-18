@@ -14,7 +14,7 @@ services:
       ]
     # Volumes a corriger avant le demarrage de Coolify
     volumes:
-      - coolify_ssh:/var/www/html/storage/app/ssh
+      - /data/coolify/ssh:/var/www/html/storage/app/ssh
       - coolify_applications:/var/www/html/storage/app/applications
       - coolify_databases:/var/www/html/storage/app/databases
       - coolify_services:/var/www/html/storage/app/services
@@ -33,7 +33,7 @@ services:
         source: coolify.env
         target: /var/www/html/.env
         read_only: true
-      - coolify_ssh:/var/www/html/storage/app/ssh
+      - /data/coolify/ssh:/var/www/html/storage/app/ssh
       - coolify_applications:/var/www/html/storage/app/applications
       - coolify_databases:/var/www/html/storage/app/databases
       - coolify_services:/var/www/html/storage/app/services
@@ -69,7 +69,7 @@ services:
     env_file:
       - coolify.env
     volumes:
-      - coolify_ssh:/var/www/html/storage/app/ssh
+      - /data/coolify/ssh:/var/www/html/storage/app/ssh
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:6001/ready && wget -qO- http://127.0.0.1:6002/ready || exit 1"]
       interval: 5s
@@ -79,7 +79,6 @@ services:
       - d4g-internal
 
 volumes:
-  coolify_ssh:
   coolify_applications:
   coolify_databases:
   coolify_services:

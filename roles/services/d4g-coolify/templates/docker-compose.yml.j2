@@ -1,27 +1,5 @@
 
 services:
-  coolify-init:
-    # Image minimale pour executer les commandes d'initialisation
-    image: alpine:3.20
-    restart: "no"
-    user: "0:0"
-    # Creation des dossiers et correction des proprietaires
-    command:
-      [
-        "sh",
-        "-c",
-        "mkdir -p /var/www/html/storage/app/ssh/keys && chown -R 9999:9999 /var/www/html/storage/app/ssh /var/www/html/storage/app/applications /var/www/html/storage/app/databases /var/www/html/storage/app/services /var/www/html/storage/app/backups",
-      ]
-    # Volumes a corriger avant le demarrage de Coolify
-    volumes:
-      - /data/coolify/ssh:/var/www/html/storage/app/ssh
-      - coolify_applications:/var/www/html/storage/app/applications
-      - coolify_databases:/var/www/html/storage/app/databases
-      - coolify_services:/var/www/html/storage/app/services
-      - coolify_backups:/var/www/html/storage/app/backups
-    networks:
-      - d4g-internal
-
   coolify:
     # Image officielle Coolify, pas de version fixee
     image: "ghcr.io/coollabsio/coolify:latest"

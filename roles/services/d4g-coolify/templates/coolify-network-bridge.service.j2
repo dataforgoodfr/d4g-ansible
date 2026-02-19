@@ -1,0 +1,13 @@
+[Unit]
+Description=Auto-connect Coolify containers to d4g-internal network
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStart=/opt/d4g-coolify/coolify-network-bridge.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

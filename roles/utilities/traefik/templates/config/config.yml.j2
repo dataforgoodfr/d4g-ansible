@@ -49,6 +49,13 @@ providers:
   file:
     filename: /opt/traefik/config/config.yml
     watch: true
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  swarm:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: d4g-internal
 
 http:
   middlewares:

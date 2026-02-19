@@ -31,6 +31,28 @@
     - up
   when: is_swarm_leader | default(false)
 
+- name: Deploy coolify-network-bridge script
+  template:
+    src: coolify-network-bridge.sh.j2
+    dest: /opt/d4g-coolify/coolify-network-bridge.sh
+    mode: "0755"
+  when: inventory_hostname == deploy_on
+
+- name: Deploy coolify-network-bridge systemd service
+  template:
+    src: coolify-network-bridge.service.j2
+    dest: /etc/systemd/system/coolify-network-bridge.service
+  notify: restart coolify-network-bridge
+  when: inventory_hostname == deploy_on
+
+- name: Enable and start coolify-network-bridge
+  systemd:
+    name: coolify-network-bridge
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: inventory_hostname == deploy_on
+
 - import_role:
     name: roles/utilities/sql-backup
   vars:

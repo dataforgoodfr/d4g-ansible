@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Auto-connect Coolify-managed containers to the d4g-internal overlay network.
+# Listens for Docker container start events and connects containers
+# that have the coolify.managed=true label.
+set -uo pipefail
+
+NETWORK="d4g-internal"
+
+connect_container() {
+  local container_id="$1"
+  if docker inspect "$container_id" --format '{{ '{{' }}index .Config.Labels "coolify.managed"{{ '}}' }}' 2>/dev/null | grep -q "true"; then
+    if ! docker inspect "$container_id" --format '{{ '{{' }}json .NetworkSettings.Networks{{ '}}' }}' 2>/dev/null | grep -q "$NETWORK"; then
+      docker network connect "$NETWORK" "$container_id" 2>/dev/null && \
+        logger -t coolify-network-bridge "Connected $container_id to $NETWORK" || \
+        logger -t coolify-network-bridge "Failed to connect $container_id to $NETWORK"
+    fi
+  fi
+}
+
+# Connect any already-running Coolify containers on startup
+for cid in $(docker ps -q --filter "label=coolify.managed=true"); do
+  connect_container "$cid"
+done
+
+# Watch for new container start events
+docker events --filter "event=start" --filter "type=container" --format '{{ '{{' }}.Actor.ID{{ '}}' }}' | while read -r container_id; do
+  connect_container "$container_id"
+done

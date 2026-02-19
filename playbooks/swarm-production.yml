@@ -390,6 +390,8 @@
             port: 465
           - name: stalwart-imaps
             port: 993
+          - name: nextcloud-talk
+            port: 3478
         # TODO: current traefik config for tcp service rules is HostSNI(`*`) and ignore provided `domain` ?
         tcp_services:
           - name: stalwart-smtp-service
@@ -407,6 +409,17 @@
             entrypoint: stalwart-imaps
             addresses:
               - "d4g-stalwart_app:993"
+          - name: nextcloud-talk-tcp
+            domain: nextcloud.services.dataforgood.fr
+            entrypoint: nextcloud-talk
+            addresses:
+              - "d4g-nextcloud_talk:3478"
+        udp_services:
+          - name: nextcloud-talk-udp
+            entrypoint: nextcloud-talk
+            addresses:
+              - "d4g-nextcloud_talk:3478"
+
       tags:
         - proxy
         - traefik

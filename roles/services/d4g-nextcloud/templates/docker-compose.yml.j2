@@ -8,6 +8,7 @@ services:
   nextcloud:
     depends_on:
       - redis
+      - talk
     image: ghcr.io/nextcloud-releases/aio-nextcloud:20260211_141900
     init: true
     healthcheck:
@@ -130,6 +131,46 @@ services:
     env_file:
       - nextcloud-stack.env
     read_only: true
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+
+  ### TALK videoconference ###
+
+  talk:
+    image: ghcr.io/nextcloud-releases/aio-talk:20260211_141900
+    user: "1000"
+    init: true
+    healthcheck:
+      start_period: 0s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 3
+    env_file:
+      - nextcloud-stack.env
+    environment:
+      - SKIP_CERT_VERIFY=true
+    read_only: true
+    volumes:
+      - type: tmpfs
+        target: /var/log/supervisord
+      - type: tmpfs
+        target: /var/run/supervisord
+      - type: tmpfs
+        target: /opt/eturnal/run
+      - type: tmpfs
+        target: /conf
+      - type: tmpfs
+        target: /tmp
     cap_drop:
       - NET_RAW
     networks:

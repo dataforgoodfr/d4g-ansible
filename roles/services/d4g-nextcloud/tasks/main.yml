@@ -10,22 +10,44 @@
     dest: /opt/d4g-nextcloud/{{ item }}
   with_items:
     - docker-compose.yml
-    - nextcloud.env
+    - nextcloud-stack.env
+    - nextcloud-instance.env
 
 - name: Create d4g-nextcloud volume directories
   file:
     path: "{{ item }}"
     state: directory
+    mode: "0755"
   with_items:
-    - /opt/d4g-nextcloud/nextcloud-html
-    - /opt/d4g-nextcloud/nextcloud-data
-    - /opt/d4g-nextcloud/nextcloud-mnt
+    - /opt/d4g-nextcloud/nextcloud-data/html
+    - /opt/d4g-nextcloud/nextcloud-data/ncdata
+    - /opt/d4g-nextcloud/nextcloud-data/mnt
     - /opt/d4g-nextcloud/apache-data
     - /opt/d4g-nextcloud/redis-data
-    - /opt/d4g-nextcloud/elasticsearch-data
-    - /opt/d4g-nextcloud/talk_recording-data
-    - /opt/d4g-nextcloud/clamav-data
-    - /opt/d4g-nextcloud/onlyoffice-data
+
+- name: Set correct ownership for nextcloud-data directory
+  file:
+    path: /opt/d4g-nextcloud/nextcloud-data/
+    owner: "33"
+    group: "33"
+    state: directory
+    recurse: yes
+
+- name: Set correct ownership for apache-data directory
+  file:
+    path: /opt/d4g-nextcloud/apache-data/
+    owner: "33"
+    group: "33"
+    state: directory
+    recurse: yes
+
+- name: Set correct ownership for redis-data directory
+  file:
+    path: /opt/d4g-nextcloud/redis-data
+    owner: "999"
+    group: "999"
+    state: directory
+    recurse: yes
 
 - name: Pull
   command: docker compose pull
@@ -36,8 +58,7 @@
   when: inventory_hostname == deploy_on
 
 - name: Up
-  # Source .env before deploy (set -a to enable propagate env variables, +a to disable): variables must be interpolated in compose file
-  command: set -a && source ./nextcloud.env && set +a && docker stack deploy -c docker-compose.yml d4g-nextcloud
+  command: docker stack deploy -c docker-compose.yml d4g-nextcloud
   args:
     chdir: /opt/d4g-nextcloud
   tags:
@@ -47,11 +68,8 @@
 - import_role:
     name: roles/utilities/s3-backup
   vars:
-    service_name: "{{ item }}"
-    data_dir: "/opt/d4g-nextcloud/{{ item }}"
-  with_items:
-    - nextcloud-html
-    - nextcloud-data
+    service_name: "nextcloud-data"
+    data_dir: "/opt/d4g-nextcloud/nextcloud-data"
   tags:
     - backup
     - service

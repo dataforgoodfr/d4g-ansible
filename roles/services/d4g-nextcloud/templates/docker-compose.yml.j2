@@ -7,20 +7,8 @@ services:
 
   nextcloud:
     depends_on:
-      redis:
-        condition: service_healthy
-      clamav:
-        condition: service_healthy
-      fulltextsearch:
-        condition: service_started
-        required: false
-      talk-recording:
-        condition: service_started
-        required: false
-      imaginary:
-        condition: service_started
-        required: false
-    image: ghcr.io/nextcloud-releases/aio-nextcloud:latest
+      - redis
+    image: ghcr.io/nextcloud-releases/aio-nextcloud:20260211_141900
     init: true
     healthcheck:
       start_period: 0s
@@ -29,120 +17,36 @@ services:
       timeout: 30s
       start_interval: 5s
       retries: 3
-    expose:
-      - "9000"
-      - "9001"
     volumes:
-      - ./nextcloud-html:/var/www/html:rw
-      - ./nextcloud-data:/mnt/ncdata:rw
-      - ./nextcloud-mnt:${NEXTCLOUD_MOUNT}:rw
+      - /opt/d4g-nextcloud/nextcloud-data/html:/var/www/html:rw
+      - /opt/d4g-nextcloud/nextcloud-data/ncdata:/mnt/ncdata:rw
+      - /opt/d4g-nextcloud/nextcloud-data/mnt:/mnt/nc:rw
+    env_file:
+      - nextcloud-stack.env
+      - nextcloud-instance.env
     environment:
-      - NEXTCLOUD_HOST=nextcloud
-      - POSTGRES_HOST=${DATABASE_HOST}
-      - POSTGRES_PORT=${DATABASE_PORT}
-      - POSTGRES_DB=${DATABASE_DB}
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
-      - APACHE_HOST=apache
-      - APACHE_PORT
-      - NC_DOMAIN
-      - ADDITIONAL_TRUSTED_DOMAIN
       - ADMIN_USER=admin
-      - ADMIN_PASSWORD=${NEXTCLOUD_PASSWORD}
-      - NEXTCLOUD_DATA_DIR=/mnt/ncdata
-      - OVERWRITEHOST=${NC_DOMAIN}
       - OVERWRITEPROTOCOL=https
-      - TURN_SECRET
-      - SIGNALING_SECRET
-      - ONLYOFFICE_SECRET
-      - NEXTCLOUD_MOUNT
-      - CLAMAV_ENABLED
-      - CLAMAV_HOST=clamav
-      - ONLYOFFICE_ENABLED
-      - COLLABORA_ENABLED
-      - COLLABORA_HOST=collabora
-      - TALK_ENABLED
-      - ONLYOFFICE_HOST=onlyoffice
-      - UPDATE_NEXTCLOUD_APPS
-      - TZ=${TIMEZONE}
-      - TALK_PORT
-      - IMAGINARY_ENABLED
-      - IMAGINARY_HOST=imaginary
-      - PHP_UPLOAD_LIMIT=${NEXTCLOUD_UPLOAD_LIMIT}
-      - PHP_MEMORY_LIMIT=${NEXTCLOUD_MEMORY_LIMIT}
-      - FULLTEXTSEARCH_ENABLED
-      - FULLTEXTSEARCH_HOST=fulltextsearch
-      - FULLTEXTSEARCH_PROTOCOL=http
-      - FULLTEXTSEARCH_PORT=9200
-      - FULLTEXTSEARCH_USER=elastic
-      - FULLTEXTSEARCH_INDEX=nextcloud-aio
-      - PHP_MAX_TIME=${NEXTCLOUD_MAX_TIME}
-      - TRUSTED_CACERTS_DIR=${NEXTCLOUD_TRUSTED_CACERTS_DIR}
-      - STARTUP_APPS=${NEXTCLOUD_STARTUP_APPS}
-      - ADDITIONAL_APKS=${NEXTCLOUD_ADDITIONAL_APKS}
-      - ADDITIONAL_PHP_EXTENSIONS=${NEXTCLOUD_ADDITIONAL_PHP_EXTENSIONS}
-      - INSTALL_LATEST_MAJOR
-      - TALK_RECORDING_ENABLED
-      - RECORDING_SECRET
-      - TALK_RECORDING_HOST=talk-recording
-      - FULLTEXTSEARCH_PASSWORD
-      - REMOVE_DISABLED_APPS
-      - IMAGINARY_SECRET
-      - WHITEBOARD_SECRET
-      - WHITEBOARD_ENABLED
-
-      # S3 config
-      - OBJECTSTORE_S3_HOST
-      - OBJECTSTORE_S3_PORT
-      - OBJECTSTORE_S3_SSL
-      - OBJECTSTORE_S3_REGION
-      - OBJECTSTORE_S3_KEY
-      - OBJECTSTORE_S3_SECRET
-      - OBJECTSTORE_S3_BUCKET
-      - OBJECTSTORE_S3_USEPATH_STYLE=true
-      - OBJECTSTORE_S3_MULTIBUCKET=false
-
-      # mail service for internal purpose e.g. sending agenda invitations
-      - SMTP_HOST
-      - MAIL_FROM_ADDRESS
-      - MAIL_DOMAIN
-      - SMTP_PORT
-      - SMTP_SECURE
-      - SMTP_NAME
-      - SMTP_PASSWORD
+      - NEXTCLOUD_DATA_DIR=/mnt/ncdata
+      - NEXTCLOUD_MOUNT=/mnt/nc
     stop_grace_period: 600s
-    restart: unless-stopped
     cap_drop:
       - NET_RAW
     networks:
       - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
 
   #### APACHE web server ###
 
   apache:
     depends_on:
-      onlyoffice:
-        condition: service_started
-        required: false
-      collabora:
-        condition: service_started
-        required: false
-      talk:
-        condition: service_started
-        required: false
-      notify-push:
-        condition: service_started
-        required: false
-      whiteboard:
-        condition: service_started
-        required: false
-      nextcloud:
-        condition: service_started
-        required: false
-    image: ghcr.io/nextcloud-releases/aio-apache:latest
+      - nextcloud
+    image: ghcr.io/nextcloud-releases/aio-apache:20260211_141900
     user: "33"
     init: true
     healthcheck:
@@ -152,39 +56,37 @@ services:
       timeout: 30s
       start_interval: 5s
       retries: 3
-    environment:
-      - NC_DOMAIN
-      - NEXTCLOUD_HOST=nextcloud
-      - APACHE_HOST=apache
-      - COLLABORA_HOST=collabora
-      - TALK_HOST=talk
-      - APACHE_PORT
-      - ONLYOFFICE_HOST=onlyoffice
-      - TZ=${TIMEZONE}
-      - APACHE_MAX_SIZE
-      - APACHE_MAX_TIME=${NEXTCLOUD_MAX_TIME}
-      - NOTIFY_PUSH_HOST=notify-push
-      - WHITEBOARD_HOST=whiteboard
     volumes:
-      - ./nextcloud-html:/var/www/html:ro
-      - ./apache-data:/mnt/data:rw
-    restart: unless-stopped
+      - /opt/d4g-nextcloud/nextcloud-data/html:/var/www/html:ro
+      - /opt/d4g-nextcloud/apache-data:/mnt/data:rw
+      - type: tmpfs
+        target: /var/log/supervisord
+      - type: tmpfs
+        target: /var/run/supervisord
+      - type: tmpfs
+        target: /usr/local/apache2/logs
+      - type: tmpfs
+        target: /tmp
+      - type: tmpfs
+        target: /home/www-data
+    env_file:
+      - nextcloud-stack.env
     read_only: true
-    tmpfs:
-      - /var/log/supervisord
-      - /var/run/supervisord
-      - /usr/local/apache2/logs
-      - /tmp
-      - /home/www-data
     cap_drop:
       - NET_RAW
     networks:
       - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
 
-  ### Additional databases ###
+
+  ### REDIS ###
 
   redis:
-    image: ghcr.io/nextcloud-releases/aio-redis:latest
+    image: ghcr.io/nextcloud-releases/aio-redis:20260211_141900
     user: "999"
     init: true
     healthcheck:
@@ -194,56 +96,26 @@ services:
       timeout: 30s
       start_interval: 5s
       retries: 3
-    expose:
-      - "6379"
-    environment:
-      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
-      - TZ=${TIMEZONE}
+    env_file:
+      - nextcloud-stack.env
     volumes:
-      - ./redis-data:/data:rw
-    restart: unless-stopped
+      - /opt/d4g-nextcloud/redis-data:/data:rw
     read_only: true
     cap_drop:
       - NET_RAW
     networks:
       - d4g-internal
-
-  fulltextsearch:
-    image: ghcr.io/nextcloud-releases/aio-fulltextsearch:latest
-    init: false
-    healthcheck:
-      start_period: 60s
-      test: /healthcheck.sh
-      interval: 10s
-      timeout: 5s
-      start_interval: 5s
-      retries: 5
-    expose:
-      - "9200"
-    environment:
-      - TZ=${TIMEZONE}
-      - ES_JAVA_OPTS=${FULLTEXTSEARCH_JAVA_OPTIONS}
-      - bootstrap.memory_lock=false
-      - cluster.name=nextcloud-aio
-      - discovery.type=single-node
-      - logger.level=WARN
-      - http.port=9200
-      - xpack.license.self_generated.type=basic
-      - xpack.security.enabled=false
-      - FULLTEXTSEARCH_PASSWORD
-    volumes:
-      - ./elasticsearch-data:/usr/share/elasticsearch/data:rw
-    restart: unless-stopped
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
 
 
-  ### PUSH ###
+  ### NOTIFY PUSH ###
 
   notify-push:
-    image: ghcr.io/nextcloud-releases/aio-notify-push:latest
+    image: ghcr.io/nextcloud-releases/aio-notify-push:20260211_141900
     user: "33"
     init: true
     healthcheck:
@@ -253,257 +125,20 @@ services:
       timeout: 30s
       start_interval: 5s
       retries: 3
-    expose:
-      - "7867"
     volumes:
-      - ./nextcloud-html:/nextcloud:ro
-    environment:
-      - NC_DOMAIN
-      - NEXTCLOUD_HOST=nextcloud
-      - TZ=${TIMEZONE}
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
-      - POSTGRES_HOST=${DATABASE_HOST}
-      - POSTGRES_PORT=${DATABASE_PORT}
-      - POSTGRES_DB=${DATABASE_DB}
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-    restart: unless-stopped
+      - /opt/d4g-nextcloud/nextcloud-data/html:/nextcloud:ro
+    env_file:
+      - nextcloud-stack.env
     read_only: true
     cap_drop:
       - NET_RAW
     networks:
       - d4g-internal
-
-
-  ### Collaborative editing ###
-
-  collabora:
-    command: ${ADDITIONAL_COLLABORA_OPTIONS}
-    image: ghcr.io/nextcloud-releases/aio-collabora:latest
-    init: true
-    healthcheck:
-      start_period: 60s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 9
-    expose:
-      - "9980"
-    environment:
-      - aliasgroup1=https://${NC_DOMAIN}:443,http://apache:23973
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:logging.disable_server_audit=true --o:logging.level=warning --o:logging.level_startup=warning --o:welcome.enable=false --o:remote_font_config.url=https://${NC_DOMAIN}/apps/richdocuments/settings/fonts.json --o:net.post_allow.host[0]=.+
-      - dictionaries=${COLLABORA_DICTIONARIES}
-      - TZ=${TIMEZONE}
-      - server_name=${NC_DOMAIN}
-      - DONT_GEN_SSL_CERT=1
-    restart: unless-stopped
-    cap_add:
-      - MKNOD
-      - SYS_ADMIN
-      - SYS_CHROOT
-      - FOWNER
-      - CHOWN
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
-
-
-
-  ### Spreed WebRTC videoconference ###
-
-  talk:
-    image: ghcr.io/nextcloud-releases/aio-talk:latest
-    user: "1000"
-    init: true
-    healthcheck:
-      start_period: 0s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 3
-    expose:
-      - "8081"
-    environment:
-      - NC_DOMAIN
-      - TALK_HOST=talk
-      - TURN_SECRET
-      - SIGNALING_SECRET
-      - TZ=${TIMEZONE}
-      - TALK_PORT
-      - INTERNAL_SECRET=${TALK_INTERNAL_SECRET}
-    restart: unless-stopped
-    read_only: true
-    tmpfs:
-      - /var/log/supervisord
-      - /var/run/supervisord
-      - /opt/eturnal/run
-      - /conf
-      - /tmp
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
-
-  talk-recording:
-    image: ghcr.io/nextcloud-releases/aio-talk-recording:latest
-    user: "122"
-    init: true
-    healthcheck:
-      start_period: 0s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 3
-    expose:
-      - "1234"
-    environment:
-      - NC_DOMAIN
-      - TZ=${TIMEZONE}
-      - RECORDING_SECRET
-      - INTERNAL_SECRET=${TALK_INTERNAL_SECRET}
-    volumes:
-      - ./talk_recording-data:/tmp:rw
-    shm_size: 2147483648  # 2GiB
-    restart: unless-stopped
-    read_only: true
-    tmpfs:
-      - /conf
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
-
-
-  ### Antivirus ###
-
-  clamav:
-    image: ghcr.io/nextcloud-releases/aio-clamav:latest
-    user: "100"
-    init: false
-    healthcheck:
-      start_period: 60s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 9
-    expose:
-      - "3310"
-    environment:
-      - TZ=${TIMEZONE}
-      - MAX_SIZE=${NEXTCLOUD_UPLOAD_LIMIT}
-    volumes:
-      - ./clamav-data:/var/lib/clamav:rw
-    restart: unless-stopped
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/log/clamav
-      - /run/clamav
-      - /var/log/supervisord
-      - /var/run/supervisord
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
-
-
-  ### Onlyoffice document server ###
-
-  onlyoffice:
-    image: ghcr.io/nextcloud-releases/aio-onlyoffice:latest
-    init: true
-    healthcheck:
-      start_period: 60s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 9
-    expose:
-      - "80"
-    environment:
-      - TZ=${TIMEZONE}
-      - JWT_ENABLED=true
-      - JWT_HEADER=AuthorizationJwt
-      - JWT_SECRET=${ONLYOFFICE_SECRET}
-    volumes:
-      - ./onlyoffice-data:/var/lib/onlyoffice:rw
-    restart: unless-stopped
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
-
-
-  ### REST API for high-level image processing ###
-
-  imaginary:
-    image: ghcr.io/nextcloud-releases/aio-imaginary:latest
-    user: "65534"
-    init: true
-    healthcheck:
-      start_period: 0s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 3
-    expose:
-      - "9000"
-    environment:
-      - TZ=${TIMEZONE}
-      - IMAGINARY_SECRET
-    restart: unless-stopped
-    cap_add:
-      - SYS_NICE
-    cap_drop:
-      - NET_RAW
-    read_only: true
-    tmpfs:
-      - /tmp
-    networks:
-      - d4g-internal
-
-
-  ### whiteboard app for Nextcloud ###
-
-  whiteboard:
-    image: ghcr.io/nextcloud-releases/aio-whiteboard:latest
-    user: "65534"
-    init: true
-    healthcheck:
-      start_period: 0s
-      test: /healthcheck.sh
-      interval: 30s
-      timeout: 30s
-      start_interval: 5s
-      retries: 3
-    expose:
-      - "3002"
-    tmpfs:
-      - /tmp
-    environment:
-      - TZ=${TIMEZONE}
-      - NEXTCLOUD_URL=https://${NC_DOMAIN}
-      - JWT_SECRET_KEY=${WHITEBOARD_SECRET}
-      - STORAGE_STRATEGY=redis
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
-      - BACKUP_DIR=/tmp
-    restart: unless-stopped
-    read_only: true
-    cap_drop:
-      - NET_RAW
-    networks:
-      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
 
 
 networks:

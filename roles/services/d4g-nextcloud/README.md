@@ -24,10 +24,27 @@ Steps to match D4G setup (docker swarm cluster with Traefik reverse proxy, Postg
 
 ## TODO
 
-- [ ] Create scaleway infra: postgres db/user & S3 bucket
+- [x] Create scaleway infra: postgres db/user & S3 bucket
 - [ ] Deploy and validate simple nextcloud setup: nextcloud with redis + clamav
 - [ ] Setup OIDC user connection, cf [doc](https://docs.nextcloud.com/server/32/admin_manual/configuration_user/user_auth_oidc.html)
 - [ ] Setup and enable additional nextcloud applications:
   - [ ] spreed (talk videoconference) -> additional ports (cf env var `TALK_PORT`) to expose
   - [ ] collabora/onlyoffice
   - [ ] fulltext search (stateful elasticsearch)
+
+
+## Operations
+
+
+### Option 1 : web UI
+
+Nextcloud creates an `admin` user group that access to `Administration settings` in the [web UI](https://nextcloud.services.dataforgood.fr/settings/admin/overview), adding accounts to the group makes them admin. Admins can manipulate: system instance settings, install/enable/disable applications, application settings, etc.
+
+### Option 2 : cli
+
+Connect to the machine where stack is deployed (currently metal-2), run a shell in the nextcloud docker container. Run `php occ` commands to manipulate configuration and applications, see [occ doc](https://docs.nextcloud.com/server/latest/admin_manual/occ_command.html), such as `php occ app:list` (list installed application), `php occ config:system:set loglevel --value="0" --type=integer` (set logs to debug), etc.
+
+### Troubleshoot
+
+Nextcloud container comes with [entrypoint.sh](https://github.com/nextcloud/all-in-one/blob/main/Containers/nextcloud/entrypoint.sh) running occ commands at each container start, so configuration might be loss in case of manual config in contradiction to docker image config or environment variable.
+s

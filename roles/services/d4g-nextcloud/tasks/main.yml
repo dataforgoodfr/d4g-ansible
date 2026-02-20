@@ -24,6 +24,7 @@
     - /opt/d4g-nextcloud/nextcloud-data/mnt
     - /opt/d4g-nextcloud/apache-data
     - /opt/d4g-nextcloud/redis-data
+    - /opt/d4g-nextcloud/clamav-data
 
 - name: Set correct ownership for nextcloud-data directory
   file:
@@ -46,6 +47,14 @@
     path: /opt/d4g-nextcloud/redis-data
     owner: "999"
     group: "999"
+    state: directory
+    recurse: yes
+
+- name: Set correct ownership for clamav-data directory
+  file:
+    path: /opt/d4g-nextcloud/clamav-data
+    owner: "100"
+    group: "100"
     state: directory
     recurse: yes
 

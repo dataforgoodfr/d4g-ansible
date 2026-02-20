@@ -141,6 +141,44 @@ services:
         constraints:
           - node.hostname == {{ deploy_on }}
 
+  ### CLAMAV antivirus ###
+
+  clamav:
+    image: ghcr.io/nextcloud-releases/aio-clamav:20260211_141900
+    user: "100"
+    init: false
+    healthcheck:
+      start_period: 60s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 9
+    env_file:
+      - nextcloud-stack.env
+    volumes:
+      - /opt/d4g-nextcloud/clamav-data:/var/lib/clamav:rw
+      - type: tmpfs
+        target: /tmp
+      - type: tmpfs
+        target: /var/log/clamav
+      - type: tmpfs
+        target: /run/clamav
+      - type: tmpfs
+        target: /var/log/supervisord
+      - type: tmpfs
+        target: /var/run/supervisord
+    read_only: true
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
 
   ### TALK videoconference ###
 
@@ -161,6 +199,7 @@ services:
       - SKIP_CERT_VERIFY=true
     read_only: true
     volumes:
+      - /opt/d4g-nextcloud/talk-container-start.sh:/start.sh
       - type: tmpfs
         target: /var/log/supervisord
       - type: tmpfs

@@ -25,7 +25,7 @@ Steps to match D4G setup (docker swarm cluster with Traefik reverse proxy, Postg
 ## TODO
 
 - [x] Create scaleway infra: postgres db/user & S3 bucket
-- [ ] Deploy and validate simple nextcloud setup: nextcloud with redis + clamav
+- [x] Deploy and validate simple nextcloud setup: nextcloud with redis + clamav
 - [ ] Setup OIDC user connection, cf [doc](https://docs.nextcloud.com/server/32/admin_manual/configuration_user/user_auth_oidc.html)
 - [ ] Setup and enable additional nextcloud applications:
   - [ ] spreed (talk videoconference) -> additional ports (cf env var `TALK_PORT`) to expose

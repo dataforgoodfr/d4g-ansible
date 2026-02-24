@@ -22,7 +22,7 @@ services:
       - /opt/d4g-nextcloud/nextcloud-data/ncdata:/mnt/ncdata:rw
       - /opt/d4g-nextcloud/nextcloud-data/mnt:/mnt/nc:rw
     env_file:
-      - nextcloud-stack.env
+      - nextcloud-shared.env
       - nextcloud-instance.env
     environment:
       - ADMIN_USER=admin
@@ -70,7 +70,7 @@ services:
       - type: tmpfs
         target: /home/www-data
     env_file:
-      - nextcloud-stack.env
+      - nextcloud-shared.env
     read_only: true
     cap_drop:
       - NET_RAW
@@ -97,7 +97,7 @@ services:
       start_interval: 5s
       retries: 3
     env_file:
-      - nextcloud-stack.env
+      - nextcloud-shared.env
     volumes:
       - /opt/d4g-nextcloud/redis-data:/data:rw
     read_only: true
@@ -128,7 +128,7 @@ services:
     volumes:
       - /opt/d4g-nextcloud/nextcloud-data/html:/nextcloud:ro
     env_file:
-      - nextcloud-stack.env
+      - nextcloud-shared.env
     read_only: true
     cap_drop:
       - NET_RAW
@@ -154,7 +154,7 @@ services:
       start_interval: 5s
       retries: 9
     env_file:
-      - nextcloud-stack.env
+      - nextcloud-shared.env
     volumes:
       - /opt/d4g-nextcloud/clamav-data:/var/lib/clamav:rw
       - type: tmpfs

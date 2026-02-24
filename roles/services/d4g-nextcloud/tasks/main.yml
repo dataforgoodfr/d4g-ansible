@@ -10,7 +10,7 @@
     dest: /opt/d4g-nextcloud/{{ item }}
   with_items:
     - docker-compose.yml
-    - nextcloud-stack.env
+    - nextcloud-shared.env
     - nextcloud-instance.env
 
 - name: Create d4g-nextcloud volume directories

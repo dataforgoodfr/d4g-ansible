@@ -47,4 +47,3 @@ Connect to the machine where stack is deployed (currently metal-2), run a shell 
 ### Troubleshoot
 
 Nextcloud container comes with [entrypoint.sh](https://github.com/nextcloud/all-in-one/blob/main/Containers/nextcloud/entrypoint.sh) running occ commands at each container start, so configuration might be loss in case of manual config in contradiction to docker image config or environment variable.
-s

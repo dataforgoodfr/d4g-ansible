@@ -107,27 +107,6 @@ tcp:
 {% endfor %}
 {% endif %}
 
-{% if udp_services %}
-udp:
-  routers:
-{% for service in udp_services %}
-    {{ service.name }}:
-      service: {{ service.name }}
-      entryPoints:
-        - {{ service.entrypoint }}
-{% endfor %}
-
-  services:
-{% for service in udp_services %}
-    {{ service.name }}:
-      loadBalancer:
-        servers:
-{% for address in service.addresses %}
-          - address: "{{ address }}"
-{% endfor %}
-{% endfor %}
-{% endif %}
-
 tls:
   certificates:
 {% for cert in certificates %}

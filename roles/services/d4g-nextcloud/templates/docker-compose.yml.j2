@@ -180,7 +180,7 @@ services:
           - node.hostname == {{ deploy_on }}
 
 
-  ### TALK videoconference ###
+  ### TALK videoconference: signaling + eturnal (STUN/TURN) + NATS + Janus (WebRTC) ###
 
   talk:
     image: ghcr.io/nextcloud-releases/aio-talk:20260211_141900
@@ -197,6 +197,8 @@ services:
       - nextcloud-stack.env
     environment:
       - SKIP_CERT_VERIFY=true
+      - TURN_LOG_LEVEL=info
+      - SIGNAL_LOG_DEBUG=true
     read_only: true
     volumes:
       - /opt/d4g-nextcloud/talk-container-start.sh:/start.sh
@@ -210,15 +212,24 @@ services:
         target: /conf
       - type: tmpfs
         target: /tmp
-    cap_drop:
-      - NET_RAW
+    # Need to forward to host because traefik cannot expose layer 4 STUN/TURN protocol
+    ports:
+      - target: 3478
+        published: 3478
+        protocol: tcp
+        mode: host
+      - target: 3478
+        published: 3478
+        protocol: udp
+        mode: host
     networks:
       - d4g-internal
     deploy:
       replicas: {{ replicas }}
       placement:
         constraints:
-          - node.hostname == {{ deploy_on }}
+          # need to be on host public IP resolved by DNS
+          - node.role == manager
 
 
 networks:

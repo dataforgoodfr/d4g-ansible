@@ -12,7 +12,6 @@
     - docker-compose.yml
     - nextcloud-stack.env
     - nextcloud-instance.env
-    - talk-container-start.sh
 
 - name: Create d4g-nextcloud volume directories
   file:
@@ -58,13 +57,6 @@
     group: "100"
     state: directory
     recurse: yes
-
-- name: Set correct ownership for talk container start shell
-  file:
-    path: /opt/d4g-nextcloud/talk-container-start.sh
-    owner: "1000"
-    group: "1000"
-    mode: "0755"
 
 - name: Pull
   command: docker compose pull

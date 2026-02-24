@@ -407,11 +407,6 @@
             entrypoint: stalwart-imaps
             addresses:
               - "d4g-stalwart_app:993"
-          - name: nextcloud-talk-tcp
-            domain: nextcloud.services.dataforgood.fr
-            entrypoint: nextcloud-talk-tcp
-            addresses:
-              - "d4g-nextcloud_talk:3478"
 
       tags:
         - proxy

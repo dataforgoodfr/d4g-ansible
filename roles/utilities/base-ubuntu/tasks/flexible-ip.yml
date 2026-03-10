@@ -1,0 +1,31 @@
+---
+- name: Install flexible IP configuration script
+  template:
+    src: configure-flexible-ip.sh.j2
+    dest: /usr/local/bin/configure-flexible-ip
+    mode: "0755"
+  notify: restart flexible-ip
+
+- name: Create flexible IP systemd service
+  copy:
+    dest: /etc/systemd/system/flexible-ip.service
+    content: |
+      [Unit]
+      Description=Configure flexible IP SNAT for outbound SMTP
+      After=network-online.target docker.service
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/configure-flexible-ip
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart flexible-ip
+
+- name: Enable flexible IP service
+  systemd:
+    name: flexible-ip.service
+    enabled: yes
+    daemon_reload: yes

@@ -125,9 +125,3 @@
         UserKnownHostsFile /dev/null
         LogLevel ERROR
         ForwardAgent yes
-
-- import_tasks: flexible-ip.yml
-  when: flexible_ip is defined
-  tags:
-    - base
-    - flexible-ip

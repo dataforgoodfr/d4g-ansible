@@ -4,9 +4,3 @@
     name: ssh
     state: restarted
     enabled: yes
-
-- name: restart flexible-ip
-  systemd:
-    name: flexible-ip.service
-    state: restarted
-    daemon_reload: yes

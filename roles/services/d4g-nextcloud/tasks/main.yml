@@ -92,7 +92,7 @@
     pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
     pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
     pgsql_user: oc_nextcloud
-    pgsql_password: "{{ lookup('env', 'NEXTCLOUD_DB_PASSWORD') }}"
+    pgsql_password: "{{ lookup('env', 'NEXTCLOUD_POSTGRES_PASSWORD') }}"
     pgsql_database: nextcloud
   tags:
     - backup

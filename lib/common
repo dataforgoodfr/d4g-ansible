@@ -35,9 +35,9 @@ refresh_vaultwarden_secrets() {
   local env="${1:-production}"
 
   if [ "$env" == "staging" ]; then
-    BW_FOLDER_ID="2871d276-d56e-4433-8c12-15c6e6873ef9"
+    BW_FOLDER_ID="f3bb9d55-84a0-4fdb-a201-eaa50d19b339"
   else
-    BW_FOLDER_ID="f982a0fd-2a58-4893-8f8d-0f8f4bb45fea"
+    BW_FOLDER_ID="a4d890c1-af0d-49f0-8fde-a99d6c28b2b9"
   fi
 
   info "Logging into Vaultwarden ($env), you may be prompted for your master password."
@@ -58,13 +58,25 @@ refresh_vaultwarden_secrets() {
 }
 
 bw_create_session() {
-    # No session, new session !
-    export BW_PASSWORD="$(gum input --password --prompt="Please enter your Vaultwarden master password")"
+    # If BW_PASSWORD is not already set, prompt interactively
+    if [ -z "${BW_PASSWORD:-}" ]; then
+      export BW_PASSWORD="$(gum input --password --prompt="Please enter your Vaultwarden master password")"
+    fi
+
     debug "BW_PASSWORD: $BW_PASSWORD"
     BW_SESSION=$(bw unlock --passwordenv BW_PASSWORD --raw)
 }
 
 get_bw_session() {
+  # If BW_SESSION is already set in the environment and valid, use it directly.
+  # This allows non-interactive usage (e.g. from CI or AI assistants).
+  BW_SESSION="${BW_SESSION:-}"
+  if [ -n "$BW_SESSION" ] && bw unlock --check --session "$BW_SESSION" > /dev/null 2>&1; then
+    debug "Using BW_SESSION from environment"
+    echo "export BW_SESSION=$BW_SESSION" > .bw-session.env
+    return
+  fi
+
   # Check if .bw-session.env exists
   BW_SESSION=
   if [ -f .bw-session.env ]; then

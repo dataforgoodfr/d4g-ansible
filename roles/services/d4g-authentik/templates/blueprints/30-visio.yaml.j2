@@ -5,6 +5,14 @@ metadata:
     blueprints.goauthentik.io/description: "OAuth2 provider, application, and staff-only access policy for Visio"
 
 entries:
+  # Ensure the "staff" group exists
+  - model: authentik_core.group
+    id: staff-group
+    identifiers:
+      name: "staff"
+    attrs:
+      name: "staff"
+
   # OAuth2/OIDC Provider
   - model: authentik_providers_oauth2.oauth2provider
     id: visio-provider
@@ -44,7 +52,7 @@ entries:
       order: 0
     attrs:
       target: !KeyOf visio-application
-      group: !Find [authentik_core.group, [name, staff]]
+      group: !KeyOf staff-group
       order: 0
       enabled: true
       negate: false

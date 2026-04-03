@@ -75,6 +75,9 @@
           - db: peertube
             user: peertube
             password: "{{ lookup('env', 'PEERTUBE_DB_PASSWORD') }}"
+          - db: visio
+            user: visio
+            password: "{{ lookup('env', 'VISIO_DB_PASSWORD') }}"
       tags:
         - postgresql
         - database
@@ -126,6 +129,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-visio
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - visio
+        - service
+
+    - import_role:
         name: roles/utilities/observability
       vars:
         group_name: staging_swarm_cluster_nodes
@@ -160,6 +172,10 @@
             addresses: ["observability_grafana:3000"]
           - name: "theconversation-peertube"
             addresses: ["theconversation-peertube_app:9000"]
+          - name: "visio"
+            addresses: ["d4g-visio_frontend:8083"]
+          - name: "livekit-visio"
+            addresses: ["d4g-visio_livekit:7880"]
       tags:
         - proxy
         - traefik

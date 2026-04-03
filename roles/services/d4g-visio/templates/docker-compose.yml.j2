@@ -1,11 +1,9 @@
 services:
   frontend:
     image: lasuite/meet-frontend:latest
-    entrypoint: ["/docker-entrypoint.sh"]
-    command: ["nginx", "-g", "daemon off;"]
     env_file: ./visio.env
     volumes:
-      - ./default.conf.template:/etc/nginx/templates/docs.conf.template
+      - ./default.conf.template:/etc/nginx/conf.d/docs.conf:ro
     networks:
       - d4g-internal
     deploy:

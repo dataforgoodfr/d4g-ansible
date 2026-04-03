@@ -1,9 +1,9 @@
 upstream meet_backend {
-    server ${BACKEND_INTERNAL_HOST}:8000 fail_timeout=0;
+    server d4g-visio_backend:8000 fail_timeout=0;
 }
 
 upstream meet_frontend {
-    server ${FRONTEND_INTERNAL_HOST}:8080 fail_timeout=0;
+    server d4g-visio_frontend:8080 fail_timeout=0;
 }
 
 server {

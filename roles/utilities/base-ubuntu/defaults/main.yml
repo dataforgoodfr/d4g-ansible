@@ -1,0 +1,3 @@
+---
+flexible_ip_snat_ports:
+  - 25

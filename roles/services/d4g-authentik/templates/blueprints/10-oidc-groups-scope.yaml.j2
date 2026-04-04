@@ -1,0 +1,17 @@
+version: 1
+metadata:
+  name: "OIDC Groups Scope Mapping"
+  labels:
+    blueprints.goauthentik.io/description: "Add groups claim to OIDC tokens"
+
+entries:
+  - model: authentik_providers_oauth2.scopemapping
+    id: groups-scope-mapping
+    identifiers:
+      managed: "goauthentik.io/providers/oauth2/scope-groups"
+    attrs:
+      name: "groups"
+      scope_name: "groups"
+      description: "User group memberships"
+      expression: |
+        return [group.name for group in request.user.ak_groups.all()]

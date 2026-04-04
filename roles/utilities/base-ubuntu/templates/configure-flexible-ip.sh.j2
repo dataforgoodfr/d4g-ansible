@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+
+FLEXIBLE_IP="{{ flexible_ip }}"
+INTERFACE="eno1"
+
+# 1. Add flexible IP as secondary /32 address.
+#    Needed so the kernel accepts return traffic for this IP.
+if ! ip addr show dev "$INTERFACE" | grep -q "$FLEXIBLE_IP"; then
+    ip addr add "${FLEXIBLE_IP}/32" dev "$INTERFACE"
+fi
+
+# 2. NO default route change — all non-SMTP traffic uses the primary IP.
+
+# 3. SNAT only outbound SMTP delivery traffic.
+#    Inserted at position 1, before Docker's MASQUERADE rules.
+{% for port in flexible_ip_snat_ports %}
+if ! iptables -t nat -C POSTROUTING -o "$INTERFACE" -p tcp --dport {{ port }} -j SNAT --to-source "$FLEXIBLE_IP" 2>/dev/null; then
+    iptables -t nat -I POSTROUTING 1 -o "$INTERFACE" -p tcp --dport {{ port }} -j SNAT --to-source "$FLEXIBLE_IP"
+fi
+{% endfor %}

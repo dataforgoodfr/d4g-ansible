@@ -150,25 +150,6 @@ services:
           memory: 128M
           cpus: '0.1'
 
-  # Chat Exporter - Slack and Mattermost metrics
-  chat-exporter:
-    image: ghcr.io/dataforgoodfr/d4g-chat-exporter:latest
-    env_file: ./chat-exporter.env
-    networks:
-      - d4g-internal
-    deploy:
-      mode: replicated
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.2'
-        reservations:
-          memory: 128M
-
   # Loki - Log aggregation system
   loki:
     image: grafana/loki:latest

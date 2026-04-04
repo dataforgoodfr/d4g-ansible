@@ -1,15 +1,14 @@
 ---
-- name: Create d4g-authentik directory
+- name: Create d4g-authentik directories
   file:
-    path: /opt/d4g-authentik
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - /opt/d4g-authentik
+    - /opt/d4g-authentik/branding
+    - /opt/d4g-authentik/blueprints
 
-- name: Create d4g-authentik directory
-  file:
-    path: /opt/d4g-authentik/branding
-    state: directory
-
-- name: Create d4g-authentik files
+- name: Template d4g-authentik config files
   template:
     src: "{{ item }}.j2"
     dest: /opt/d4g-authentik/{{ item }}
@@ -17,7 +16,15 @@
     - docker-compose.yml
     - authentik.env
 
-- name: Create d4g-authentik files
+- name: Template d4g-authentik blueprints
+  template:
+    src: "blueprints/{{ item }}.j2"
+    dest: /opt/d4g-authentik/blueprints/{{ item }}
+  with_items:
+    - 10-oidc-groups-scope.yaml
+    - 30-visio.yaml
+
+- name: Copy d4g-authentik branding files
   copy:
     src: "{{ item }}"
     dest: /opt/d4g-authentik/branding/{{ item }}

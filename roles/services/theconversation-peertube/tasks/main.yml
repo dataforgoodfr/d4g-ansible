@@ -1,0 +1,40 @@
+---
+- name: Create theconversation-peertube directory
+  file:
+    path: "/opt/theconversation-peertube"
+    state: directory
+
+- name: Create theconversation-peertube data directories
+  file:
+    path: "/opt/theconversation-peertube/{{ item }}"
+    state: directory
+  with_items:
+    - data
+    - data/storage
+    - data/config
+    - data/logs
+    - data/redis
+
+- name: Creating theconversation-peertube templates
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/theconversation-peertube/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - peertube.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/theconversation-peertube
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml theconversation-peertube
+  args:
+    chdir: /opt/theconversation-peertube
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

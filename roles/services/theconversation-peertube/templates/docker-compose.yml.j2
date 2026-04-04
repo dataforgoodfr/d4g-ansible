@@ -1,0 +1,31 @@
+services:
+  app:
+    image: chocobozzz/peertube:production-bookworm
+    env_file: ./peertube.env
+    volumes:
+      - ./data/storage:/data
+      - ./data/config:/config
+      - ./data/logs:/var/log/peertube
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

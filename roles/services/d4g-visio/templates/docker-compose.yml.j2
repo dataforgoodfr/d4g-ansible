@@ -1,0 +1,74 @@
+services:
+  frontend:
+    image: lasuite/meet-frontend:latest
+    env_file: ./visio.env
+    volumes:
+      - ./default.conf.template:/etc/nginx/conf.d/docs.conf:ro
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  backend:
+    image: lasuite/meet-backend:latest
+    env_file: ./visio.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  celery:
+    image: lasuite/meet-backend:latest
+    command: celery -A meet.celery worker -l info
+    env_file: ./visio.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --config /config.yaml
+    ports:
+      - target: 7881
+        published: 7881
+        protocol: tcp
+        mode: host
+      - target: 7882
+        published: 7882
+        protocol: udp
+        mode: host
+    volumes:
+      - ./livekit-server.yaml:/config.yaml:ro
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

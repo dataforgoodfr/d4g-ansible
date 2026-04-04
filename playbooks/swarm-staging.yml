@@ -72,6 +72,12 @@
           - db: authentik
             user: authentik
             password: "{{ lookup('env', 'AUTHENTIK_DB_PASSWORD') }}"
+          - db: peertube
+            user: peertube
+            password: "{{ lookup('env', 'PEERTUBE_DB_PASSWORD') }}"
+          - db: visio
+            user: visio
+            password: "{{ lookup('env', 'VISIO_DB_PASSWORD') }}"
       tags:
         - postgresql
         - database
@@ -114,12 +120,12 @@
         - service
 
     - import_role:
-        name: roles/services/d4g-community-manager
+        name: roles/services/theconversation-peertube
       vars:
         deploy_on: "d4g-staging-01.d4g.fr"
         replicas: 1
       tags:
-        - d4g-community-manager
+        - theconversation-peertube
         - service
 
     - import_role:
@@ -132,11 +138,23 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-visio
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - visio
+        - service
+
+    - import_role:
         name: roles/utilities/observability
       vars:
         group_name: staging_swarm_cluster_nodes
         observability_cluster_name: d4g-staging
         observability_environment: staging
+        observability_remote_write_url: "https://victoriametrics.services.dataforgood.fr/api/v1/write"
+        observability_remote_write_basic_auth_username: "{{ lookup('env', 'VICTORIAMETRICS_WRITE_USER') }}"
+        observability_remote_write_basic_auth_password: "{{ lookup('env', 'VICTORIAMETRICS_WRITE_PASSWORD') }}"
       tags:
         - observability
         - utils
@@ -166,6 +184,12 @@
             addresses: ["d4g-mattermost_app:8065"]
           - name: "grafana"
             addresses: ["observability_grafana:3000"]
+          - name: "theconversation-peertube"
+            addresses: ["theconversation-peertube_app:9000"]
+          - name: "visio"
+            addresses: ["d4g-visio_frontend:8083"]
+          - name: "livekit-visio"
+            addresses: ["d4g-visio_livekit:7880"]
       tags:
         - proxy
         - traefik

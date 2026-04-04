@@ -1,0 +1,184 @@
+# Based on https://github.com/nextcloud/all-in-one/blob/main/manual-install/latest.yml
+
+
+services:
+
+  ### NEXTCLOUD INSTANCE ###
+
+  nextcloud:
+    depends_on:
+      - redis
+    image: ghcr.io/nextcloud-releases/aio-nextcloud:20260211_141900
+    init: true
+    healthcheck:
+      start_period: 0s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 3
+    volumes:
+      - /opt/d4g-nextcloud/nextcloud-data/html:/var/www/html:rw
+      - /opt/d4g-nextcloud/nextcloud-data/ncdata:/mnt/ncdata:rw
+      - /opt/d4g-nextcloud/nextcloud-data/mnt:/mnt/nc:rw
+    env_file:
+      - nextcloud-shared.env
+      - nextcloud-instance.env
+    environment:
+      - ADMIN_USER=admin
+      - OVERWRITEPROTOCOL=https
+      - NEXTCLOUD_DATA_DIR=/mnt/ncdata
+      - NEXTCLOUD_MOUNT=/mnt/nc
+    stop_grace_period: 600s
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+
+  #### APACHE web server ###
+
+  apache:
+    depends_on:
+      - nextcloud
+    image: ghcr.io/nextcloud-releases/aio-apache:20260211_141900
+    user: "33"
+    init: true
+    healthcheck:
+      start_period: 0s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 3
+    volumes:
+      - /opt/d4g-nextcloud/nextcloud-data/html:/var/www/html:ro
+      - /opt/d4g-nextcloud/apache-data:/mnt/data:rw
+      - type: tmpfs
+        target: /var/log/supervisord
+      - type: tmpfs
+        target: /var/run/supervisord
+      - type: tmpfs
+        target: /usr/local/apache2/logs
+      - type: tmpfs
+        target: /tmp
+      - type: tmpfs
+        target: /home/www-data
+    env_file:
+      - nextcloud-shared.env
+    read_only: true
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+
+  ### REDIS ###
+
+  redis:
+    image: ghcr.io/nextcloud-releases/aio-redis:20260211_141900
+    user: "999"
+    init: true
+    healthcheck:
+      start_period: 0s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 3
+    env_file:
+      - nextcloud-shared.env
+    volumes:
+      - /opt/d4g-nextcloud/redis-data:/data:rw
+    read_only: true
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+
+  ### NOTIFY PUSH ###
+
+  notify-push:
+    image: ghcr.io/nextcloud-releases/aio-notify-push:20260211_141900
+    user: "33"
+    init: true
+    healthcheck:
+      start_period: 0s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 3
+    volumes:
+      - /opt/d4g-nextcloud/nextcloud-data/html:/nextcloud:ro
+    env_file:
+      - nextcloud-shared.env
+    read_only: true
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+  ### CLAMAV antivirus ###
+
+  clamav:
+    image: ghcr.io/nextcloud-releases/aio-clamav:20260211_141900
+    user: "100"
+    init: false
+    healthcheck:
+      start_period: 60s
+      test: /healthcheck.sh
+      interval: 30s
+      timeout: 30s
+      start_interval: 5s
+      retries: 9
+    env_file:
+      - nextcloud-shared.env
+    volumes:
+      - /opt/d4g-nextcloud/clamav-data:/var/lib/clamav:rw
+      - type: tmpfs
+        target: /tmp
+      - type: tmpfs
+        target: /var/log/clamav
+      - type: tmpfs
+        target: /run/clamav
+      - type: tmpfs
+        target: /var/log/supervisord
+      - type: tmpfs
+        target: /var/run/supervisord
+    read_only: true
+    cap_drop:
+      - NET_RAW
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+
+networks:
+  d4g-internal:
+    external: true

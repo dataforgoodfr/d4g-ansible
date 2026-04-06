@@ -1,0 +1,69 @@
+---
+- name: Create d4g-coolify directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - /opt/d4g-coolify
+    - /opt/d4g-coolify/data/coolify/ssh
+
+- name: Create d4g-coolify files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-coolify/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - coolify.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-coolify
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-coolify
+  args:
+    chdir: /opt/d4g-coolify
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- name: Deploy coolify-network-bridge script
+  template:
+    src: coolify-network-bridge.sh.j2
+    dest: /opt/d4g-coolify/coolify-network-bridge.sh
+    mode: "0755"
+  when: inventory_hostname == deploy_on
+
+- name: Deploy coolify-network-bridge systemd service
+  template:
+    src: coolify-network-bridge.service.j2
+    dest: /etc/systemd/system/coolify-network-bridge.service
+  notify: restart coolify-network-bridge
+  when: inventory_hostname == deploy_on
+
+- name: Enable and start coolify-network-bridge
+  systemd:
+    name: coolify-network-bridge
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-coolify
+    service_dir: /opt/d4g-coolify
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: coolify
+    pgsql_password: "{{ lookup('env', 'coolify_DB_PASSWORD') }}"
+    pgsql_database: coolify
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

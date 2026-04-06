@@ -1,0 +1,73 @@
+
+services:
+  coolify:
+    # Image officielle Coolify, pas de version fixee
+    image: "ghcr.io/coollabsio/coolify:latest"
+    working_dir: /var/www/html
+    restart: unless-stopped
+    env_file:
+      - coolify.env
+    volumes:
+      - type: bind
+        source: coolify.env
+        target: /var/www/html/.env
+        read_only: true
+      - ./data/coolify/ssh:/var/www/html/storage/app/ssh
+      - coolify_applications:/var/www/html/storage/app/applications
+      - coolify_databases:/var/www/html/storage/app/databases
+      - coolify_services:/var/www/html/storage/app/services
+      - coolify_backups:/var/www/html/storage/app/backups
+      - /var/run/docker.sock:/var/run/docker.sock
+    extra_hosts:
+        - host.docker.internal:host-gateway
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://127.0.0.1:8080/api/health || exit 1"]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - d4g-internal
+
+  coolify-redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    env_file:
+      - coolify.env
+    volumes:
+      - coolify_redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - d4g-internal
+
+  coolify-realtime:
+    image: "ghcr.io/coollabsio/coolify-realtime:1.0.10"
+    restart: unless-stopped
+    env_file:
+      - coolify.env
+    volumes:
+      - ./data/coolify/ssh:/var/www/html/storage/app/ssh
+    extra_hosts:
+        - host.docker.internal:host-gateway
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:6001/ready && wget -qO- http://127.0.0.1:6002/ready || exit 1"]
+      interval: 5s
+      retries: 10
+      timeout: 2s
+    networks:
+      - d4g-internal
+
+volumes:
+  coolify_applications:
+  coolify_databases:
+  coolify_services:
+  coolify_backups:
+  coolify_redis:
+
+networks:
+  d4g-internal:
+    external: true

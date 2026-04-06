@@ -129,6 +129,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-coolify
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - d4g-coolify
+        - service
+
+    - import_role:
         name: roles/services/d4g-visio
       vars:
         deploy_on: "d4g-staging-01.d4g.fr"
@@ -164,6 +173,11 @@
         services:
           - name: "outline"
             addresses: ["d4g-outline_app"]
+          - name: "coolify"
+            addresses: ["d4g-coolify_coolify:8080"]
+          - name: "coolify-realtime"
+            rule: "Host(`coolify.services.d4g.fr`) && (PathPrefix(`/app`) || PathPrefix(`/socket.io`))"
+            addresses: ["d4g-coolify_coolify-realtime:6001"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
           - name: "mattermost"

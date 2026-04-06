@@ -49,6 +49,13 @@ providers:
   file:
     filename: /opt/traefik/config/config.yml
     watch: true
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+  swarm:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: d4g-internal
 
 http:
   middlewares:
@@ -60,7 +67,11 @@ http:
   routers:
 {% for item in services %}
     {{ item.name }}:
+{% if item.rule is defined %}
+      rule: "{{ item.rule }}"
+{% else %}
       rule: "Host(`{% if item.override_name is defined %}{{ item.override_name }}{% else %}{{ item.name }}.{{ base_domain }}{% endif %}`)"
+{% endif %}
       service: {{ item.name }}
 {% if item.middlewares is defined and item.middlewares %}
       middlewares:
@@ -70,9 +81,7 @@ http:
 {% endif %}
       entryPoints:
         - webtls
-      tls:
-        domains:
-          - main: "{% if item.override_name is defined %}{{ item.override_name }}{% else %}{{ item.name }}.{{ base_domain }}{% endif %}"
+      tls: {}
 {% endfor %}
 
   services:

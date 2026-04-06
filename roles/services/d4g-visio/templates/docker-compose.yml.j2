@@ -25,7 +25,7 @@ services:
 
   celery:
     image: lasuite/meet-backend:latest
-    command: celery -A meet.celery worker -l info
+    command: celery -A meet.celery_app worker -l info
     env_file: ./visio.env
     networks:
       - d4g-internal

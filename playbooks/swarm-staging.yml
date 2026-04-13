@@ -97,6 +97,7 @@
       vars:
         deploy_on: "d4g-staging-01.d4g.fr"
         replicas: 1
+        mattermost_image_tag: "10.11.14"
       tags:
         - mattermost
         - service

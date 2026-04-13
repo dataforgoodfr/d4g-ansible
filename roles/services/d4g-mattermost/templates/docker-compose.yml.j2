@@ -1,6 +1,6 @@
 services:
   app:
-    image: mattermost/mattermost-enterprise-edition:release-10
+    image: mattermost/mattermost-enterprise-edition:{{ mattermost_image_tag }}
     tmpfs:
       - /tmp
     volumes:

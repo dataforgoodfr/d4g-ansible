@@ -419,6 +419,7 @@
             addresses: ["d4g-grist_app:8484"]
           - name: "home"
             addresses: ["d4g-home_app:8000"]
+            override_name: "home.dataforgood.fr"
         tcp_entrypoints:
           - name: stalwart-smtp
             port: 25

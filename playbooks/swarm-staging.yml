@@ -168,6 +168,7 @@
       vars:
         deploy_on: "d4g-staging-01.d4g.fr"
         replicas: 1
+        home_base_url: "https://home.d4g.fr"
       tags:
         - d4g-home
         - service
@@ -220,6 +221,7 @@
             addresses: ["d4g-grist_app:8484"]
           - name: "home"
             addresses: ["d4g-home_app:8000"]
+            override_name: "home.d4g.fr"
       tags:
         - proxy
         - traefik

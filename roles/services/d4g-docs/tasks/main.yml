@@ -1,0 +1,38 @@
+---
+- name: Create d4g-docs directory
+  file:
+    path: /opt/d4g-docs
+    state: directory
+
+- name: Create d4g-docs data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+    - /opt/d4g-docs/data/redis
+
+- name: Create d4g-docs template files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-docs/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - docs.env
+    - default.conf.template
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-docs
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-docs
+  args:
+    chdir: /opt/d4g-docs
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

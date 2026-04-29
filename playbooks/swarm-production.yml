@@ -320,6 +320,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-docs
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-docs
+        - service
+
+    - import_role:
         name: roles/utilities/watchtower
       vars:
         watchtower_scope:
@@ -365,7 +374,7 @@
           - name: "outline"
             addresses: ["d4g-outline_app"]
           - name: "docs"
-            addresses: ["d4g-outline_app"]
+            addresses: ["d4g-docs_frontend:8083"]
           - name: "moodle"
             addresses: ["d4g-moodle_app:8080"]
           - name: "strapi"

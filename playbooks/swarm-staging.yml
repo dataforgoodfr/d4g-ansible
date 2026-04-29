@@ -84,6 +84,9 @@
           - db: community_manager
             user: community_manager
             password: "{{ lookup('env', 'HOME_DB_PASSWORD') }}"
+          - db: docs
+            user: docs
+            password: "{{ lookup('env', 'DOCS_DB_PASSWORD') }}"
       tags:
         - postgresql
         - database
@@ -174,6 +177,16 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-docs
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+        docs_s3_bucket: docs-uploads-staging
+      tags:
+        - d4g-docs
+        - service
+
+    - import_role:
         name: roles/utilities/observability
       vars:
         group_name: staging_swarm_cluster_nodes
@@ -222,6 +235,8 @@
           - name: "home"
             addresses: ["d4g-home_app:8000"]
             override_name: "home.d4g.fr"
+          - name: "docs"
+            addresses: ["d4g-docs_frontend:8083"]
       tags:
         - proxy
         - traefik

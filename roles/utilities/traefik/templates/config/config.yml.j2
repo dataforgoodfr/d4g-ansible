@@ -62,7 +62,7 @@ http:
     basic-auth:
       basicAuth:
         users:
-          - "{{ lookup('env', 'BASIC_AUTH_USER') }}"
+          - "{{ lookup('env', 'BASIC_AUTH_USER') | replace('\\$', '$') }}"
 
   routers:
 {% for item in services %}

@@ -23,6 +23,8 @@
   with_items:
     - 10-oidc-groups-scope.yaml
     - 30-visio.yaml
+    - 31-grist.yaml
+    - 32-home.yaml
 
 - name: Copy d4g-authentik branding files
   copy:

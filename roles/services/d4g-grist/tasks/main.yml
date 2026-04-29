@@ -1,0 +1,38 @@
+---
+- name: Create d4g-grist directory
+  file:
+    path: /opt/d4g-grist
+    state: directory
+
+- name: Create d4g-grist data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+    - /opt/d4g-grist/data/persist
+    - /opt/d4g-grist/data/redis
+
+- name: Create d4g-grist template files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-grist/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - grist.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-grist
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-grist
+  args:
+    chdir: /opt/d4g-grist
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

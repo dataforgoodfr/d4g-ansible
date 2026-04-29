@@ -1,0 +1,16 @@
+services:
+  app:
+    image: ghcr.io/pagbrl/d4g-community-manager:latest
+    env_file:
+      - home.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

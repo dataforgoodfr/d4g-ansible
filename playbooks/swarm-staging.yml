@@ -78,6 +78,12 @@
           - db: visio
             user: visio
             password: "{{ lookup('env', 'VISIO_DB_PASSWORD') }}"
+          - db: grist
+            user: grist
+            password: "{{ lookup('env', 'GRIST_DB_PASSWORD') }}"
+          - db: community_manager
+            user: community_manager
+            password: "{{ lookup('env', 'HOME_DB_PASSWORD') }}"
       tags:
         - postgresql
         - database
@@ -148,6 +154,25 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-grist
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+        grist_s3_bucket: grist-docs-staging
+      tags:
+        - d4g-grist
+        - service
+
+    - import_role:
+        name: roles/services/d4g-home
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - d4g-home
+        - service
+
+    - import_role:
         name: roles/utilities/observability
       vars:
         group_name: staging_swarm_cluster_nodes
@@ -191,6 +216,10 @@
             addresses: ["d4g-visio_frontend:8083"]
           - name: "livekit-visio"
             addresses: ["d4g-visio_livekit:7880"]
+          - name: "grist"
+            addresses: ["d4g-grist_app:8484"]
+          - name: "home"
+            addresses: ["d4g-home_app:8000"]
       tags:
         - proxy
         - traefik

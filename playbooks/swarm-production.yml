@@ -293,6 +293,33 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-visio
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - visio
+        - service
+
+    - import_role:
+        name: roles/services/d4g-grist
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-grist
+        - service
+
+    - import_role:
+        name: roles/services/d4g-home
+      vars:
+        deploy_on: "metal-1.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-home
+        - service
+
+    - import_role:
         name: roles/utilities/watchtower
       vars:
         watchtower_scope:
@@ -384,6 +411,14 @@
             addresses: ["observability_grafana:3000"]
           - name: "tousexposes"
             addresses: ["tousexposes_app:3000"]
+          - name: "visio"
+            addresses: ["d4g-visio_frontend:8083"]
+          - name: "livekit-visio"
+            addresses: ["d4g-visio_livekit:7880"]
+          - name: "grist"
+            addresses: ["d4g-grist_app:8484"]
+          - name: "home"
+            addresses: ["d4g-home_app:8000"]
         tcp_entrypoints:
           - name: stalwart-smtp
             port: 25

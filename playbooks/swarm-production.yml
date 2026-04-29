@@ -364,6 +364,8 @@
             addresses: ["d4g-uptime-kuma_app"]
           - name: "outline"
             addresses: ["d4g-outline_app"]
+          - name: "docs"
+            addresses: ["d4g-outline_app"]
           - name: "moodle"
             addresses: ["d4g-moodle_app:8080"]
           - name: "strapi"

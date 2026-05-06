@@ -213,6 +213,10 @@
         services:
           - name: "outline"
             addresses: ["d4g-outline_app"]
+          - name: "risefor-admin"
+            addresses: ["risefor-backend-1:8000"]
+          - name: "risefor-frontend"
+            addresses: ["risefor-orbit-1:5174"]
           - name: "coolify"
             addresses: ["d4g-coolify_coolify:8080"]
           - name: "coolify-realtime"

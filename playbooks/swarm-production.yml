@@ -297,6 +297,7 @@
       vars:
         deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
+        admin_password: "{{ lookup('env', 'VISIO_ADMIN_PASSWORD') }}"
       tags:
         - visio
         - service
@@ -324,6 +325,7 @@
       vars:
         deploy_on: "metal-2.dataforgood.fr"
         replicas: 1
+        admin_password: "{{ lookup('env', 'DOCS_ADMIN_PASSWORD') }}"
       tags:
         - d4g-docs
         - service

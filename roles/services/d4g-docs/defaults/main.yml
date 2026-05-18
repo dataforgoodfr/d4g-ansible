@@ -1,3 +1,4 @@
 ---
 base_domain: services.dataforgood.fr
 docs_s3_bucket: docs-uploads
+admin_email: tech@dataforgood.fr

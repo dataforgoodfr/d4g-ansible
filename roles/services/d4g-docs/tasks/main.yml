@@ -21,6 +21,12 @@
     - docs.env
     - default.conf.template
 
+- name: Copy ensure-admin script
+  copy:
+    src: ensure-admin.py
+    dest: /opt/d4g-docs/ensure-admin.py
+    mode: "0600"
+
 - name: Pull
   command: docker compose pull
   args:
@@ -36,3 +42,13 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- name: Ensure admin user exists
+  shell: |
+    sleep 10
+    CONTAINER=$(docker ps -q -f name=d4g-docs_backend -f status=running | head -1)
+    [ -z "$CONTAINER" ] && echo "No backend container running" && exit 0
+    cat /opt/d4g-docs/ensure-admin.py | docker exec -i "$CONTAINER" python
+  register: admin_result
+  changed_when: "'Created' in admin_result.stdout or 'Promoted' in admin_result.stdout"
+  when: inventory_hostname == deploy_on

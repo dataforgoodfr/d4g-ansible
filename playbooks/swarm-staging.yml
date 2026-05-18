@@ -152,6 +152,7 @@
       vars:
         deploy_on: "d4g-staging-01.d4g.fr"
         replicas: 1
+        admin_password: "{{ lookup('env', 'VISIO_ADMIN_PASSWORD') }}"
       tags:
         - visio
         - service
@@ -182,6 +183,7 @@
         deploy_on: "d4g-staging-01.d4g.fr"
         replicas: 1
         docs_s3_bucket: docs-uploads-staging
+        admin_password: "{{ lookup('env', 'DOCS_ADMIN_PASSWORD') }}"
       tags:
         - d4g-docs
         - service

@@ -1,6 +1,7 @@
 services:
   app:
     image: ghcr.io/dataforgoodfr/website-backend:latest
+    command: ["/opt/app/backend/node_modules/.bin/strapi", "start"]
     env_file: './strapi.env'
     networks:
       - d4g-internal

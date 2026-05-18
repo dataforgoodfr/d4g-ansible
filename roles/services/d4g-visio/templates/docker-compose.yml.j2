@@ -4,6 +4,7 @@ services:
     env_file: ./visio.env
     volumes:
       - ./default.conf.template:/etc/nginx/conf.d/docs.conf:ro
+      - ./d4g-custom.css:/opt/d4g/custom.css:ro
     networks:
       - d4g-internal
     deploy:

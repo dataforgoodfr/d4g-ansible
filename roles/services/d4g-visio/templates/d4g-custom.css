@@ -1,0 +1,191 @@
+/* D4G Branding for La Suite Visio */
+
+:root {
+  /* D4G brand colors */
+  --d4g-purple: #6b21a8;
+  --d4g-purple-dark: #581c87;
+  --d4g-green: #35C4D7;
+  --d4g-green-dark: #2aa8b8;
+  --d4g-lime: #CCE03D;
+  --d4g-orange: #FAA211;
+
+  /* Override primary palette → D4G green (teal) */
+  --colors-primary: var(--d4g-green);
+  --colors-primary-hover: var(--d4g-green-dark);
+  --colors-primary-active: #238a97;
+  --colors-primary-text: #fff;
+  --colors-primary-subtle: #e0f7fa;
+  --colors-primary-subtle-text: #1a7a87;
+  --colors-primary-action: var(--d4g-green);
+  --colors-primary-warm: #80deea;
+
+  /* Primary scale → teal/green */
+  --colors-primary-50: #e0f7fa;
+  --colors-primary-100: #b2ebf2;
+  --colors-primary-200: #80deea;
+  --colors-primary-300: #4dd0e1;
+  --colors-primary-400: #26c6da;
+  --colors-primary-500: var(--d4g-green);
+  --colors-primary-600: #2aa8b8;
+  --colors-primary-700: #238a97;
+  --colors-primary-800: #1a7a87;
+  --colors-primary-900: #0e5f6b;
+  --colors-primary-950: #073d45;
+
+  /* Focus ring */
+  --colors-focus-ring: var(--d4g-green);
+
+  /* Alert → D4G orange */
+  --colors-alert: var(--d4g-orange);
+}
+
+/* LiveKit in-call theme */
+[data-lk-theme="visio-light"] {
+  --lk-accent-bg: var(--d4g-green);
+  --lk-accent2: var(--d4g-green-dark);
+  --lk-accent3: #238a97;
+  --lk-accent4: #1a7a87;
+  --lk-accent-fg: #fff;
+}
+
+/* ============================================
+   HEADER — D4G logo
+   ============================================ */
+
+/* Replace the La Suite logo with D4G logo */
+.Header-logo img {
+  content: url("https://dataforgood.fr/images/dataforgood.svg");
+  height: 40px !important;
+  width: auto !important;
+  max-height: 40px;
+}
+
+/* Use the .Header-beforeLogo slot to add a colored accent bar */
+.Header-beforeLogo {
+  display: block !important;
+  width: 4px;
+  height: 32px;
+  background: linear-gradient(to bottom, var(--d4g-green), var(--d4g-lime));
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+/* ============================================
+   HOMEPAGE — Override text via CSS content
+   ============================================ */
+
+/* Hide the original heading text, replace with D4G copy */
+main#main-content h1 {
+  visibility: hidden;
+  position: relative;
+  line-height: 1.2;
+}
+main#main-content h1::after {
+  content: "La visio Data For Good";
+  visibility: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--d4g-purple) 0%, var(--d4g-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Override the intro paragraph */
+main#main-content h1 + p {
+  visibility: hidden;
+  position: relative;
+}
+main#main-content h1 + p::after {
+  content: "Simple, sécurisée et open source. Pour nos bénévoles, nos partenaires et nos équipes.";
+  visibility: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* ============================================
+   CAROUSEL — Hide the default slides
+   ============================================ */
+
+/* Hide the entire intro slider (La Suite promo content) */
+main#main-content [role="region"][aria-roledescription="carousel"] {
+  display: none !important;
+}
+
+/* Replace carousel area with D4G branding block */
+main#main-content > div > div:last-child {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+main#main-content > div > div:last-child::before {
+  content: "";
+  display: block;
+  width: 280px;
+  height: 280px;
+  background-image: url("https://dataforgood.fr/images/dataforgood.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.12;
+}
+
+/* ============================================
+   BUTTONS — Purple accent for primary CTA
+   ============================================ */
+
+/* Create meeting / login button → purple with green hover */
+main#main-content button[data-attr="create-meeting"],
+main#main-content a[href*="authenticate"] {
+  background-color: var(--d4g-purple) !important;
+  border-color: var(--d4g-purple) !important;
+  color: #fff !important;
+}
+main#main-content button[data-attr="create-meeting"]:hover,
+main#main-content a[href*="authenticate"]:hover {
+  background-color: var(--d4g-purple-dark) !important;
+  border-color: var(--d4g-purple-dark) !important;
+}
+
+/* ============================================
+   FOOTER — Hide "PRO" badge & gov references
+   ============================================ */
+
+/* Hide the ProConnect / government footer if present */
+footer [class*="gov"],
+[class*="proconnect"],
+[class*="ProConnect"] {
+  display: none !important;
+}
+
+/* ============================================
+   GLOBAL — Typography & subtle brand touches
+   ============================================ */
+
+/* Add a subtle top border in D4G gradient */
+body::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--d4g-purple), var(--d4g-green), var(--d4g-lime));
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+}
+
+/* Offset the body to account for the top bar */
+body {
+  padding-top: 3px;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(53, 196, 215, 0.3);
+}

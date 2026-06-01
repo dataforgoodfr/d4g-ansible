@@ -34,10 +34,11 @@ die() {
 refresh_vaultwarden_secrets() {
   local env="${1:-production}"
 
+  # Shared org collections (Pole Tech sub-collections), visible to all team members.
   if [ "$env" == "staging" ]; then
-    BW_FOLDER_ID="f3bb9d55-84a0-4fdb-a201-eaa50d19b339"
+    BW_COLLECTION_ID="c0fccdd9-abd1-4db4-9da8-76d6b05a90ce"
   else
-    BW_FOLDER_ID="a4d890c1-af0d-49f0-8fde-a99d6c28b2b9"
+    BW_COLLECTION_ID="309b1f21-2119-4119-b4d9-888bcee056f9"
   fi
 
   info "Logging into Vaultwarden ($env), you may be prompted for your master password."
@@ -48,7 +49,11 @@ refresh_vaultwarden_secrets() {
   bw sync
 
   # merge secure notes (item type 2)
-  SECRETS=$(bw list items --folderid ${BW_FOLDER_ID} --raw --session "${BW_SESSION}" | jq -r '.[] | select(.type == 2) | .notes')
+  SECRETS=$(bw list items --collectionid ${BW_COLLECTION_ID} --raw --session "${BW_SESSION}" | jq -r '.[] | select(.type == 2) | .notes')
+
+  if [ -z "$SECRETS" ]; then
+    die "No secrets found in the Vaultwarden collection for '$env' ($BW_COLLECTION_ID). Check that you are a member of the 'Pole Tech/ansible-$env' collection. .env was NOT updated."
+  fi
 
   echo -e '#!/usr/bin/env bash\n' > .env
   echo "$SECRETS" >> .env

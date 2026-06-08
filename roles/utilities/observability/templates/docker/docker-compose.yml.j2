@@ -22,12 +22,6 @@ services:
       placement:
         constraints:
           - node.hostname == {{ groups[group_name] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2.0'
-        reservations:
-          memory: 2G
 
   # vmalert - Recording and alerting rules
   vmalert:
@@ -51,11 +45,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
 
   # OpenTelemetry Collector - Metrics aggregation
   otel-collector:
@@ -72,12 +61,6 @@ services:
       replicas: 2
       placement:
         max_replicas_per_node: 1
-      resources:
-        limits:
-          memory: 512M
-          cpus: '1.0'
-        reservations:
-          memory: 256M
 
   # Grafana - Visualization and dashboards
   grafana:
@@ -108,12 +91,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      resources:
-        limits:
-          memory: 1G
-          cpus: '0.5'
-        reservations:
-          memory: 512M
 
   # Node Exporter - System metrics collection
   node-exporter:
@@ -133,9 +110,6 @@ services:
       - d4g-internal
     deploy:
       mode: global
-      resources:
-        limits:
-          memory: 128M
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
@@ -145,10 +119,6 @@ services:
       - d4g-internal
     deploy:
       replicas: 1
-      resources:
-        limits:
-          memory: 128M
-          cpus: '0.1'
 
   # Loki - Log aggregation system
   loki:
@@ -169,12 +139,6 @@ services:
       placement:
         constraints:
           - node.hostname == {{ groups[group_name] | map('extract', hostvars) | selectattr('is_swarm_leader', 'defined') | selectattr('is_swarm_leader', 'equalto', true) | map(attribute='inventory_hostname') | list | first }}
-      resources:
-        limits:
-          memory: 2G
-          cpus: '1.0'
-        reservations:
-          memory: 1G
 
   # Promtail - Log collector agent
   promtail:
@@ -193,12 +157,6 @@ services:
       - d4g-internal
     deploy:
       mode: global
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
-        reservations:
-          memory: 128M
 
 networks:
   d4g-internal:

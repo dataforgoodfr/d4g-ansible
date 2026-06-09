@@ -351,6 +351,15 @@
         - utils
 
     - import_role:
+        name: roles/services/democis
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - democis
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -365,6 +374,8 @@
         services:
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
+          - name: "democis"
+            addresses: ["democis_web"]
           - name: "biolitlabel"
             addresses: ["biolit-labelstudio_app:8080"]
           - name: "stalwart"

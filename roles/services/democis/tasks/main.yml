@@ -17,8 +17,8 @@
     - docker-compose.yml
 
 - name: Create democis files
-  ansible.builtin.copy:
-    src: files/"{{ item }}"
+  ansible.builtin.template:
+    src: "{{ item }}"
     dest: /opt/democis/{{ item }}
   with_items:
     - index.html

@@ -16,11 +16,11 @@
   with_items:
     - docker-compose.yml
 
-- name: Create democis files
-  ansible.builtin.template:
+- name: Copy democis files
+  ansible.builtin.copy:
     src: "{{ item }}"
-    dest: /opt/democis/{{ item }}
-  with_items:
+    dest: "/opt/democis/{{ item }}"
+  loop:
     - index.html
     - images/1.jpg
     - images/2.jpg

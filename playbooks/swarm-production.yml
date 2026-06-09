@@ -373,7 +373,7 @@
               - "*.dataforgood.fr"
         services:
           - name: "vaultwarden"
-            addresses: ["d4g-vaultwarden_app"]
+            addresses: ["d4g-vaultwarden_app:80"]
           - name: "democis"
             addresses: ["democis_web"]
           - name: "biolitlabel"

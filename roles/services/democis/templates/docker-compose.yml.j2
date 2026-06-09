@@ -4,8 +4,6 @@ services:
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./images:/usr/share/nginx/html/images:ro
-    ports:
-      - "8080:80"
     deploy:
       replicas: 1
       restart_policy:

@@ -34,9 +34,9 @@
     - images/logo_longueur.png
     - images/logo_sur_fond_fonce.png
     - images/logo.png
-    - logocarre.png
-    - science-po.jpg
-    - sciencespologo.png
+    - images/logocarre.png
+    - images/science-po.jpg
+    - images/sciencespologo.png
 
 - name: Pull
   command: docker compose pull

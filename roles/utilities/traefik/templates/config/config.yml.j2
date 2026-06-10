@@ -65,6 +65,12 @@ http:
           - "{{ lookup('env', 'BASIC_AUTH_USER') | replace('\\$', '$') }}"
 
   routers:
+    acme-challenge:
+      rule: "PathPrefix(`/.well-known/acme-challenge/`)"
+      service: acme-challenge
+      entryPoints:
+        - web
+      priority: 1000
 {% for item in services %}
     {{ item.name }}:
 {% if item.rule is defined %}
@@ -85,6 +91,10 @@ http:
 {% endfor %}
 
   services:
+    acme-challenge:
+      loadBalancer:
+        servers:
+          - url: "http://acme-challenge-responder_app:80"
 {% for item in services %}
     {{ item.name }}:
       loadBalancer:

@@ -4,6 +4,13 @@
     state: directory
     mode: "0755"
 
+- name: Ensure ACME webroot directory exists
+  file:
+    path: "{{ acme_webroot }}/.well-known/acme-challenge"
+    state: directory
+    mode: "0755"
+  when: certificates | selectattr('challenge', 'defined') | selectattr('challenge', 'equalto', 'http') | list | length > 0
+
 - name: Clone acme.sh git repo
   git:
     repo: https://github.com/Neilpang/acme.sh.git

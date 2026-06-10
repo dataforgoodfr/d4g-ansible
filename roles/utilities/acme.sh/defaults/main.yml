@@ -1,6 +1,7 @@
 ---
 reload_cmd: docker service update --force traefik_app
 le_certs_dir: /opt/certificates
+acme_webroot: /opt/acme-webroot
 staging: False
 notification_mail_from: le+room303@quickpipes.io
 notification_mail_to: le+room303@quickpipes.io

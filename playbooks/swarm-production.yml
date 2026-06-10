@@ -376,6 +376,7 @@
             addresses: ["d4g-vaultwarden_app"]
           - name: "democis"
             addresses: ["democis_web"]
+            override_name: "conventioncitoyennepourlademocratie.fr"
           - name: "biolitlabel"
             addresses: ["biolit-labelstudio_app:8080"]
           - name: "stalwart"

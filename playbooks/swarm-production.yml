@@ -42,7 +42,10 @@
           - name: dataforgood.fr
             domains:
               - "dataforgood.fr"
-              - "*.dataforgood.fr"
+              - "*.dataforgood.fr" 
+          - name: conventioncitoyennepourlademocratie.fr
+            domains:
+              - "conventioncitoyennepourlademocratie.fr" 
       tags:
         - acme
         - tls

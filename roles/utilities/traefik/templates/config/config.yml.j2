@@ -27,12 +27,6 @@ accessLog:
 entrypoints:
   web:
     address: ":80"
-    http:
-      redirections:
-        entryPoint:
-          to: "webtls"
-          scheme: "https"
-          permanent: true
 
 {% for entrypoint in tcp_entrypoints %}
   {{ entrypoint.name }}:
@@ -59,12 +53,24 @@ providers:
 
 http:
   middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
     basic-auth:
       basicAuth:
         users:
           - "{{ lookup('env', 'BASIC_AUTH_USER') | replace('\\$', '$') }}"
 
   routers:
+    redirect-to-https:
+      rule: "PathPrefix(`/`)"
+      middlewares:
+        - redirect-to-https
+      service: acme-challenge
+      entryPoints:
+        - web
+      priority: 1
     acme-challenge:
       rule: "PathPrefix(`/.well-known/acme-challenge/`)"
       service: acme-challenge

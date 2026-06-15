@@ -38,6 +38,7 @@
     - images/logocarre.png
     - images/science-po.jpg
     - images/sciencespologo.png
+    - images/favicon.ico
 
 - name: Pull
   command: docker compose pull

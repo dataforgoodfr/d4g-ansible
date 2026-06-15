@@ -46,11 +46,16 @@
 
 - name: "{{ cert.name }} - Provision certificate using acme.sh"
   block:
-    - name: "{{ cert.name }} - Issuing certificate"
+    - name: "{{ cert.name }} - Issuing certificate (DNS-01)"
       shell: /root/.acme.sh/acme.sh --issue --server {{ ' letsencrypt_test ' if staging else ' letsencrypt ' }}--log -d {{ cert.domains | join(' -d ') }} --dns dns_scaleway --debug --force
       environment:
         SCALEWAY_API_TOKEN: "{{ scaleway_api_token }}"
-      when: needs_reissuance
+      when: needs_reissuance and (cert.challenge | default('dns')) == 'dns'
+      notify: traefik_rolling_update
+
+    - name: "{{ cert.name }} - Issuing certificate (HTTP-01)"
+      shell: /root/.acme.sh/acme.sh --issue --server {{ ' letsencrypt_test ' if staging else ' letsencrypt ' }}--log -d {{ cert.domains | join(' -d ') }} --webroot {{ acme_webroot }} --debug --force
+      when: needs_reissuance and (cert.challenge | default('dns')) == 'http'
       notify: traefik_rolling_update
 
     - name: "{{ cert.name }} - Installing certificate to disk"

@@ -1,4 +1,38 @@
 ---
+- name: Set HTTP-01 challenge flag
+  set_fact:
+    has_http_challenges: "{{ certificates | selectattr('challenge', 'defined') | selectattr('challenge', 'equalto', 'http') | list | length > 0 }}"
+
+- name: Create challenge responder directory
+  file:
+    path: /opt/acme-challenge-responder
+    state: directory
+    mode: "0755"
+  when: has_http_challenges
+
+- name: Copy nginx config for challenge responder
+  copy:
+    src: acme-nginx.conf
+    dest: /opt/acme-challenge-responder/acme-nginx.conf
+    mode: "0644"
+  when: has_http_challenges
+
+- name: Create challenge responder service definition
+  template:
+    src: acme-challenge-responder.yml.j2
+    dest: /opt/acme-challenge-responder/docker-compose.yml
+    mode: "0644"
+  when: has_http_challenges
+
+- name: Deploy challenge responder stack
+  command: docker stack deploy --with-registry-auth -c /opt/acme-challenge-responder/docker-compose.yml acme-challenge-responder
+  when: has_http_challenges
+
+- name: Remove challenge responder stack when not needed
+  command: docker stack rm acme-challenge-responder
+  when: not has_http_challenges
+  failed_when: false
+
 # Process each certificate in the certificates list
 - name: Process certificates
   include_tasks: certificate.yml

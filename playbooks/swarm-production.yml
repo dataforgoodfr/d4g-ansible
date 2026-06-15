@@ -44,8 +44,9 @@
               - "dataforgood.fr"
               - "*.dataforgood.fr" 
           - name: conventioncitoyennepourlademocratie.fr
+            challenge: http
             domains:
-              - "conventioncitoyennepourlademocratie.fr" 
+              - "conventioncitoyennepourlademocratie.fr"
       tags:
         - acme
         - tls
@@ -374,6 +375,9 @@
             domains:
               - "dataforgood.fr"
               - "*.dataforgood.fr"
+          - name: conventioncitoyennepourlademocratie.fr
+            domains:
+              - "conventioncitoyennepourlademocratie.fr"
         services:
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]

@@ -1,0 +1,20 @@
+services:
+  web:
+    image: nginx:alpine
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./images:/usr/share/nginx/html/images:ro
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+      restart_policy:
+        condition: on-failure
+    networks:
+      - d4g-internal
+
+
+networks:
+  d4g-internal:
+    external: true

@@ -1,0 +1,65 @@
+---
+- name: Create d4g-democratie directory
+  file:
+    path: /opt/d4g-democratie
+    state: directory
+
+- name: Create d4g-democratie images directory
+  file:
+    path: "/opt/d4g-democratie/images"
+    state: directory
+
+- name: Create d4g-democratie files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-democratie/{{ item }}
+  with_items:
+    - docker-compose.yml
+
+- name: Copy d4g-democratie files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/opt/d4g-democratie/{{ item }}"
+  loop:
+    - index.html
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-democratie
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-democratie
+  args:
+    chdir: /opt/d4g-democratie
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: moodle
+    data_dir: /opt/d4g-democratie/data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-democratie
+    service_dir: /opt/d4g-democratie
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: moodle
+    pgsql_password: "{{ lookup('env', 'MOODLE_DATABASE_PASSWORD') }}"
+    pgsql_database: moodle
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

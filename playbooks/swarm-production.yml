@@ -391,7 +391,7 @@
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
           - name: "d4g-democratie"
-            addresses: ["d4g-democratie_app"]
+            addresses: ["d4g-democratie_web"]
           - name: "democis"
             addresses: ["democis_web"]
             override_name: "conventioncitoyennepourlademocratie.fr"

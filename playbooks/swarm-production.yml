@@ -364,6 +364,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-democratie
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-democratie
+        - service
+
+    - import_role:
         name: roles/utilities/traefik
       vars:
         base_domain: services.dataforgood.fr
@@ -381,6 +390,8 @@
         services:
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
+          - name: "d4g-democratie"
+            addresses: ["d4g-democratie_app"]
           - name: "democis"
             addresses: ["democis_web"]
             override_name: "conventioncitoyennepourlademocratie.fr"

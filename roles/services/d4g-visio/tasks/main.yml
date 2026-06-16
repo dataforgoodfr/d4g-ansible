@@ -55,7 +55,7 @@
     sleep 10
     CONTAINER=$(docker ps -q -f name=d4g-visio_backend -f status=running | head -1)
     [ -z "$CONTAINER" ] && echo "No backend container running" && exit 0
-    cat /opt/d4g-visio/ensure-admin.py | docker exec -i "$CONTAINER" python
+    cat /opt/d4g-visio/ensure-admin.py | docker exec -u 0 -i "$CONTAINER" python
   register: admin_result
   changed_when: "'Created' in admin_result.stdout or 'Promoted' in admin_result.stdout"
   when: inventory_hostname == deploy_on

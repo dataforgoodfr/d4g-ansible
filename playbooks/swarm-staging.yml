@@ -243,6 +243,13 @@
             override_name: "home.d4g.fr"
           - name: "docs"
             addresses: ["d4g-docs_frontend:8083"]
+        tcp_services:
+          - name: visio-turn
+            entrypoint: webtls
+            sni: turn-visio.services.d4g.fr
+            tls: true
+            addresses:
+              - "d4g-visio_livekit:443"
       tags:
         - proxy
         - traefik

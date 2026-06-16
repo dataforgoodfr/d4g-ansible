@@ -115,10 +115,13 @@ tcp:
   routers:
 {% for service in tcp_services %}
     {{ service.name }}:
-      rule: "HostSNI(`*`)"
+      rule: "HostSNI(`{{ service.sni | default('*') }}`)"
       service: {{ service.name }}
       entryPoints:
         - {{ service.entrypoint }}
+{% if service.tls | default(false) %}
+      tls: {}
+{% endif %}
 {% endfor %}
 
   services:

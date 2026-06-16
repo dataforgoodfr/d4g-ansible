@@ -472,6 +472,12 @@
             port: 993
         # TODO: current traefik config for tcp service rules is HostSNI(`*`) and ignore provided `domain` ?
         tcp_services:
+          - name: visio-turn
+            entrypoint: webtls
+            sni: turn-visio.services.dataforgood.fr
+            tls: true
+            addresses:
+              - "d4g-visio_livekit:443"
           - name: stalwart-smtp-service
             domain: stalwart.services.dataforgood.fr
             entrypoint: stalwart-smtp

@@ -1,0 +1,29 @@
+---
+- name: Create d4g-bulwark directory
+  file:
+    path: /opt/d4g-bulwark
+    state: directory
+
+- name: Create d4g-bulwark template files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-bulwark/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - bulwark.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-bulwark
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-bulwark
+  args:
+    chdir: /opt/d4g-bulwark
+  tags:
+    - up
+  when: is_swarm_leader | default(false)

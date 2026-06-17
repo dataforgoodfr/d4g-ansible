@@ -189,6 +189,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-bulwark
+      vars:
+        deploy_on: "d4g-staging-01.d4g.fr"
+        replicas: 1
+      tags:
+        - d4g-bulwark
+        - service
+
+    - import_role:
         name: roles/utilities/observability
       vars:
         group_name: staging_swarm_cluster_nodes
@@ -243,6 +252,8 @@
             override_name: "home.d4g.fr"
           - name: "docs"
             addresses: ["d4g-docs_frontend:8083"]
+          - name: "bulwark"
+            addresses: ["d4g-bulwark_app:3000"]
         tcp_services:
           - name: visio-turn
             entrypoint: webtls

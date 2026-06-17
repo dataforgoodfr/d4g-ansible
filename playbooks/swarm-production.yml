@@ -288,6 +288,15 @@
         - service
 
     - import_role:
+        name: roles/services/d4g-bulwark
+      vars:
+        deploy_on: "metal-2.dataforgood.fr"
+        replicas: 1
+      tags:
+        - d4g-bulwark
+        - service
+
+    - import_role:
         name: roles/services/d4g-nextcloud
       vars:
         deploy_on: "metal-2.dataforgood.fr"
@@ -460,6 +469,8 @@
             addresses: ["d4g-visio_livekit:7880"]
           - name: "grist"
             addresses: ["d4g-grist_app:8484"]
+          - name: "bulwark"
+            addresses: ["d4g-bulwark_app:3000"]
           - name: "home"
             addresses: ["d4g-home_app:8000"]
             override_name: "home.dataforgood.fr"

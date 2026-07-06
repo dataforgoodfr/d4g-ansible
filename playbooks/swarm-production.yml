@@ -47,6 +47,11 @@
             challenge: http
             domains:
               - "conventioncitoyennepourlademocratie.fr"
+          - name: tousexposes.fr
+            challenge: http
+            domains:
+              - "tousexposes.fr"
+              - "www.tousexposes.fr"
       tags:
         - acme
         - tls
@@ -396,6 +401,10 @@
           - name: conventioncitoyennepourlademocratie.fr
             domains:
               - "conventioncitoyennepourlademocratie.fr"
+          - name: tousexposes.fr
+            domains:
+              - "tousexposes.fr"
+              - "www.tousexposes.fr"
         services:
           - name: "vaultwarden"
             addresses: ["d4g-vaultwarden_app"]
@@ -463,6 +472,7 @@
             addresses: ["observability_grafana:3000"]
           - name: "tousexposes"
             addresses: ["tousexposes_app:3000"]
+            rule: "Host(`tousexposes.fr`) || Host(`www.tousexposes.fr`) || Host(`tousexposes.services.dataforgood.fr`)"
           - name: "visio"
             addresses: ["d4g-visio_frontend:8083"]
           - name: "livekit-visio"

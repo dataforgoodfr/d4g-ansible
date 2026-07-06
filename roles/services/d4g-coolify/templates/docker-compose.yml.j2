@@ -1,8 +1,8 @@
 
 services:
   coolify:
-    # Image officielle Coolify, pas de version fixee
-    image: "ghcr.io/coollabsio/coolify:latest"
+    # Coolify v4.4.1 - pinned by digest (upstream publishes no semver tags on ghcr)
+    image: "ghcr.io/coollabsio/coolify:latest@sha256:3a27ba5f7f98ff7763a0a4d6715ec36e564f9622eea8f492c46f90716ea2525f"
     working_dir: /var/www/html
     restart: unless-stopped
     env_file:
@@ -45,7 +45,7 @@ services:
       - d4g-internal
 
   coolify-realtime:
-    image: "ghcr.io/coollabsio/coolify-realtime:1.0.10"
+    image: "ghcr.io/coollabsio/coolify-realtime:1.0.16"
     restart: unless-stopped
     env_file:
       - coolify.env

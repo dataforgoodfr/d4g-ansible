@@ -66,6 +66,9 @@
           - db: outline
             user: outline
             password: "{{ lookup('env', 'OUTLINE_DB_PASSWORD') }}"
+          - db: mattermost
+            user: mattermost
+            password: "{{ lookup('env', 'MATTERMOST_DB_PASSWORD') }}"
           - db: authentik
             user: authentik
             password: "{{ lookup('env', 'AUTHENTIK_DB_PASSWORD') }}"

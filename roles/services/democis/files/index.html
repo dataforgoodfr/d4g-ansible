@@ -508,7 +508,9 @@ p.lead {
   background: var(--blanc);
   padding: 36px 40px;
   display: grid;
-  grid-template-columns: clamp(96px, 11vw, 130px) 1fr;
+  /* minmax(0,…) : sans ça le min-width:auto de la piste vaut la largeur du
+     mot le plus long (« socio-démographiques. ») et élargit la carte. */
+  grid-template-columns: clamp(96px, 11vw, 130px) minmax(0, 1fr);
   gap: 32px;
   align-items: center;
   transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
@@ -538,10 +540,18 @@ p.lead {
   line-height: 1.5;
   color: var(--encre-doux);
 }
+.panel-card-label,
+.panel-card-desc { overflow-wrap: break-word; }
 
 @media (max-width: 880px) {
   .panel-grid { grid-template-columns: 1fr; gap: 48px; }
   .panel-card { padding: 28px 24px; gap: 20px; }
+}
+@media (max-width: 480px) {
+  /* Sur très petits écrans, le chiffre passe au-dessus du texte :
+     côte à côte il ne reste plus assez de place pour le libellé. */
+  .panel-card { grid-template-columns: 1fr; gap: 12px; }
+  .panel-card-num { text-align: left; }
 }
 
 /* =========================================================================
@@ -835,9 +845,13 @@ p.lead {
   padding: 6px;
   align-items: center;
   gap: 0;
+  flex-wrap: wrap;
 }
 .newsletter-input input {
   flex: 1;
+  /* Sans min-width:0 l'input refuse de descendre sous sa taille intrinsèque :
+     la ligne reste plus large que l'écran et le bouton sort du cadre. */
+  min-width: 0;
   border: none;
   background: transparent;
   padding: 18px 20px;
@@ -893,6 +907,12 @@ p.lead {
 .newsletter-social a:hover { border-bottom-color: var(--blanc); opacity: 0.85; }
 @media (max-width: 880px) {
   .newsletter-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 480px) {
+  /* Sous ~432px le bouton sortait du cadre : champ et bouton sont empilés,
+     côte à côte il ne reste plus assez de place pour saisir une adresse. */
+  .newsletter-input { flex-direction: column; align-items: stretch; gap: 6px; }
+  .newsletter-input button { width: 100%; }
 }
 
 .sib-form-message-panel {
@@ -1021,6 +1041,21 @@ p.lead {
   transition: color 0.2s;
 }
 .footer-col ul li a:hover { color: var(--rouge); }
+/* Sous-titre « Contact presse » : même traitement que les h4 du footer,
+   pour distinguer l'adresse presse de l'adresse de contact générale. */
+.footer-contact-role { margin-top: 24px; }
+.footer-contact-role > span {
+  display: block;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 10px;
+}
+/* Le <wbr> des adresses mail n'est utile qu'en mono-colonne : neutralisé ici,
+   sinon il casse l'adresse en deux lignes alors qu'elle tient sur une. */
+.footer-col ul li a wbr { display: none; }
 .footer-bottom {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -1046,6 +1081,22 @@ p.lead {
 @media (max-width: 880px) {
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
   .footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  /* Une seule colonne : sur deux colonnes il ne reste qu'environ 150px,
+     trop peu pour afficher les adresses mail sans les hacher. */
+  .footer-grid { grid-template-columns: 1fr; gap: 36px; }
+  /* Ces deux règles ne valent que sous 560px. Au-dessus, c'est la largeur
+     min-content des adresses mail qui dimensionne la colonne Contact et les
+     garde sur une seule ligne : y toucher décalerait le footer en desktop. */
+  .footer-col { min-width: 0; }
+  .footer-col ul li a {
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  /* Réactivé : la césure se fera après le @ plutôt qu'au milieu du domaine. */
+  .footer-col ul li a wbr { display: inline; }
 }
 
 /* =========================================================================
@@ -1518,9 +1569,12 @@ p.lead {
     <div class="footer-col">
       <h4>Contact</h4>
       <ul>
-        <li><a href="mailto:contact@conventioncitoyennepourlademocratie.fr">contact@conventioncitoyennepourlademocratie.fr</a></li>
-        <li><a href="mailto:oteixeira@bonafide.paris">oteixeira@bonafide.paris</a></li>
-        <li><a href="mailto:relationspresse@univ-lille.fr">relationspresse@univ-lille.fr</a></li>
+        <!-- <wbr> : point de césure privilégié après le @, pour éviter une coupure au milieu du domaine -->
+        <li><a href="mailto:contact@conventioncitoyennepourlademocratie.fr">contact@<wbr>conventioncitoyennepourlademocratie.fr</a></li>
+        <li class="footer-contact-role">
+          <span>Contact presse</span>
+          <a href="mailto:oteixeira@bonafide.paris">oteixeira@<wbr>bonafide.paris</a>
+        </li>
       </ul>
     </div>
   </div>

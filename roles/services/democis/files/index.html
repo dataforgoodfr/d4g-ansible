@@ -1041,6 +1041,18 @@ p.lead {
   transition: color 0.2s;
 }
 .footer-col ul li a:hover { color: var(--rouge); }
+/* Sous-titre « Contact presse » : même traitement que les h4 du footer,
+   pour distinguer l'adresse presse de l'adresse de contact générale. */
+.footer-contact-role { margin-top: 24px; }
+.footer-contact-role > span {
+  display: block;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 10px;
+}
 /* Le <wbr> des adresses mail n'est utile qu'en mono-colonne : neutralisé ici,
    sinon il casse l'adresse en deux lignes alors qu'elle tient sur une. */
 .footer-col ul li a wbr { display: none; }
@@ -1559,8 +1571,10 @@ p.lead {
       <ul>
         <!-- <wbr> : point de césure privilégié après le @, pour éviter une coupure au milieu du domaine -->
         <li><a href="mailto:contact@conventioncitoyennepourlademocratie.fr">contact@<wbr>conventioncitoyennepourlademocratie.fr</a></li>
-        <li><a href="mailto:oteixeira@bonafide.paris">oteixeira@<wbr>bonafide.paris</a></li>
-        <li><a href="mailto:relationspresse@univ-lille.fr">relationspresse@<wbr>univ-lille.fr</a></li>
+        <li class="footer-contact-role">
+          <span>Contact presse</span>
+          <a href="mailto:oteixeira@bonafide.paris">oteixeira@<wbr>bonafide.paris</a>
+        </li>
       </ul>
     </div>
   </div>

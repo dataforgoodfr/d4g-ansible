@@ -447,7 +447,7 @@
             override_name: "dataforgood.fr"
           - name: "noco"
             addresses: ["d4g-noco_app"]
-          - name: "d4g-peertube"
+          - name: "peertube"
             addresses: ["d4g-peertube_app:9000"]
           - name: "decidim"
             addresses: ["d4g-decidim_app:3000"]

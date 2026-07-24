@@ -446,9 +446,9 @@
             addresses: ["d4g-website_app:3000"]
             override_name: "dataforgood.fr"
           - name: "noco"
+            addresses: ["d4g-noco_app"]
           - name: "d4g-peertube"
             addresses: ["d4g-peertube_app:9000"]
-            addresses: ["d4g-noco_app"]
           - name: "decidim"
             addresses: ["d4g-decidim_app:3000"]
           - name: "penpot"

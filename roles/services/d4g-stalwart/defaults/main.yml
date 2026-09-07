@@ -1,2 +1,8 @@
 tcp_entrypoints: []
 tcp_services: []
+
+# Nom public de l'instance et bucket S3 des blobs. Les valeurs par defaut sont
+# celles de la production ; le play staging les surcharge pour que staging
+# n'ecrive jamais dans le bucket ni sous le nom de la production.
+base_domain: services.dataforgood.fr
+stalwart_s3_bucket: d4g-stalwart

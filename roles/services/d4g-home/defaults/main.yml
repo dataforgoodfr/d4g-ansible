@@ -1,3 +1,14 @@
 ---
 base_domain: services.dataforgood.fr
 home_base_url: https://home.dataforgood.fr
+
+# Quel fournisseur d'identite l'application interroge : "authentik" ou
+# "keycloak". Authentik par defaut — la production n'a pas bouge, et un
+# deploiement qui ne dit rien doit garder le comportement qu'il avait.
+# Voir decision-2 dans le depot d4g-community-manager.
+home_idp_provider: authentik
+
+# Realm interroge quand home_idp_provider vaut keycloak. Defini ici et pas
+# emprunte au role d4g-keycloak : les defauts d'un role ne sont pas visibles
+# depuis un autre.
+home_keycloak_realm: d4g

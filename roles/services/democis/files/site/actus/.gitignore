@@ -1,0 +1,3 @@
+# Dossier monté en écriture par docker : les actualités créées depuis le
+# back-office vivent dans data/ sur le serveur, jamais dans le dépôt.
+data/

@@ -4,10 +4,15 @@
     path: /opt/democis
     state: directory
 
-- name: Create democis images directory
+# Les actualités créées depuis le back-office sont écrites par Apache (www-data,
+# uid 33 dans l'image php:apache) : le dossier doit lui appartenir.
+- name: Create democis news data directory
   file:
-    path: "/opt/democis/images"
+    path: "/opt/democis/actus/data"
     state: directory
+    owner: "33"
+    group: "33"
+    mode: "0755"
 
 - name: Create democis files
   template:
@@ -15,36 +20,20 @@
     dest: /opt/democis/{{ item }}
   with_items:
     - docker-compose.yml
+    - democis.env
 
-- name: Copy democis files
+- name: Copy democis server configuration
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/opt/democis/{{ item }}"
   loop:
-    - index.html
-    - images/1.jpg
-    - images/2.jpg
-    - images/3.jpg
-    - images/4.jpg
-    - images/5.jpg    
-    - images/cnrs.png
-    - images/democis.png
-    - images/france_2030.jpg
-    - images/imt.png
-    - images/inria.png
-    - images/Logo_Sciences Po Grenoble.png
-    - images/Logo_Université_Grenoble_Alpes_2020.png
-    - images/Logo_Université_Lille.png
-    - images/SciencesPoStGermain_Logotype 2.png
-    - images/UDL-Lyon3_Vecto.png
-    - images/CergyParisUniversité_CMJN.png
-    - images/logo_longueur.png
-    - images/logo_sur_fond_fonce.png
-    - images/logo.png
-    - images/logocarre.png
-    - images/science-po.jpg
-    - images/sciencespologo.png
-    - images/favicon.ico
+    - apache-democis.conf
+    - php-democis.ini
+
+- name: Copy democis site
+  ansible.builtin.copy:
+    src: site/
+    dest: /opt/democis/site/
 
 - name: Pull
   command: docker compose pull
@@ -61,28 +50,3 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
-
-- import_role:
-    name: roles/utilities/s3-backup
-  vars:
-    service_name: moodle
-    data_dir: /opt/democis/data
-  tags:
-    - backup
-    - service
-  when: inventory_hostname == deploy_on
-
-- import_role:
-    name: roles/utilities/sql-backup
-  vars:
-    service: democis
-    service_dir: /opt/democis
-    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
-    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
-    pgsql_user: moodle
-    pgsql_password: "{{ lookup('env', 'MOODLE_DATABASE_PASSWORD') }}"
-    pgsql_database: moodle
-  tags:
-    - backup
-    - service
-  when: inventory_hostname == deploy_on

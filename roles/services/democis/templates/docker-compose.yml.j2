@@ -1,9 +1,15 @@
 services:
   web:
-    image: nginx:alpine
+    image: php:8.3-apache
+    env_file:
+      - democis.env
     volumes:
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./images:/usr/share/nginx/html/images:ro
+      # Le site (pages PHP, assets, images) est en lecture seule ; seules les
+      # actualités créées depuis le back-office vivent dans ./actus (persistant).
+      - ./site:/var/www/html:ro
+      - ./actus:/var/www/html/actus
+      - ./apache-democis.conf:/etc/apache2/conf-enabled/zz-democis.conf:ro
+      - ./php-democis.ini:/usr/local/etc/php/conf.d/democis.ini:ro
     deploy:
       replicas: {{ replicas }}
       placement:

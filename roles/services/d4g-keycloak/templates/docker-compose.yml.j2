@@ -1,0 +1,21 @@
+---
+
+services:
+  app:
+    image: quay.io/keycloak/keycloak:{{ keycloak_image_tag }}
+    # `start` et non `start-dev` : le mode dev desactive HTTPS et le cache, et
+    # accepte n'importe quel hostname — ce qui masquerait justement les erreurs
+    # de proxy que le staging existe pour attraper.
+    command: ["start", "--optimized=false"]
+    env_file: keycloak.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+
+networks:
+  d4g-internal:
+    external: true

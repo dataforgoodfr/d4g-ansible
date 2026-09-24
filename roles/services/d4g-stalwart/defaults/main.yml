@@ -6,3 +6,9 @@ tcp_services: []
 # n'ecrive jamais dans le bucket ni sous le nom de la production.
 base_domain: services.dataforgood.fr
 stalwart_s3_bucket: d4g-stalwart
+
+# Annuaire des comptes. "internal" garde les principaux dans postgres ; "ldap"
+# les lit dans l'outpost LDAP d'Authentik, deploye alors avec la stack.
+# Par defaut internal : c'est ce que fait le role depuis toujours, et la
+# production n'a pas ete inspectee dans le cadre de cette carte.
+stalwart_directory: internal

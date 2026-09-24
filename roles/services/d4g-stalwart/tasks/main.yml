@@ -8,10 +8,8 @@
   template:
     src: "{{ item }}.j2"
     dest: /opt/d4g-stalwart/{{ item }}
-  with_items:
-    - config.toml
-    - docker-compose.yml
-    - stalwart.env
+  with_items: "{{ ['config.toml', 'docker-compose.yml', 'stalwart.env']
+                  + (['ldap.env'] if stalwart_directory == 'ldap' else []) }}"
 
 - name: Pull
   command: docker compose pull

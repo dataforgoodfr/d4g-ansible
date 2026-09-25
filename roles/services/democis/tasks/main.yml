@@ -4,15 +4,19 @@
     path: /opt/democis
     state: directory
 
-# Les actualités créées depuis le back-office sont écrites par Apache (www-data,
-# uid 33 dans l'image php:apache) : le dossier doit lui appartenir.
-- name: Create democis news data directory
+# Les actualités et les articles « On en parle » gérés depuis le back-office
+# sont écrits par Apache (www-data, uid 33 dans l'image php:apache) : les
+# dossiers doivent lui appartenir.
+- name: Create democis back-office data directories
   file:
-    path: "/opt/democis/actus/data"
+    path: "{{ item }}"
     state: directory
     owner: "33"
     group: "33"
     mode: "0755"
+  loop:
+    - /opt/democis/actus/data
+    - /opt/democis/actus/presse
 
 - name: Create democis files
   template:

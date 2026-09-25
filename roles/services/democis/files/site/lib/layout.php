@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/actus.php';
+require_once __DIR__ . '/presse.php';
 
 /**
  * Balises <meta> Open Graph. Si une actu est passée (lien partagé ?actu=…),
@@ -15,7 +16,7 @@ function layout_og_tags(string $title, string $description, string $url, ?array 
 {
     if ($actu !== null) {
         $title = $actu['titre'] . ' — ' . SITE_NAME;
-        $description = actu_excerpt($actu['texte']);
+        $description = actu_excerpt($actu['texte']) ?: $description;
         $url .= (str_contains($url, '?') ? '&' : '?') . 'actu=' . rawurlencode($actu['slug']);
     }
     ?>
@@ -25,7 +26,7 @@ function layout_og_tags(string $title, string $description, string $url, ?array 
 <meta property="og:description" content="<?= e($description) ?>">
 <meta property="og:url" content="<?= e($url) ?>">
 <?php if ($actu && $actu['image_url']): ?>
-<meta property="og:image" content="<?= e(site_url() . '/' . $actu['image_url']) ?>">
+<meta property="og:image" content="<?= e(actu_absolute_image_url($actu)) ?>">
 <meta name="twitter:card" content="summary_large_image">
 <?php else: ?>
 <meta name="twitter:card" content="summary">
@@ -139,6 +140,30 @@ function layout_rss_link(): void
 <?php
 }
 
+/**
+ * Image d'une vignette. Une image en portrait (miniature de Short…) est
+ * affichée entière, sur un fond flou tiré d'elle-même, au lieu d'être rognée.
+ */
+function layout_thumb_img(array $actu): void
+{
+    if ($actu['image_vertical']): ?>
+<img class="actu-img-backdrop" src="<?= e($actu['image_url']) ?>" alt="" aria-hidden="true">
+<?php endif; ?>
+<img src="<?= e($actu['image_url']) ?>" alt="<?= e($actu['titre']) ?>"<?= $actu['image_vertical'] ? ' class="actu-img-vertical"' : '' ?>>
+<?php
+}
+
+/** Pastille « lecture » posée sur la vignette d'une actu vidéo. */
+function layout_play_badge(array $actu): void
+{
+    if ($actu['youtube_id'] === null) {
+        return;
+    }
+    ?>
+<span class="actu-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+<?php
+}
+
 /** Bloc « Actualités » de l'accueil : une actu principale + trois secondaires. */
 function layout_actus_home(array $actus): void
 {
@@ -163,13 +188,16 @@ function layout_actus_home(array $actus): void
       <a class="actu-main" data-actu-slug="<?= e($main['slug']) ?>" href="actualites.php?actu=<?= e($main['slug']) ?>">
 <?php if ($main['image_url']): ?>
         <div class="actu-main-img">
-          <img src="<?= e($main['image_url']) ?>" alt="<?= e($main['titre']) ?>">
+          <?php layout_thumb_img($main); ?>
+          <?php layout_play_badge($main); ?>
         </div>
 <?php endif; ?>
         <div class="actu-main-body">
           <span class="actu-date"><?= e(date_fr($main['date'])) ?></span>
           <h3 class="actu-main-title"><?= e($main['titre']) ?></h3>
+<?php if ($main['texte'] !== ''): ?>
           <p class="actu-main-excerpt"><?= e(actu_excerpt($main['texte'])) ?></p>
+<?php endif; ?>
         </div>
       </a>
 
@@ -179,7 +207,8 @@ function layout_actus_home(array $actus): void
         <a class="actu-card" data-actu-slug="<?= e($actu['slug']) ?>" href="actualites.php?actu=<?= e($actu['slug']) ?>">
 <?php if ($actu['image_url']): ?>
           <div class="actu-card-img">
-            <img src="<?= e($actu['image_url']) ?>" alt="<?= e($actu['titre']) ?>">
+            <?php layout_thumb_img($actu); ?>
+            <?php layout_play_badge($actu); ?>
           </div>
 <?php endif; ?>
           <div>
@@ -204,6 +233,50 @@ function layout_actus_home(array $actus): void
 <?php
 }
 
+/**
+ * Section « On en parle » de l'accueil : une liste de médias, chaque logo
+ * menant à l'article. Le titre de l'article n'apparaît qu'en infobulle (les
+ * articles sont souvent payants : c'est le média qui compte). Rien n'est
+ * affiché tant que la liste est vide.
+ */
+function layout_presse_home(array $items): void
+{
+    if ($items === []) {
+        return;
+    }
+    ?>
+<!-- ============================ ON EN PARLE ============================ -->
+<section class="section" id="presse">
+  <div class="wrap">
+    <div class="presse-header reveal">
+      <span class="eyebrow">On en parle</span>
+      <h2 class="title sub-title">Ils parlent de la Convention.</h2>
+    </div>
+    <ul class="presse-list reveal-stagger">
+<?php foreach ($items as $item):
+    $label = 'Lire l’article de ' . $item['media'] . ($item['titre'] !== '' ? ' : ' . $item['titre'] : '');
+?>
+      <li>
+        <a class="presse-card" href="<?= e($item['url']) ?>" target="_blank" rel="noopener" title="<?= e($label) ?>" aria-label="<?= e($label) ?>">
+          <span class="presse-logo">
+<?php if ($item['logo'] !== ''): ?>
+            <img src="<?= e($item['logo']) ?>" alt="<?= e($item['media']) ?>" loading="lazy">
+<?php else: ?>
+            <span class="presse-logo-text"><?= e($item['media']) ?></span>
+<?php endif; ?>
+          </span>
+          <span class="presse-lire" aria-hidden="true">Lire l’article <span class="presse-arrow" aria-hidden="true">↗</span></span>
+        </a>
+      </li>
+<?php endforeach; ?>
+    </ul>
+  </div>
+</section>
+
+<hr class="full-hr">
+<?php
+}
+
 /** Vignette de la page « toutes les actualités ». */
 function layout_actu_tile(array $actu): void
 {
@@ -211,13 +284,16 @@ function layout_actu_tile(array $actu): void
 <a class="actu-tile" data-actu-slug="<?= e($actu['slug']) ?>" href="?actu=<?= e($actu['slug']) ?>">
 <?php if ($actu['image_url']): ?>
   <div class="actu-tile-img">
-    <img src="<?= e($actu['image_url']) ?>" alt="<?= e($actu['titre']) ?>">
+    <?php layout_thumb_img($actu); ?>
+    <?php layout_play_badge($actu); ?>
   </div>
 <?php endif; ?>
   <div class="actu-tile-body">
     <span class="actu-date"><?= e(date_fr($actu['date'])) ?></span>
     <div class="actu-tile-title"><?= e($actu['titre']) ?></div>
+<?php if ($actu['texte'] !== ''): ?>
     <p class="actu-tile-excerpt"><?= e(actu_excerpt($actu['texte'])) ?></p>
+<?php endif; ?>
   </div>
 </a>
 <?php

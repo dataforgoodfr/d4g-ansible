@@ -118,11 +118,21 @@
         return res.json();
       })
       .then(function (actu) {
-        var imgHtml = actu.image_url
-          ? '<div class="actu-modal-img"><img src="' + actu.image_url + '" alt="' + escapeHtml(actu.titre) + '"></div>'
-          : '';
+        // Vidéo : lancée d'emblée (le clic sur l'actu autorise la lecture
+        // avec le son ; à l'ouverture par un lien partagé, le navigateur peut
+        // demander un clic sur « lecture »).
+        var mediaHtml = '';
+        if (actu.youtube_id) {
+          mediaHtml =
+            '<div class="actu-modal-video' + (actu.youtube_short ? ' is-short' : '') + '"><iframe' +
+            ' src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(actu.youtube_id) + '?autoplay=1&amp;playsinline=1&amp;rel=0"' +
+            ' title="' + escapeHtml(actu.titre) + '"' +
+            ' allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>';
+        } else if (actu.image_url) {
+          mediaHtml = '<div class="actu-modal-img"><img src="' + actu.image_url + '" alt="' + escapeHtml(actu.titre) + '"></div>';
+        }
         content.innerHTML =
-          imgHtml +
+          mediaHtml +
           '<div class="actu-modal-body">' +
           '<span class="actu-modal-date">' + escapeHtml(actu.date_formatee) + '</span>' +
           '<h2 class="actu-modal-title" id="actu-modal-title">' + escapeHtml(actu.titre) + '</h2>' +
@@ -144,6 +154,8 @@
   function closeModal(fromPopstate) {
     overlay.classList.remove('open');
     document.body.classList.remove('modal-open');
+    // Vide la pop-in : sans quoi une vidéo continuerait de jouer en arrière-plan.
+    content.innerHTML = '';
     if (fromPopstate) return;
 
     var state = history.state;

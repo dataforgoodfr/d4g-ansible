@@ -8,10 +8,16 @@ Site PHP sans base de données, servi par l'image `php:8.3-apache` :
   - `index.php`, `actualites.php` : pages publiques
   - `get-actu.php` : contenu d'une actualité (JSON) pour la pop-in
   - `rss.php` : flux RSS des actualités
-  - `admin/` : back-office des actualités
+  - `admin/` : back-office des actualités et de la section « On en parle »
   - `lib/actus.php` : stockage et helpers des actualités
-- `/opt/democis/actus/data/<slug>/` sur le serveur : les actualités créées depuis le
-  back-office (`actu.json` + `photo.<ext>`), seul dossier à sauvegarder.
+  - `lib/presse.php` : articles de presse « On en parle » ; `lib/presse-defaut.json`
+    (logos dans `images/presse/`) sert de liste de départ tant que rien n'a été
+    enregistré depuis le back-office
+- `/opt/democis/actus/` sur le serveur, seul dossier à sauvegarder :
+  - `data/<slug>/` : les actualités créées depuis le back-office (`actu.json`,
+    `photo.<ext>`, miniature de vidéo `video-<id>-<n>.jpg`)
+  - `presse/` : `presse.json` (articles « On en parle », dans l'ordre d'affichage)
+    et les logos envoyés
 
 ## Back-office
 

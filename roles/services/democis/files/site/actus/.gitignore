@@ -1,3 +1,5 @@
-# Dossier monté en écriture par docker : les actualités créées depuis le
-# back-office vivent dans data/ sur le serveur, jamais dans le dépôt.
+# Dossier monté en écriture par docker : les actualités (data/) et les articles
+# « On en parle » (presse/) gérés depuis le back-office vivent sur le serveur,
+# jamais dans le dépôt.
 data/
+presse/

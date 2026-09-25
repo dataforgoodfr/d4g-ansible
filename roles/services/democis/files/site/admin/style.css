@@ -26,6 +26,11 @@ body {
 .admin-topbar .brand { font-weight: 600; }
 .admin-topbar .logout { font-size: 13px; opacity: 0.75; }
 .admin-topbar .logout:hover { opacity: 1; }
+.admin-topbar-left { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.admin-tabs { display: flex; gap: 20px; font-size: 14px; }
+.admin-tabs a { opacity: 0.7; padding-bottom: 2px; border-bottom: 2px solid transparent; }
+.admin-tabs a:hover { opacity: 1; }
+.admin-tabs a.active { opacity: 1; border-bottom-color: var(--rouge); }
 
 .admin-wrap {
   max-width: 920px;
@@ -188,3 +193,21 @@ body {
   padding: 32px;
 }
 .login-wrap h1 { font-size: 20px; margin-top: 0; }
+
+/* « On en parle » : logo du média (pas rogné) et flèches d'ordre. */
+.admin-row img.admin-presse-logo { width: 120px; height: 40px; object-fit: contain; object-position: left center; background: none; border-radius: 0; }
+.admin-presse-nologo { width: 120px; flex-shrink: 0; font-weight: 600; }
+.admin-row-date a { color: inherit; }
+.admin-order { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+.admin-order button {
+  width: 32px;
+  height: 26px;
+  border: 1px solid var(--gris);
+  background: var(--blanc);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+.admin-order button:hover:not(:disabled) { background: var(--gris-clair); }
+.admin-order button:disabled { opacity: 0.3; cursor: default; }

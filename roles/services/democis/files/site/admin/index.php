@@ -22,7 +22,7 @@ if (!admin_is_logged_in()) {
     admin_page_start('Connexion');
     ?>
   <div class="login-wrap">
-    <h1>Back office actualités</h1>
+    <h1>Back office</h1>
     <?php admin_alert($login_error ? ['type' => 'error', 'message' => $login_error] : null); ?>
     <form method="post">
       <div class="admin-field">

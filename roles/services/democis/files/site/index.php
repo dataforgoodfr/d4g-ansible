@@ -49,6 +49,8 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
 
 <?php layout_actus_home($actus); ?>
 
+<?php layout_presse_home(presse_load_all()); ?>
+
 <!-- ============================ INTRO NARRATIVE ============================ -->
 <section class="section" id="projet">
   <div class="wrap">

@@ -1289,6 +1289,91 @@ p.lead {
 .page-header .eyebrow { margin-bottom: 16px; }
 
 /* =========================================================================
+   SECTION : ON EN PARLE (articles de presse, accueil)
+   ========================================================================= */
+/* Même respiration que le bloc actualités, entre les deux traits fins. */
+#presse { padding-top: var(--actus-gap); padding-bottom: var(--actus-gap); }
+.presse-header { margin-bottom: 40px; }
+.presse-header .eyebrow { margin-bottom: 14px; }
+
+.presse-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  border-top: 1px solid var(--gris);
+  border-left: 1px solid var(--gris);
+}
+.presse-list > li {
+  display: flex;
+  border-right: 1px solid var(--gris);
+  border-bottom: 1px solid var(--gris);
+}
+.presse-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 32px 28px 28px;
+  background: var(--blanc);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.presse-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -20px rgba(0,0,0,0.18);
+  position: relative;
+  z-index: 1;
+}
+.presse-logo {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+/* Hauteur fixe, largeur plafonnée : les logos très allongés rapetissent,
+   pour un poids visuel comparable d'un média à l'autre. */
+.presse-logo img {
+  height: 36px;
+  max-width: 170px;
+  object-fit: contain;
+  object-position: left center;
+  opacity: 0.85;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+  transform-origin: left center;
+}
+.presse-card:hover .presse-logo img { opacity: 1; transform: scale(1.04); }
+.presse-logo-text {
+  font-family: var(--font-title);
+  font-size: 24px;
+  color: var(--encre);
+}
+.presse-titre {
+  font-family: var(--font-title);
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--encre);
+  margin-bottom: 20px;
+  transition: color 0.2s var(--ease);
+}
+.presse-card:hover .presse-titre { color: var(--rouge); }
+.presse-lire {
+  margin-top: auto;
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--encre-doux);
+  transition: color 0.2s var(--ease);
+}
+.presse-card:hover .presse-lire { color: var(--rouge); }
+.presse-arrow { display: inline-block; transition: transform 0.2s var(--ease); }
+.presse-card:hover .presse-arrow { transform: translate(2px, -2px); }
+
+@media (max-width: 560px) {
+  .presse-card { padding: 24px 20px; }
+  .presse-logo { margin-bottom: 18px; }
+  .presse-logo img { height: 30px; }
+}
+
+/* =========================================================================
    POP-IN ACTUALITÉ
    ========================================================================= */
 .actu-modal-overlay {

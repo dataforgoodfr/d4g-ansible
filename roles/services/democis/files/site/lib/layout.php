@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/actus.php';
+require_once __DIR__ . '/presse.php';
 
 /**
  * Balises <meta> Open Graph. Si une actu est passée (lien partagé ?actu=…),
@@ -225,6 +226,50 @@ function layout_actus_home(array $actus): void
       <?php layout_rss_link(); ?>
     </div>
 <?php endif; ?>
+  </div>
+</section>
+
+<hr class="full-hr">
+<?php
+}
+
+/**
+ * Section « On en parle » de l'accueil : un article de presse par carte,
+ * logo du média en tête. Rien n'est affiché tant que la liste est vide.
+ */
+function layout_presse_home(array $items): void
+{
+    if ($items === []) {
+        return;
+    }
+    ?>
+<!-- ============================ ON EN PARLE ============================ -->
+<section class="section" id="presse">
+  <div class="wrap">
+    <div class="presse-header reveal">
+      <span class="eyebrow">On en parle</span>
+      <h2 class="title sub-title">Ils parlent de la Convention.</h2>
+    </div>
+    <ul class="presse-list reveal-stagger">
+<?php foreach ($items as $item): ?>
+      <li>
+        <a class="presse-card" href="<?= e($item['url']) ?>" target="_blank" rel="noopener">
+          <span class="presse-logo">
+<?php if ($item['logo'] !== ''): ?>
+            <img src="<?= e($item['logo']) ?>" alt="<?= e($item['media']) ?>" loading="lazy">
+<?php else: ?>
+            <span class="presse-logo-text"><?= e($item['media']) ?></span>
+<?php endif; ?>
+          </span>
+<?php if ($item['date'] !== ''): ?>
+          <span class="actu-date"><?= e(date_fr($item['date'])) ?></span>
+<?php endif; ?>
+          <span class="presse-titre"><?= e($item['titre']) ?></span>
+          <span class="presse-lire">Lire l’article <span class="presse-arrow" aria-hidden="true">↗</span></span>
+        </a>
+      </li>
+<?php endforeach; ?>
+    </ul>
   </div>
 </section>
 

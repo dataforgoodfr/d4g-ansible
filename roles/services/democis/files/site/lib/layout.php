@@ -234,8 +234,10 @@ function layout_actus_home(array $actus): void
 }
 
 /**
- * Section « On en parle » de l'accueil : un article de presse par carte,
- * logo du média en tête. Rien n'est affiché tant que la liste est vide.
+ * Section « On en parle » de l'accueil : une liste de médias, chaque logo
+ * menant à l'article. Le titre de l'article n'apparaît qu'en infobulle (les
+ * articles sont souvent payants : c'est le média qui compte). Rien n'est
+ * affiché tant que la liste est vide.
  */
 function layout_presse_home(array $items): void
 {
@@ -251,9 +253,11 @@ function layout_presse_home(array $items): void
       <h2 class="title sub-title">Ils parlent de la Convention.</h2>
     </div>
     <ul class="presse-list reveal-stagger">
-<?php foreach ($items as $item): ?>
+<?php foreach ($items as $item):
+    $label = 'Lire l’article de ' . $item['media'] . ($item['titre'] !== '' ? ' : ' . $item['titre'] : '');
+?>
       <li>
-        <a class="presse-card" href="<?= e($item['url']) ?>" target="_blank" rel="noopener">
+        <a class="presse-card" href="<?= e($item['url']) ?>" target="_blank" rel="noopener" title="<?= e($label) ?>" aria-label="<?= e($label) ?>">
           <span class="presse-logo">
 <?php if ($item['logo'] !== ''): ?>
             <img src="<?= e($item['logo']) ?>" alt="<?= e($item['media']) ?>" loading="lazy">
@@ -261,11 +265,7 @@ function layout_presse_home(array $items): void
             <span class="presse-logo-text"><?= e($item['media']) ?></span>
 <?php endif; ?>
           </span>
-<?php if ($item['date'] !== ''): ?>
-          <span class="actu-date"><?= e(date_fr($item['date'])) ?></span>
-<?php endif; ?>
-          <span class="presse-titre"><?= e($item['titre']) ?></span>
-          <span class="presse-lire">Lire l’article <span class="presse-arrow" aria-hidden="true">↗</span></span>
+          <span class="presse-lire" aria-hidden="true">Lire l’article <span class="presse-arrow" aria-hidden="true">↗</span></span>
         </a>
       </li>
 <?php endforeach; ?>

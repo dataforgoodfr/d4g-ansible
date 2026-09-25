@@ -67,8 +67,10 @@ admin_page_start('On en parle');
         <span class="admin-presse-nologo"><?= e($item['media']) ?></span>
 <?php endif; ?>
         <div class="admin-row-info">
-          <div class="admin-row-date"><?= e($item['media']) ?><?= $item['date'] !== '' ? ' · ' . e(date_fr($item['date'])) : '' ?></div>
-          <div class="admin-row-title"><?= e($item['titre']) ?></div>
+          <div class="admin-row-title"><?= e($item['media']) ?></div>
+<?php if ($item['titre'] !== ''): ?>
+          <div class="admin-row-sub"><?= e($item['titre']) ?></div>
+<?php endif; ?>
         </div>
         <div class="admin-row-actions">
           <a href="<?= e($item['url']) ?>" class="btn secondary" target="_blank" rel="noopener">Voir</a>

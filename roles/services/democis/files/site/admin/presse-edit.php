@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST === [] && $_FILES === [] && 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     admin_require_csrf();
 
-    foreach (['media', 'titre', 'url', 'date'] as $field) {
+    foreach (['media', 'titre', 'url'] as $field) {
         $form[$field] = trim((string) ($_POST[$field] ?? ''));
     }
 
@@ -38,19 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST === [] && $_FILES === [] && 
     } elseif (mb_strlen($form['media']) > 80) {
         $errors[] = 'Le nom du média ne doit pas dépasser 80 caractères.';
     }
-    if ($form['titre'] === '') {
-        $errors[] = 'Le titre de l’article est obligatoire.';
-    } elseif (mb_strlen($form['titre']) > 300) {
+    if (mb_strlen($form['titre']) > 300) {
         $errors[] = 'Le titre ne doit pas dépasser 300 caractères.';
     }
     if (!presse_url_is_valid($form['url'])) {
         $errors[] = 'Le lien de l’article doit être une adresse web complète (https://…).';
-    }
-    if ($form['date'] !== '') {
-        $d = DateTime::createFromFormat('Y-m-d', $form['date']);
-        if ($d === false || $d->format('Y-m-d') !== $form['date']) {
-            $errors[] = 'La date est invalide.';
-        }
     }
     [$logo_ext, $logo_error] = admin_check_image_upload($_FILES['logo'] ?? [], 'le logo');
     if ($logo_error !== null) {
@@ -111,12 +103,13 @@ admin_page_start($is_new ? 'Nouvel article' : 'Modifier un article');
       <div class="admin-field">
         <label for="media">Média</label>
         <input type="text" id="media" name="media" required maxlength="80" placeholder="Le Monde" value="<?= e($form['media']) ?>">
-        <div class="hint">Affiché à la place du logo s’il n’y en a pas, et comme texte alternatif du logo.</div>
+        <div class="hint">Affiché à la place du logo s’il n’y en a pas.</div>
       </div>
 
       <div class="admin-field">
         <label for="titre">Titre de l’article</label>
-        <input type="text" id="titre" name="titre" required maxlength="300" value="<?= e($form['titre']) ?>">
+        <input type="text" id="titre" name="titre" maxlength="300" value="<?= e($form['titre']) ?>">
+        <div class="hint">Facultatif et non affiché sur la page : il apparaît seulement en infobulle au survol du logo, et vous aide à vous repérer dans cette liste.</div>
       </div>
 
       <div class="admin-field">
@@ -125,15 +118,9 @@ admin_page_start($is_new ? 'Nouvel article' : 'Modifier un article');
       </div>
 
       <div class="admin-field">
-        <label for="date">Date de parution</label>
-        <input type="date" id="date" name="date" value="<?= e($form['date']) ?>">
-        <div class="hint">Facultative.</div>
-      </div>
-
-      <div class="admin-field">
         <label for="logo">Logo du média</label>
         <input type="file" id="logo" name="logo" accept="image/png,image/webp,image/jpeg">
-        <div class="hint">PNG ou WebP à fond transparent de préférence (JPEG accepté), en couleur, recadré au plus près du logo.</div>
+        <div class="hint">C’est lui qui est affiché sur la page. PNG ou WebP à fond transparent de préférence (JPEG accepté), en couleur, recadré au plus près du logo.</div>
 <?php if (!$is_new && $item['logo'] !== ''): ?>
         <div class="admin-current-image">
           <img src="../<?= e($item['logo']) ?>" alt="" style="max-height:48px;">

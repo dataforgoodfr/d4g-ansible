@@ -211,3 +211,4 @@ body {
 }
 .admin-order button:hover:not(:disabled) { background: var(--gris-clair); }
 .admin-order button:disabled { opacity: 0.3; cursor: default; }
+.admin-row-sub { font-size: 13px; color: var(--encre-doux); margin-top: 2px; }

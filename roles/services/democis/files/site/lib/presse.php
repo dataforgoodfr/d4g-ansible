@@ -5,6 +5,8 @@
  *
  * Tout tient dans actus/presse/presse.json, dans l'ordre d'affichage :
  *   [{id, media, titre, url, date (AAAA-MM-JJ ou vide), logo}, …]
+ * Seuls le logo (ou à défaut le nom du média) et le lien sont affichés ; le
+ * titre sert d'infobulle, la date n'est plus saisie (gardée pour mémoire).
  * logo est un chemin relatif à la racine du site : un logo envoyé depuis le
  * back-office (actus/presse/logo-<id>.<ext>) ou un logo livré avec le site
  * (images/presse/…).

@@ -26,15 +26,19 @@ echo '<?xml version="1.0" encoding="UTF-8"?>', "\n";
   <lastBuildDate><?= x(date_rss($actus[0]['date'] ?? date('Y-m-d'))) ?></lastBuildDate>
 <?php foreach ($actus as $actu):
     $link = $base . '/actualites.php?actu=' . rawurlencode($actu['slug']);
-    $image = $actu['image_url'] ? __DIR__ . '/' . $actu['image_url'] : null;
+    $image = $actu['image'] ? __DIR__ . '/' . $actu['image_url'] : null;
+    $html = texte_to_html($actu['texte']);
+    if ($actu['youtube_id'] !== null) {
+        $html = '<p><a href="' . x('https://www.youtube.com/watch?v=' . $actu['youtube_id']) . '">Voir la vidéo sur YouTube</a></p>' . "\n" . $html;
+    }
 ?>
   <item>
     <title><?= x($actu['titre']) ?></title>
     <link><?= x($link) ?></link>
     <guid isPermaLink="true"><?= x($link) ?></guid>
     <pubDate><?= x(date_rss($actu['date'])) ?></pubDate>
-    <description><?= x(actu_excerpt($actu['texte'])) ?></description>
-    <content:encoded><![CDATA[<?= str_replace(']]>', ']]]]><![CDATA[>', texte_to_html($actu['texte'])) ?>]]></content:encoded>
+    <description><?= x(actu_excerpt($actu['texte']) ?: 'Vidéo : ' . $actu['titre']) ?></description>
+    <content:encoded><![CDATA[<?= str_replace(']]>', ']]]]><![CDATA[>', $html) ?>]]></content:encoded>
 <?php if ($image !== null && is_file($image)): ?>
     <enclosure url="<?= x($base . '/' . $actu['image_url']) ?>" length="<?= filesize($image) ?>" type="<?= x((string) mime_content_type($image)) ?>" />
 <?php endif; ?>

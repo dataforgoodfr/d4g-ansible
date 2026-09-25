@@ -3,8 +3,11 @@
  * Actualités : stockage et helpers partagés par le site public et le back-office.
  *
  * Chaque actualité vit dans son propre dossier actus/data/<slug>/ :
- *   - actu.json   : titre, date (AAAA-MM-JJ), texte brut, image, à la une
+ *   - actu.json   : titre, date (AAAA-MM-JJ), texte brut, à la une, lien YouTube
  *   - photo.<ext> : la photo (facultative)
+ *   - video-<id>-<n>.jpg : miniature de la vidéo YouTube (n = image choisie,
+ *     voir VIDEO_FRAMES), téléchargée par le back-office ; sert de vignette
+ *     quand il n'y a pas de photo
  * Le slug (<date>-<titre-simplifié>) est fixé à la création : il sert de lien
  * de partage (?actu=<slug>) et ne doit donc plus changer ensuite.
  *
@@ -16,6 +19,9 @@ const ACTUS_DATA_DIR = __DIR__ . '/../actus/data';
 const ACTUS_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
 const ACTUS_HOME_SECONDARY = 3;
 const ACTUS_EXCERPT_LENGTH = 160;
+/** Images proposées par YouTube pour la miniature, prises vers 25, 50 et 75 % de la vidéo. */
+const VIDEO_FRAMES = [1 => 'début', 2 => 'milieu', 3 => 'fin'];
+const VIDEO_FRAME_DEFAULT = 2;
 
 const SITE_NAME = 'Convention Citoyenne pour la Démocratie';
 const SITE_DESCRIPTION = 'Convention Citoyenne pour la Démocratie. Près de 80 citoyens, parlementaires et membres de la société civile délibèrent à Lille pour répondre à la crise démocratique avant l’élection présidentielle de 2027.';
@@ -81,6 +87,27 @@ function actu_new_slug(string $date, string $titre): string
     return $slug;
 }
 
+/**
+ * Identifiant d'une vidéo YouTube (11 caractères) à partir d'un lien collé
+ * depuis YouTube : youtube.com/shorts/…, watch?v=…, youtu.be/…, embed/…
+ * Un identifiant seul est aussi accepté. Retourne null si non reconnu.
+ */
+function youtube_id_from_url(string $url): ?string
+{
+    $url = trim($url);
+    if (preg_match('/^[A-Za-z0-9_-]{11}$/', $url)) {
+        return $url;
+    }
+    $pattern = '~^(?:https?://)?(?:(?:www|m)\.)?(?:youtube\.com/(?:shorts/|embed/|live/|watch\?(?:.*&)?v=)|youtu\.be/)([A-Za-z0-9_-]{11})(?:[?&#/].*)?$~';
+    return preg_match($pattern, $url, $m) ? $m[1] : null;
+}
+
+/** Nom du fichier de la miniature téléchargée pour une vidéo YouTube. */
+function actu_video_thumb_name(string $youtube_id, int $frame): string
+{
+    return 'video-' . $youtube_id . '-' . $frame . '.jpg';
+}
+
 /** Nom du fichier photo présent dans le dossier, ou null. */
 function actu_find_image(string $slug): ?string
 {
@@ -94,7 +121,11 @@ function actu_find_image(string $slug): ?string
 
 /**
  * Charge une actualité. Retourne null si le slug est invalide ou inconnu.
- * Le tableau contient toujours : slug, titre, date, texte, une, image, image_url.
+ * Le tableau contient toujours : slug, titre, date, texte, une, video (lien
+ * YouTube tel que saisi), youtube_id, video_frame, youtube_short, photo (envoyée), image
+ * (fichier local de la vignette), image_url, image_vertical.
+ * Sans photo, une actu vidéo prend la miniature téléchargée, à défaut celle
+ * servie par YouTube. image_vertical signale une vignette en portrait.
  */
 function actu_load(string $slug): ?array
 {
@@ -109,15 +140,37 @@ function actu_load(string $slug): ?array
     if (!is_array($data)) {
         return null;
     }
-    $image = actu_find_image($slug);
+    $photo = actu_find_image($slug);
+    $image = $photo;
+    $video = (string) ($data['video'] ?? '');
+    $youtube_id = $video === '' ? null : youtube_id_from_url($video);
+    $video_frame = (int) ($data['video_frame'] ?? VIDEO_FRAME_DEFAULT);
+    if (!isset(VIDEO_FRAMES[$video_frame])) {
+        $video_frame = VIDEO_FRAME_DEFAULT;
+    }
+    if ($image === null && $youtube_id !== null && is_file(actu_dir($slug) . '/' . actu_video_thumb_name($youtube_id, $video_frame))) {
+        $image = actu_video_thumb_name($youtube_id, $video_frame);
+    }
+    $image_url = $image ? 'actus/data/' . $slug . '/' . $image : null;
+    if ($image_url === null && $youtube_id !== null) {
+        $image_url = 'https://i.ytimg.com/vi/' . $youtube_id . '/hq' . $video_frame . '.jpg';
+    }
+    $size = $image ? @getimagesize(actu_dir($slug) . '/' . $image) : false;
     return [
         'slug' => $slug,
         'titre' => (string) ($data['titre'] ?? ''),
         'date' => (string) ($data['date'] ?? ''),
         'texte' => (string) ($data['texte'] ?? ''),
         'une' => (bool) ($data['une'] ?? false),
+        'video' => $video,
+        'youtube_id' => $youtube_id,
+        'video_frame' => $video_frame,
+        // Un lien /shorts/ est lu au format vertical dans la pop-in.
+        'youtube_short' => $youtube_id !== null && str_contains($video, '/shorts/'),
+        'photo' => $photo,
         'image' => $image,
-        'image_url' => $image ? 'actus/data/' . $slug . '/' . $image : null,
+        'image_url' => $image_url,
+        'image_vertical' => $size !== false && $size[1] > $size[0],
     ];
 }
 
@@ -158,6 +211,8 @@ function actu_save(string $slug, array $data): void
         'date' => (string) $data['date'],
         'texte' => (string) $data['texte'],
         'une' => (bool) $data['une'],
+        'video' => (string) ($data['video'] ?? ''),
+        'video_frame' => (int) ($data['video_frame'] ?? VIDEO_FRAME_DEFAULT),
     ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (file_put_contents($dir . '/actu.json', $json . "\n", LOCK_EX) === false) {
         throw new RuntimeException('Impossible d’enregistrer l’actualité');
@@ -262,6 +317,16 @@ function texte_to_html(string $texte): string
     return $html;
 }
 
+/** URL absolue d'une image d'actu (photo locale ou miniature YouTube). */
+function actu_absolute_image_url(array $actu): ?string
+{
+    $url = $actu['image_url'];
+    if ($url === null || str_starts_with($url, 'https://')) {
+        return $url;
+    }
+    return site_url() . '/' . $url;
+}
+
 /** Représentation d'une actu pour get-actu.php (la pop-in). */
 function actu_to_json(array $actu): array
 {
@@ -270,6 +335,8 @@ function actu_to_json(array $actu): array
         'date' => $actu['date'],
         'date_formatee' => date_fr($actu['date']),
         'image_url' => $actu['image_url'],
+        'youtube_id' => $actu['youtube_id'],
+        'youtube_short' => $actu['youtube_short'],
         'texte_html' => texte_to_html($actu['texte']),
     ];
 }

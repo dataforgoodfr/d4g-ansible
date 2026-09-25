@@ -111,6 +111,7 @@ body {
 .admin-field label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
 .admin-field .hint { font-size: 12px; color: var(--encre-doux); margin-top: 6px; }
 .admin-field input[type="text"],
+.admin-field input[type="url"],
 .admin-field input[type="date"],
 .admin-field input[type="password"],
 .admin-field textarea {
@@ -123,6 +124,26 @@ body {
 }
 .admin-field textarea { min-height: 220px; resize: vertical; }
 .admin-current-image { margin-top: 10px; }
+
+/* Choix de la miniature d'une vidéo YouTube. */
+.admin-video-frames { border: none; padding: 0; margin: 16px 0 0; }
+.admin-video-frames legend { font-weight: 600; font-size: 14px; margin-bottom: 8px; padding: 0; }
+.admin-video-frames-list { display: flex; gap: 12px; flex-wrap: wrap; }
+.admin-video-frames-list label { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-weight: 400; margin: 0; }
+.admin-video-frames-list input { position: absolute; opacity: 0; }
+.admin-video-frames-list img {
+  width: 160px;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 3px solid transparent;
+  background: var(--gris);
+}
+/* Short : les miniatures YouTube sont en 4:3 avec la vidéo verticale au centre. */
+.admin-video-frames-list.is-short img { width: 110px; aspect-ratio: 9/16; }
+.admin-video-frames-list input:checked + img { border-color: var(--rouge); }
+.admin-video-frames-list input:focus-visible + img { outline: 2px solid var(--encre); outline-offset: 2px; }
+.admin-video-frames-list span { font-size: 13px; }
 .admin-current-image img { max-width: 200px; border-radius: 4px; display: block; }
 
 .admin-field-checkbox {

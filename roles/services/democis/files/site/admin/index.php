@@ -55,7 +55,7 @@ admin_page_start('Actualités');
 <?php foreach ($actus as $actu): ?>
       <div class="admin-row">
 <?php if ($actu['image_url']): ?>
-        <img src="../<?= e($actu['image_url']) ?>" alt="">
+        <img src="<?= e($actu['image'] ? '../' . $actu['image_url'] : $actu['image_url']) ?>" alt="">
 <?php else: ?>
         <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
 <?php endif; ?>

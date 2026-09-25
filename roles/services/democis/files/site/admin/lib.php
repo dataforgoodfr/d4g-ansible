@@ -164,6 +164,42 @@ function admin_remove_image(string $slug): void
     }
 }
 
+/**
+ * Télécharge la miniature de la vidéo dans le dossier de l'actu
+ * (video-<id>-<n>.jpg) et supprime les précédentes. On essaie d'abord la
+ * miniature verticale d'un Short (oar<n>), puis les miniatures 16:9 et 4:3.
+ * Sans accès à YouTube, le site se rabat sur la miniature servie par YouTube.
+ */
+function admin_sync_video_thumb(string $slug, ?string $youtube_id, int $frame): void
+{
+    $keep = $youtube_id !== null ? actu_video_thumb_name($youtube_id, $frame) : null;
+    foreach (glob(actu_dir($slug) . '/video-*.jpg') ?: [] as $path) {
+        if (basename($path) !== $keep) {
+            unlink($path);
+        }
+    }
+    if ($keep === null || is_file(actu_dir($slug) . '/' . $keep)) {
+        return;
+    }
+    $context = stream_context_create(['http' => ['timeout' => 5, 'ignore_errors' => true]]);
+    foreach (['oar', 'maxres', 'hq'] as $prefix) {
+        $variant = $prefix . $frame;
+        $url = 'https://i.ytimg.com/vi/' . $youtube_id . '/' . $variant . '.jpg';
+        $data = @file_get_contents($url, false, $context);
+        $status = $http_response_header[0] ?? '';
+        // YouTube répond 404 avec une image grise de 120×90 quand la variante n'existe pas.
+        if ($data === false || !str_contains($status, ' 200')) {
+            continue;
+        }
+        $size = @getimagesizefromstring($data);
+        if ($size === false || $size[2] !== IMAGETYPE_JPEG || $size[0] <= 120) {
+            continue;
+        }
+        file_put_contents(actu_dir($slug) . '/' . $keep, $data, LOCK_EX);
+        return;
+    }
+}
+
 /* ------------------------------------------------------------------------
    Gabarit
    ------------------------------------------------------------------------ */

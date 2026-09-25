@@ -327,7 +327,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
           <a href="https://www.linkedin.com/company/convention-citoyenne-pour-la-d%C3%A9mocratie/" target="_blank" rel="noopener">LinkedIn</a>
           <a href="https://www.instagram.com/conventioncitoyennedemocratie/" target="_blank" rel="noopener">Instagram</a>
           <a href="https://x.com/ConventionC_" target="_blank" rel="noopener">X / Twitter</a>
-          <a href="https://www.facebook.com/profile.php?id=61590648778446" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://www.facebook.com/ConventionCitoyenneDemocratie" target="_blank" rel="noopener">Facebook</a>
       </div>
     </div>
     <!-- =====================================================

@@ -1549,3 +1549,387 @@ body.modal-open { overflow: hidden; }
   color: var(--bleu);
   border-bottom-color: var(--bleu);
 }
+
+/* =========================================================================
+   PAGE : LES CITOYEN.NES (les-citoyens.php)
+   Composition du panel tiré au sort. Les animations se déclenchent quand
+   un élément .reveal reçoit .in-view (assets/site.js).
+   ========================================================================= */
+.page-citoyens { --accent: var(--rouge); }
+
+/* Chiffre surligné au marqueur, dans la couleur d'accent de la section */
+.cit-hl {
+  padding: 0 0.06em;
+  background-image: linear-gradient(color-mix(in srgb, var(--accent) 30%, transparent), color-mix(in srgb, var(--accent) 30%, transparent));
+  background-repeat: no-repeat;
+  background-position: 0 74%;
+  background-size: 100% 0.42em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+@keyframes citHl { from { background-size: 0% 0.42em; } }
+
+/* ---------- En-tête ---------- */
+.cit-hero { padding-bottom: 24px; }
+.cit-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 1fr);
+  gap: clamp(40px, 6vw, 96px);
+  align-items: center;
+}
+.cit-hero .section-title { margin-bottom: 24px; }
+.cit-hero .cit-hl { animation: citHl 1s var(--ease) 0.5s both; }
+.cit-hero .lead { max-width: 520px; }
+.cit-hero-glyphs { display: flex; justify-content: flex-end; }
+.cit-glyphs-hero { width: 100%; max-width: 480px; }
+
+.cit-intro { padding-top: 48px; }
+
+/* ---------- Pictogrammes « personne » ---------- */
+.cit-glyphs {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  color: var(--accent);
+  overflow: visible;
+}
+.cit-glyph { transform-box: fill-box; transform-origin: center; }
+.cit-glyph.c-rouge { color: var(--rouge); }
+.cit-glyph.c-bleu { color: var(--bleu); }
+.cit-glyph.c-encre { color: var(--encre); }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal:not(.in-view) .cit-glyph { opacity: 0; }
+  .reveal.in-view .cit-glyph {
+    animation: citGlyphIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 0ms) both;
+  }
+  .reveal:not(.in-view) .cit-hl { background-size: 0% 0.42em; }
+  .reveal.in-view .cit-hl { animation: citHl 0.9s var(--ease) 0.25s both; }
+}
+@keyframes citGlyphIn {
+  from { opacity: 0; transform: scale(0.2); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Sommaire collant ---------- */
+.cit-sommaire {
+  position: sticky;
+  top: 81px; /* hauteur de la nav dans son état « scrolled » */
+  z-index: 50;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--gris);
+  border-bottom: 1px solid var(--gris);
+  padding: 12px 0;
+}
+.cit-sommaire .wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.cit-sommaire-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gris-fonce);
+  white-space: nowrap;
+}
+.cit-sommaire ul {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Garde la place de l'outline de focus, rognée sinon par l'overflow. */
+  padding: 4px;
+  margin: -4px;
+}
+.cit-sommaire ul::-webkit-scrollbar { display: none; }
+.cit-sommaire a {
+  display: block;
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--encre-doux);
+  padding: 7px 14px;
+  border: 1px solid var(--gris);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+.cit-sommaire a:hover { color: var(--rouge); border-color: var(--rouge); }
+.cit-sommaire a.active { color: var(--blanc); background: var(--rouge); border-color: var(--rouge); }
+@media (max-width: 880px) {
+  .cit-sommaire-label { display: none; }
+}
+
+/* ---------- Sections de critère ---------- */
+.cit-section {
+  padding: var(--actus-gap) 0;
+  scroll-margin-top: 140px;
+}
+.cit-section + .cit-section { border-top: 1px solid #c7c7c5; }
+.cit-section-header { margin-bottom: 40px; max-width: 680px; }
+.cit-section-num {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.cit-section-header .sub-title { font-size: clamp(28px, 3.4vw, 42px); }
+.cit-section-intro {
+  margin-top: 14px;
+  color: var(--encre-doux);
+  font-size: 17px;
+}
+
+/* ---------- Lignes « chiffre | pictogrammes » ---------- */
+.cit-rows { border-bottom: 1px solid var(--gris); }
+.cit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px 48px;
+  align-items: center;
+  padding: 28px 0;
+  border-top: 1px solid var(--gris);
+}
+.cit-row-text,
+.cit-zones-item,
+.cit-opinion-legend li {
+  display: grid;
+  grid-template-columns: clamp(64px, 7vw, 88px) minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: baseline;
+}
+.cit-num {
+  grid-row: span 2;
+  font-family: var(--font-title);
+  font-size: clamp(40px, 4.4vw, 56px);
+  line-height: 1;
+  color: var(--encre);
+  font-feature-settings: "tnum";
+}
+.cit-label {
+  font-family: var(--font-title);
+  font-size: clamp(18px, 1.6vw, 21px);
+  line-height: 1.25;
+  color: var(--encre);
+}
+.cit-pct {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--gris-fonce);
+}
+.cit-row .cit-glyphs { justify-self: end; }
+@media (max-width: 720px) {
+  .cit-row { grid-template-columns: 1fr; gap: 18px; padding: 24px 0; }
+  .cit-row .cit-glyphs { justify-self: start; }
+}
+
+/* ---------- Carte des zones ---------- */
+.cit-carte {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+.cit-carte-svg { width: 100%; height: auto; overflow: visible; }
+.cit-zone {
+  fill: color-mix(in srgb, var(--accent) 14%, var(--blanc));
+  stroke: var(--blanc);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  transition: fill 0.3s var(--ease);
+}
+.cit-zone.is-hot { fill: color-mix(in srgb, var(--accent) 38%, var(--blanc)); }
+.cit-pastille { pointer-events: none; transform-box: fill-box; transform-origin: center; }
+.cit-pastille circle { fill: var(--accent); stroke: var(--blanc); stroke-width: 3; }
+.cit-pastille text {
+  font-family: var(--font-title);
+  font-size: 26px;
+  fill: var(--blanc);
+}
+.cit-pastille.is-hot circle { fill: var(--encre); }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal:not(.in-view) .cit-zone { opacity: 0; }
+  .reveal.in-view .cit-zone { animation: citFadeIn 0.8s var(--ease) both; }
+  .reveal:not(.in-view) .cit-pastille { opacity: 0; }
+  .reveal.in-view .cit-pastille {
+    animation: citGlyphIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--d) + 300ms) both;
+  }
+}
+@keyframes citFadeIn { from { opacity: 0; } }
+.cit-zones { border-bottom: 1px solid var(--gris); }
+.cit-zones-item {
+  padding: 16px 12px;
+  border-top: 1px solid var(--gris);
+  cursor: default;
+  transition: background 0.2s var(--ease);
+}
+.cit-zones-item.is-hot { background: color-mix(in srgb, var(--accent) 10%, var(--blanc)); }
+.cit-zones-item .cit-num { font-size: clamp(32px, 3.4vw, 44px); }
+@media (max-width: 880px) {
+  .cit-carte { grid-template-columns: 1fr; }
+  .cit-carte-svg { max-width: 520px; margin: 0 auto; }
+}
+
+/* ---------- Encadré QPV ---------- */
+.cit-callout {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px 28px;
+  flex-wrap: wrap;
+  background: var(--encre);
+  color: var(--blanc);
+  padding: 28px 36px;
+}
+.cit-callout-num {
+  font-family: var(--font-title);
+  font-size: clamp(44px, 5vw, 64px);
+  line-height: 1;
+  color: var(--rouge);
+}
+.cit-callout p {
+  flex: 1 1 280px;
+  font-size: 18px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.92);
+  max-width: 560px;
+}
+
+/* ---------- Liste dépliable des situations professionnelles ---------- */
+.cit-metiers { margin-top: 40px; }
+.cit-metiers summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 22px;
+  border: 1.5px solid var(--encre);
+  font-family: var(--font-tech);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--encre);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.cit-metiers summary::-webkit-details-marker { display: none; }
+.cit-metiers summary:hover { background: var(--encre); color: var(--blanc); }
+.cit-metiers-icon {
+  position: relative;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s var(--ease);
+}
+.cit-metiers-icon::before,
+.cit-metiers-icon::after {
+  content: '';
+  position: absolute;
+  background: currentColor;
+  left: 0; right: 0; top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+}
+.cit-metiers-icon::after { transform: rotate(90deg); }
+.cit-metiers[open] .cit-metiers-icon { transform: rotate(45deg); }
+.cit-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+.cit-chips li {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--encre);
+  padding: 8px 14px;
+  border: 1px solid var(--gris);
+  background: var(--blanc);
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.cit-chips li:hover { border-color: var(--accent); color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) {
+  .cit-metiers[open] .cit-chips li {
+    animation: citChipIn 0.45s var(--ease) calc(var(--i) * 22ms) both;
+  }
+}
+@keyframes citChipIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+}
+
+/* ---------- Intérêt pour la politique : barre divergente ---------- */
+.cit-opinion {
+  --o1: var(--bleu);
+  --o2: color-mix(in srgb, var(--bleu) 45%, var(--blanc));
+  --o3: color-mix(in srgb, var(--rouge) 45%, var(--blanc));
+  --o4: var(--rouge);
+}
+.cit-opinion-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.cit-opinion-axis span:first-child { color: var(--bleu); }
+.cit-opinion-axis span:last-child { color: var(--rouge); }
+.cit-opinion-bar {
+  position: relative;
+  display: flex;
+  gap: 3px;
+  height: clamp(44px, 6vw, 64px);
+}
+/* Repère central : la frontière entre « non » et « oui » */
+.cit-opinion-bar::after {
+  content: '';
+  position: absolute;
+  top: -10px; bottom: -10px;
+  left: calc(var(--non) - 1px);
+  width: 2px;
+  background: var(--encre);
+}
+.cit-opinion-seg { flex-basis: 0; }
+.cit-opinion-seg.non { transform-origin: right center; }
+.cit-opinion-seg.oui { transform-origin: left center; }
+.o1 { background: var(--o1); }
+.o2 { background: var(--o2); }
+.o3 { background: var(--o3); }
+.o4 { background: var(--o4); }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal:not(.in-view) .cit-opinion-seg { transform: scaleX(0); }
+  .reveal.in-view .cit-opinion-seg {
+    animation: citBarIn 0.8s var(--ease) calc(var(--d) + 200ms) both;
+  }
+}
+@keyframes citBarIn { from { transform: scaleX(0); } }
+.cit-opinion-legend {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.cit-opinion-legend li {
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: 20px;
+  border-top: 1px solid var(--gris);
+}
+.cit-opinion-legend .cit-swatch {
+  width: 28px;
+  height: 8px;
+  margin-bottom: 14px;
+}
+.cit-opinion-legend .cit-num { grid-row: auto; margin-bottom: 6px; }
+@media (max-width: 720px) {
+  .cit-opinion-legend { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 880px) {
+  .cit-hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .cit-hero-glyphs { justify-content: flex-start; }
+}

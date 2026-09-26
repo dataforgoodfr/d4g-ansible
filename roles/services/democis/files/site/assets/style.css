@@ -534,6 +534,59 @@ p.lead {
 .panel-card-label,
 .panel-card-desc { overflow-wrap: break-word; }
 
+/* CTA vers la page « Les citoyen.nes » (les pictogrammes sont ceux de cette
+   page : ils apparaissent quand le bloc .reveal parent entre dans l'écran). */
+.cta-citoyens {
+  --accent: var(--rouge);
+  margin-top: 36px;
+  max-width: 460px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px 20px;
+  align-items: center;
+  background: var(--blanc);
+  padding: 24px 28px;
+  border-left: 3px solid var(--rouge);
+  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.cta-citoyens:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -20px rgba(0,0,0,0.18);
+}
+.cta-citoyens .cit-glyphs { grid-column: 1 / -1; width: 180px; }
+.cta-citoyens-text { display: block; }
+.cta-citoyens-title {
+  display: block;
+  font-family: var(--font-title);
+  font-size: 21px;
+  line-height: 1.2;
+  color: var(--encre);
+  transition: color 0.2s var(--ease);
+}
+.cta-citoyens-sub {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--encre-doux);
+}
+.cta-citoyens-arrow {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rouge);
+  color: var(--blanc);
+  font-family: var(--font-tech);
+  font-size: 18px;
+  transition: transform 0.3s var(--ease), background 0.2s var(--ease);
+}
+.cta-citoyens:hover .cta-citoyens-title { color: var(--rouge); }
+.cta-citoyens:hover .cta-citoyens-arrow { transform: translateX(4px); background: #c52f31; }
+
 @media (max-width: 880px) {
   .panel-grid { grid-template-columns: 1fr; gap: 48px; }
   .panel-card { padding: 28px 24px; gap: 20px; }

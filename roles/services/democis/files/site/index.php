@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/lib/layout.php';
+require_once __DIR__ . '/lib/citoyens.php';
 
 $actus = actus_load_all();
 // Lien partagé (?actu=<slug>) : la pop-in s'ouvre au chargement (assets/actus.js)
@@ -25,6 +26,8 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
 </head>
 
 <body>
+
+<?php citoyens_glyph_symbol(); ?>
 
 <!-- ============================ NAV ============================ -->
 <?php layout_nav(true); ?>
@@ -128,6 +131,14 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
         <span class="eyebrow bleu">Le panel</span>
         <h2 class="title section-title">Trois groupes, une même table.</h2>
         <p>Le panel mixte de la Convention rassemble des expériences qui se croisent peu dans le débat public. Cette composition permet de construire des recommandations légitimes et largement appropriables.</p>
+        <a href="les-citoyens.php" class="cta-citoyens">
+          <?= citoyens_glyphs(8, 'cta-home', 8, ['rouge', 'bleu', 'encre', 'rouge', 'bleu', 'rouge', 'encre', 'bleu']) ?>
+          <span class="cta-citoyens-text">
+            <span class="cta-citoyens-title">Qui sont les citoyen.nes tiré.es au sort&nbsp;?</span>
+            <span class="cta-citoyens-sub">Âge, genre, territoire, profession…</span>
+          </span>
+          <span class="cta-citoyens-arrow" aria-hidden="true">→</span>
+        </a>
         <div style="margin-top: 32px;">
           <a href="#calendrier" class="btn-link">Voir comment ces groupes se rencontrent →</a>
         </div>

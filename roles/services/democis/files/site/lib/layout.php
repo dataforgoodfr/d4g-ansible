@@ -38,9 +38,10 @@ function layout_og_tags(string $title, string $description, string $url, ?array 
 /**
  * Barre de navigation. Sur l'accueil les liens sont des ancres ; ailleurs ils
  * renvoient vers l'accueil et la nav est affichée d'emblée dans son état
- * « scrolled » (fond blanc), faute de hero derrière elle.
+ * « scrolled » (fond blanc), faute de hero derrière elle. $active désigne
+ * l'ancre surlignée sur ces autres pages (ex. '#actualites').
  */
-function layout_nav(bool $is_home): void
+function layout_nav(bool $is_home, ?string $active = null): void
 {
     $home = $is_home ? '' : './';
     $links = [
@@ -58,7 +59,7 @@ function layout_nav(bool $is_home): void
   </a>
   <div class="nav-links">
 <?php foreach ($links as $anchor => $label): ?>
-    <a href="<?= $home . $anchor ?>"<?= (!$is_home && $anchor === '#actualites') ? ' class="active"' : '' ?>><?= $label ?></a>
+    <a href="<?= $home . $anchor ?>"<?= (!$is_home && $anchor === $active) ? ' class="active"' : '' ?>><?= $label ?></a>
 <?php endforeach; ?>
     <a href="<?= $home ?>#newsletter" class="nav-cta">Suivre</a>
   </div>

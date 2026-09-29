@@ -27,7 +27,7 @@ $page_description = 'Toutes les actualités de la Convention Citoyenne pour la D
 <body>
 
 <!-- ============================ NAV ============================ -->
-<?php layout_nav(false); ?>
+<?php layout_nav(false, '#actualites'); ?>
 
 <!-- ============================ EN-TÊTE DE PAGE ============================ -->
 <header class="page-header">

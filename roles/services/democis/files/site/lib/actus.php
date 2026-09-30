@@ -24,7 +24,7 @@ const VIDEO_FRAMES = [1 => 'début', 2 => 'milieu', 3 => 'fin'];
 const VIDEO_FRAME_DEFAULT = 2;
 
 const SITE_NAME = 'Convention Citoyenne pour la Démocratie';
-const SITE_DESCRIPTION = 'Convention Citoyenne pour la Démocratie. Près de 80 citoyens, parlementaires et membres de la société civile délibèrent à Lille pour répondre à la crise démocratique avant l’élection présidentielle de 2027.';
+const SITE_DESCRIPTION = 'Convention Citoyenne pour la Démocratie. Près de 70 citoyens, parlementaires et membres de la société civile délibèrent à Lille pour répondre à la crise démocratique avant l’élection présidentielle de 2027.';
 
 /** Échappement HTML court, utilisé partout dans les templates. */
 function e(?string $s): string

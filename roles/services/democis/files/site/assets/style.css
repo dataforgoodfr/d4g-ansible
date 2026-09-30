@@ -1638,6 +1638,23 @@ body.modal-open { overflow: hidden; }
 
 .cit-intro { padding-top: 48px; }
 
+/* Photo de groupe, entre l'introduction et le sommaire */
+.cit-photo { margin-top: 56px; }
+.cit-photo img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1696 / 1152;
+  object-fit: cover;
+}
+.cit-photo figcaption {
+  margin-top: 12px;
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gris-fonce);
+}
+
 /* ---------- Pictogrammes « personne » ---------- */
 .cit-glyphs {
   display: block;
@@ -1831,23 +1848,23 @@ body.modal-open { overflow: hidden; }
   margin-top: 40px;
   display: flex;
   align-items: center;
-  gap: 16px 28px;
+  gap: 12px 24px;
   flex-wrap: wrap;
-  background: var(--encre);
-  color: var(--blanc);
-  padding: 28px 36px;
+  background: color-mix(in srgb, var(--accent) 7%, var(--blanc));
+  border-left: 3px solid var(--accent);
+  padding: 20px 28px;
 }
 .cit-callout-num {
   font-family: var(--font-title);
-  font-size: clamp(44px, 5vw, 64px);
+  font-size: clamp(36px, 4vw, 48px);
   line-height: 1;
-  color: var(--rouge);
+  color: var(--accent);
 }
 .cit-callout p {
   flex: 1 1 280px;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.5;
-  color: rgba(255,255,255,0.92);
+  color: var(--encre-doux);
   max-width: 560px;
 }
 

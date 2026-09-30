@@ -14,7 +14,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
 <script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Convention Citoyenne pour la Démocratie. Près de 80 citoyens, parlementaires et membres de la société civile délibèrent à Lille pour répondre à la crise démocratique avant l’élection présidentielle de 2027.">
+<meta name="description" content="Convention Citoyenne pour la Démocratie. Près de 70 citoyens, parlementaires et membres de la société civile délibèrent à Lille pour répondre à la crise démocratique avant l’élection présidentielle de 2027.">
 <title>Convention Citoyenne pour la Démocratie</title>
 <?php layout_og_tags(SITE_NAME, SITE_DESCRIPTION, site_url() . '/', $actu_partagee); ?>
 <link rel="icon" type="image/png" href="./images/favicon.ico">
@@ -38,7 +38,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
     <div class="hero-content">
       <span class="eyebrow">Septembre à décembre 2026</span>
       <h1 class="title hero-title">Écrire ensemble la démocratie de demain.</h1>
-      <p class="lead hero-lead">Citoyen.nes tiré.es au sort, parlementaires, société civile : près de 80 personnes délibèrent avant la présidentielle 2027 pour répondre à la crise démocratique.</p>
+      <p class="lead hero-lead">Citoyen.nes tiré.es au sort, parlementaires, société civile : près de 70 personnes délibèrent avant la présidentielle 2027 pour répondre à la crise démocratique.</p>
       <div class="hero-actions">
         <a href="#newsletter" class="btn btn-primary">Suivre la convention</a>
         <a href="#projet" class="btn-link">Comprendre le projet ↓</a>
@@ -94,8 +94,8 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
       </div>
       <div class="point">
         <div class="point-num tech">02 · Qui délibère</div>
-        <h3 class="point-title">Près de 80 personnes, trois groupes</h3>
-        <p class="point-desc">50 citoyen.nes tiré.es au sort, 11 parlementaires transpartisan.es et une vingtaine de membres de la société civile.</p>
+        <h3 class="point-title">Près de 70 personnes, trois groupes</h3>
+        <p class="point-desc">52 citoyen.nes tiré.es au sort, 11 parlementaires transpartisan.es et 5 membres de la société civile.</p>
       </div>
       <div class="point">
         <div class="point-num tech">03 · Un dispositif inédit</div>
@@ -146,10 +146,10 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
 
       <div class="panel-numbers reveal-stagger">
         <div class="panel-card">
-          <div class="panel-card-num tech" data-count="50">50</div>
+          <div class="panel-card-num tech" data-count="52">52</div>
           <div>
             <div class="panel-card-label">Citoyen.nes tiré.es au sort</div>
-            <p class="panel-card-desc">Sélectionné.es sur 7 critères socio-démographiques. Contacté.es par téléphone, libres d’accepter.</p>
+            <p class="panel-card-desc">Un panel à l’image de la société française, tiré au sort pour délibérer au sein de la Convention et libre d’accepter.</p>
           </div>
         </div>
         <div class="panel-card">
@@ -160,10 +160,10 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
           </div>
         </div>
         <div class="panel-card">
-          <div class="panel-card-num tech" data-count="20">20</div>
+          <div class="panel-card-num tech" data-count="5">5</div>
           <div>
             <div class="panel-card-label">Membres de la société civile</div>
-            <p class="panel-card-desc">Une vingtaine de personnes, issues notamment du Conseil Économique, Social et Environnemental (CESE).</p>
+            <p class="panel-card-desc">Cinq personnes, issues notamment du Conseil Économique, Social et Environnemental (CESE).</p>
           </div>
         </div>
       </div>

@@ -51,6 +51,10 @@ $page_description = 'Genre, âge, diplôme, région, territoire, profession, rap
       <p>Pour que la Convention reflète la diversité de la société française, ses citoyen.nes ont été tiré.es au sort par téléphone, puis sélectionné.es selon plusieurs critères socio-démographiques. Chacun.e était libre d’accepter.</p>
       <p>Genre, âge, diplôme, lieu de vie, profession, rapport à la politique&nbsp;: voici, critère par critère, qui sont les <?= CITOYENS_TOTAL ?> citoyen.nes de la Convention.</p>
     </div>
+    <figure class="cit-photo reveal">
+      <img src="./images/panel-lancement.jpg" alt="Photo de groupe des membres de la Convention, en plein air devant un mur de briques" width="1696" height="1152">
+      <figcaption>Les membres de la Convention lors du lancement, le 12 septembre 2026, à Lille.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -154,7 +158,7 @@ $page_description = 'Genre, âge, diplôme, région, territoire, profession, rap
   <!-- ============================ 7. POLITIQUE ============================ -->
   <section class="cit-section" id="politique">
     <div class="wrap">
-      <?php citoyens_section_header(7, 'Intérêt pour la politique', 'Le rapport à la politique faisait partie des critères : le panel réunit des personnes qui s’y intéressent beaucoup, et d’autres pas du tout.'); ?>
+      <?php citoyens_section_header(7, 'Intérêt pour la politique', 'Le panel réunit des personnes qui s’intéressent beaucoup à la politique, et d’autres pas du tout.'); ?>
       <?php citoyens_opinion(); ?>
     </div>
   </section>

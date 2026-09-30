@@ -245,6 +245,13 @@ function layout_presse_home(array $items): void
     if ($items === []) {
         return;
     }
+    $n = count($items);
+    $cols = sprintf(
+        '--cols: %d; --cols-t: %d; --cols-m: %d',
+        presse_colonnes($n, 5),
+        presse_colonnes($n, 4),
+        min($n, 2)
+    );
     ?>
 <!-- ============================ ON EN PARLE ============================ -->
 <section class="section" id="presse">
@@ -253,7 +260,7 @@ function layout_presse_home(array $items): void
       <span class="eyebrow">On en parle</span>
       <h2 class="title sub-title">Ils parlent de la Convention.</h2>
     </div>
-    <ul class="presse-list reveal-stagger">
+    <ul class="presse-list reveal-stagger" style="<?= $cols ?>">
 <?php foreach ($items as $item):
     $label = 'Lire l’article de ' . $item['media'] . ($item['titre'] !== '' ? ' : ' . $item['titre'] : '');
 ?>
@@ -276,6 +283,29 @@ function layout_presse_home(array $items): void
 
 <hr class="full-hr">
 <?php
+}
+
+/**
+ * Nombre de colonnes de la liste « On en parle », $max au plus : celui qui
+ * laisse le moins de cases vides sur la dernière ligne (à égalité, le plus
+ * grand), sans descendre sous 3 colonnes pour ne pas multiplier les lignes.
+ * Ex. avec $max = 5 : 5 → 5, 6 → 3 (3 + 3), 7 → 4 (4 + 3), 9 → 3 (3 × 3).
+ */
+function presse_colonnes(int $n, int $max): int
+{
+    if ($n <= $max) {
+        return max($n, 1);
+    }
+    $best = $max;
+    $best_vides = PHP_INT_MAX;
+    for ($c = $max; $c >= 3; $c--) {
+        $vides = ($c - $n % $c) % $c;
+        if ($vides < $best_vides) {
+            $best = $c;
+            $best_vides = $vides;
+        }
+    }
+    return $best;
 }
 
 /** Vignette de la page « toutes les actualités ». */

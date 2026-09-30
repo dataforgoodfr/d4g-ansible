@@ -1349,17 +1349,28 @@ p.lead {
 .presse-header { margin-bottom: 40px; }
 .presse-header .eyebrow { margin-bottom: 14px; }
 
+/* Nombre de colonnes choisi selon le nombre d'articles (layout_presse_home) :
+   --cols sur ordinateur, --cols-t sur tablette, 2 sur mobile. Une dernière
+   ligne incomplète est centrée. Chaque case a sa propre bordure ; les marges
+   négatives superposent celles des cases voisines en un trait unique. */
 .presse-list {
+  --n: var(--cols, 4);
   list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  border-top: 1px solid var(--gris);
-  border-left: 1px solid var(--gris);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 0 1px 1px;
 }
 .presse-list > li {
   display: flex;
-  border-right: 1px solid var(--gris);
-  border-bottom: 1px solid var(--gris);
+  flex: 0 0 calc(100% / var(--n) + 1px);
+  /* Sans min-width:0, un logo large élargit sa case au-delà de sa colonne. */
+  min-width: 0;
+  margin: 0 0 -1px -1px;
+  border: 1px solid var(--gris);
+}
+@media (max-width: 1100px) {
+  .presse-list { --n: var(--cols-t, 3); }
 }
 .presse-card {
   display: flex;
@@ -1380,6 +1391,7 @@ p.lead {
 }
 .presse-logo {
   height: 56px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1388,7 +1400,7 @@ p.lead {
    pour un poids visuel comparable d'un média à l'autre. */
 .presse-logo img {
   height: 48px;
-  max-width: 190px;
+  max-width: min(190px, 100%);
   object-fit: contain;
   opacity: 0.85;
   transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
@@ -1414,7 +1426,7 @@ p.lead {
 
 /* Mobile : deux médias par ligne. */
 @media (max-width: 560px) {
-  .presse-list { grid-template-columns: repeat(2, 1fr); }
+  .presse-list { --n: var(--cols-m, 2); }
   .presse-card { padding: 28px 12px 20px; gap: 18px; }
   .presse-logo { height: 40px; }
   .presse-logo img { height: 34px; max-width: 100%; }

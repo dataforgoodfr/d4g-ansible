@@ -10,6 +10,37 @@ services:
       placement:
         constraints:
           - node.hostname == {{ deploy_on }}
+{%- if home_worker_enabled | bool %}
+
+  # Le worker de fond, dans son propre service : la passe complete toutes les
+  # 15 min, l'import horaire et les jobs cibles. L'application ne le lance plus
+  # dans le processus web depuis le 22/08/2026 (d4g-community-manager 346393a) :
+  # sans ce service, aucun cron ne tourne.
+  worker:
+    image: ghcr.io/dataforgoodfr/d4g-community-manager:latest
+    command: ["d4g-cm", "worker"]
+    env_file:
+      - home.env
+    networks:
+      - d4g-internal
+    # L'image porte un health check HTTP, fait pour le service web : le worker
+    # n'ecoute sur aucun port. Celui-ci verifie son battement de coeur en base.
+    healthcheck:
+      test: ["CMD", "d4g-cm", "worker-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      # UN, pas plus : deux workers feraient deux passes en meme temps.
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+      restart_policy:
+        condition: any
+        delay: 10s
+{% endif %}
 
 networks:
   d4g-internal:

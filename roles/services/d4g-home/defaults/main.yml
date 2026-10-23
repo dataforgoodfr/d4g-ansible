@@ -1,3 +1,8 @@
 ---
 base_domain: services.dataforgood.fr
 home_base_url: https://home.dataforgood.fr
+
+# Le worker de fond comme service distinct. Eteint par defaut : le role sert
+# aussi au staging Swarm, qui ne doit pas ecrire dans les outils avec un second
+# worker. Le play production l'active.
+home_worker_enabled: false

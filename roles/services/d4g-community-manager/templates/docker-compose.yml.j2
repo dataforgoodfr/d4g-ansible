@@ -1,6 +1,9 @@
 services:
   app:
-    image: ghcr.io/dataforgoodfr/d4g-community-manager:latest
+    # Épinglé : depuis octobre 2026, dataforgoodfr/d4g-community-manager porte
+    # l'application de pagbrl (d4g-home), qui republie `latest` à chaque push.
+    # Ce digest est le dernier bot (3c535ba, branche `legacy`, 30/06/2026).
+    image: ghcr.io/dataforgoodfr/d4g-community-manager@sha256:c478f21f1b635bb3387cdcc6a1b0f87166bd88c0cc49613d715c80c1d6e8bfdf
     env_file:
       - community-manager.env
     networks:

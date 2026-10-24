@@ -302,15 +302,6 @@
         - service
 
     - import_role:
-        name: roles/services/d4g-nextcloud
-      vars:
-        deploy_on: "metal-2.dataforgood.fr"
-        replicas: 1
-      tags:
-        - d4g-nextcloud
-        - service
-
-    - import_role:
         name: roles/services/d4g-peertube
       vars:
         deploy_on: "metal-2.dataforgood.fr"
@@ -465,8 +456,6 @@
             addresses: ["d4g-mattermost_app:8065"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
-          - name: "nextcloud"
-            addresses: ["d4g-nextcloud_apache:8443"]
           - name: "cartocampement"
             addresses: ["d4g-authentik_app"]
           - name: "us-climate-data"

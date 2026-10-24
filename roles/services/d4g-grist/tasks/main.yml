@@ -36,3 +36,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-grist
+    service_dir: /opt/d4g-grist
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: grist
+    pgsql_password: "{{ lookup('env', 'GRIST_DB_PASSWORD') }}"
+    pgsql_database: grist
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

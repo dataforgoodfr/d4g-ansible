@@ -27,3 +27,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: us-climate-data-metabase
+    service_dir: /opt/us-climate-data-metabase
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: us_climate_data
+    pgsql_password: "{{ lookup('env', 'US_CLIMATE_DATA_DB_PASSWORD') }}"
+    pgsql_database: us_climate_data
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

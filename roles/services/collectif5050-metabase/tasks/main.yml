@@ -27,3 +27,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: collectif5050-metabase
+    service_dir: /opt/collectif5050-metabase
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: ric_metabase
+    pgsql_password: "{{ lookup('env', 'SECONDEMAIN_METABASE_DB_PASSWORD') }}"
+    pgsql_database: reveler_inegalites_cinema
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

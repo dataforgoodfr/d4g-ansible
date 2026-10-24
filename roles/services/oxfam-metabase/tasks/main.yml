@@ -27,3 +27,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: oxfam-metabase
+    service_dir: /opt/oxfam-metabase
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: oxfam
+    pgsql_password: "{{ lookup('env', 'METABASE_OXFAM_DB_PASSWORD') }}"
+    pgsql_database: metabase_oxfam
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

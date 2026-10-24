@@ -52,3 +52,18 @@
   register: admin_result
   changed_when: "'Created' in admin_result.stdout or 'Promoted' in admin_result.stdout"
   when: inventory_hostname == deploy_on
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-docs
+    service_dir: /opt/d4g-docs
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: docs
+    pgsql_password: "{{ lookup('env', 'DOCS_DB_PASSWORD') }}"
+    pgsql_database: docs
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

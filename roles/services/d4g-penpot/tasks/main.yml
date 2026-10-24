@@ -27,3 +27,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-penpot
+    service_dir: /opt/d4g-penpot
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: penpot
+    pgsql_password: "{{ lookup('env', 'PENPOT_DATABASE_PASSWORD') }}"
+    pgsql_database: penpot
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

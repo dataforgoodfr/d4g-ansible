@@ -27,3 +27,18 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-metabase
+    service_dir: /opt/d4g-metabase
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: d4g_metabase
+    pgsql_password: "{{ lookup('env', 'D4G_METABASE_DB_PASSWORD') }}"
+    pgsql_database: d4g_metabase
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

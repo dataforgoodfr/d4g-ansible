@@ -1,0 +1,478 @@
+{
+  "chercheurs": [
+    {
+      "titre": "Les effets de la délibération sur les préférences démocratiques : une enquête miroir auprès des citoyens, élus et représentants de la société civile",
+      "presentation": "Le projet de recherche vise à comprendre comment la délibération transforme les conceptions de la démocratie, mais aussi la manière dont chaque collège perçoit la compétence et la légitimité des autres collèges ou type d'acteurs. Il s’agit notamment d’étudier si l’expérience commune peut favoriser un « apprentissage inter-représentatif » et conduire à une vision plus hybride de la décision démocratique, combinant représentation électorale, participation citoyenne, expertise et société civile.",
+      "membres": [
+        {
+          "prenom": "Frédéric",
+          "nom": "Gonthier",
+          "photo": "images/equipe/frederic-gonthier.jpg",
+          "affiliation": "Sciences Po Grenoble-UGA, Pacte CNRS"
+        },
+        {
+          "prenom": "Tristan",
+          "nom": "Haute",
+          "photo": "images/equipe/tristan-haute.jpg",
+          "affiliation": "Université de Lille, CERAPS CNRS"
+        },
+        {
+          "prenom": "Antoine",
+          "nom": "Ancelet-Schwarts",
+          "photo": "images/equipe/antoine-ancelet-schwarts.jpg",
+          "affiliation": "Pacte CNRS"
+        },
+        {
+          "prenom": "Camille",
+          "nom": "Bedock",
+          "photo": "images/equipe/camille-bedock.jpg",
+          "affiliation": "Centre Emile Durkheim CNRS"
+        }
+      ]
+    },
+    {
+      "titre": "Qui peut prétendre légitimement définir ce qui est (plus ou moins) démocratique ?",
+      "presentation": "Cette enquête de théorie politique inductive se propose d’étudier 1) comment la relation entre le langage ordinaire et les savoirs savants se négocie sur un sujet – la démocratie – dont le postulat est l’égale légitimité des opinions politiques et 2) comment les différents groupes à l’intérieur de l’assemblée prétendent représenter les absents (qui, et au nom de quoi ?)",
+      "membres": [
+        {
+          "prenom": "Théophile",
+          "nom": "Pénigaud de Mourgues",
+          "photo": "images/equipe/theophile-penigaud-de-mourgues.jpg",
+          "affiliation": "Sciences Po (CEVIPOF) / Yale (ISPS)."
+        }
+      ]
+    },
+    {
+      "titre": "Mixité statutaire et diversité des perspectives dans la délibération",
+      "presentation": "À rebours des approches « informationnelles » de la délibération, nous explorons l’hypothèse selon laquelle l'activité délibérative possède en soi des vertus épistémiques, c'est à dire permet à un groupe et aux individus qui le composent de mieux comprendre un problème ou un sujet, indépendamment de l'information acquise pendant le processus. En se projetant dans l’expérience vécue de l'autre ou en adoptant momentanément sa perspective, on ferait à travers la délibération une expérience cognitive ayant une série d'effets, à la fois individuels et collectifs.",
+      "membres": [
+        {
+          "prenom": "Ariane",
+          "nom": "Lambert-Mojilianski",
+          "photo": "images/equipe/ariane-lambert-mojilianski.jpg",
+          "affiliation": "School of Economics (groupes Théorie et Gouvernance)"
+        },
+        {
+          "prenom": "Chloé",
+          "nom": "Santoro",
+          "photo": "images/equipe/chloe-santoro.jpg",
+          "affiliation": "Université Paris-Est Créteil, LIPHA (UR 7373), associée Logiques de l'Agir (UR 2274)"
+        }
+      ]
+    },
+    {
+      "titre": "Co-construction du sens dans les conventions citoyennes",
+      "presentation": "Avant même de prendre position dans le débat entre conceptions habermassiennes de la délibération et approches antagonistes du conflit démocratique, ce qui intéresse les linguistes est la condition première de toute discussion publique : la possibilité, pour les participants, d’arriver à parler de la même chose. À l’aide de méthodes d’analyse linguistique, nous étudions si, comment et dans quelles limites les méthodes délibératives permettent aux participants aux conventions citoyennes de construire progressivement des objets communs de discussion et une compréhension partagée, malgré la diversité de leurs expériences, de leurs savoirs et de leurs usages des mots.",
+      "membres": [
+        {
+          "prenom": "Paola",
+          "nom": "Pietrandrea",
+          "photo": "images/equipe/paola-pietrandrea.jpg",
+          "affiliation": "Université de Lille, STL UMR 8163 & IUF"
+        },
+        {
+          "prenom": "Caroline",
+          "nom": "Boissant",
+          "photo": "images/equipe/caroline-boissant.jpg",
+          "affiliation": "Université de Lille, STL UMR 8163"
+        }
+      ]
+    },
+    {
+      "titre": "Dispositif info-communicationnel de la Convention Citoyenne pour la Démocratie",
+      "presentation": "Le projet DISCC s’intéresse à la fois à la conception du dispositif info-communicationnel de la Convention Citoyenne pour la Démocratie et à sa réception/appropriation de la part des conventionnel.les tiré.es au sort et de celleux issu.es de la société civile. Il s’agit d’analyser la façon dont les pratiques informationnelles de ce mini-public (activités de recherche, production et partage de l'information) leur permettent d’acquérir une expertise, de se positionner dans le débat public tout en s’appuyant sur différents registres et imaginaires de la démocratie. Comment les usages des outils de communication et des documents - produits par les les organisateur.trices ou par les conventionnel.les et partagés dans les différentes arènes - contribuent-ils au processus d’acculturation au dispositif de la convention citoyenne, à la politisation, à la formation d’une identité collective et de dispositions relationnelles, indispensables à l’exercice délibératif et de la participation politique ?",
+      "membres": [
+        {
+          "prenom": "Gersende",
+          "nom": "Blanchard",
+          "photo": "images/equipe/gersende-blanchard.jpg",
+          "affiliation": "Gériico, Université de Lille"
+        },
+        {
+          "prenom": "Paola",
+          "nom": "Sedda",
+          "photo": "images/equipe/paola-sedda.jpg",
+          "affiliation": "Gériico, Université de Lille"
+        },
+        {
+          "prenom": "Axel",
+          "nom": "Humbert-Labeaumaz",
+          "photo": "images/equipe/axel-humbert-labeaumaz.jpg",
+          "affiliation": "Gériico, Université de Lille"
+        }
+      ]
+    },
+    {
+      "titre": "Les élu·es dans la participation citoyenne, contrôler l’hétéronomie ?",
+      "presentation": "Par son dispositif original, la convention citoyenne pour la démocratie inclut des citoyen·nes et des élu·es qui délibèrent à égalité. Les représentant·es perdent ainsi le monopole de la prise de décision qui caractérise leur profession. Notre projet de recherche repose sur l’analyse du comportement et le positionnement des élu·es dans ce processus, entre expertise, proximité et défense de leurs intérêts. L’objectif est ainsi d’observer les élu·es non comme pilotes mais comme parties prenantes d’un processus participatif qui leur échappe.",
+      "membres": [
+        {
+          "prenom": "Adrien",
+          "nom": "Desingue",
+          "photo": "images/equipe/adrien-desingue.jpg",
+          "affiliation": "JPEG UPR 3788, Avignon Université"
+        },
+        {
+          "prenom": "Noé",
+          "nom": "Duprat-Lassus",
+          "photo": "images/equipe/noe-duprat-lassus.jpg",
+          "affiliation": "JPEG UPR 3788, Avignon Université"
+        },
+        {
+          "prenom": "Victor",
+          "nom": "Planche",
+          "photo": "images/equipe/victor-planche.jpg",
+          "affiliation": "JPEG UPR 3788, Avignon Université"
+        }
+      ]
+    },
+    {
+      "titre": "Interactions, socialisations et discours dans les assemblées citoyennes",
+      "presentation": "Ce projet de recherche s’intéresse, d’une part, aux relations entre citoyen·nes dans la Convention par le prisme des rapports sociaux. D’autre part, il se penche sur les rapports entre citoyen·nes et élu·es dans un cadre délibératif, et sur la politisation de la démocratie qui en résulte.",
+      "membres": [
+        {
+          "prenom": "Thémis Andéol",
+          "nom": "Lê Quan Phong",
+          "photo": "images/equipe/themis-andeol-le-quan-phong.jpg",
+          "affiliation": "LIPHA, UPEC"
+        },
+        {
+          "prenom": "Lucile",
+          "nom": "Bouré",
+          "photo": "images/equipe/lucile-boure.jpg",
+          "affiliation": "LIPHA, UPEC"
+        },
+        {
+          "prenom": "Pierre",
+          "nom": "Moy",
+          "photo": "",
+          "affiliation": "LIPHA, UPEC"
+        },
+        {
+          "prenom": "Emilie",
+          "nom": "Frenkiel",
+          "photo": "",
+          "affiliation": "LIPHA, UPEC"
+        }
+      ]
+    },
+    {
+      "titre": "Amateurs et professionnel·les du politique : analyse comparée face à un problème ouvert",
+      "presentation": "Mon projet comparatif analyse, au sein de la convention citoyenne DemoCIS, la manière dont les citoyen·nes tirés au sort et les parlementaires, aux statuts et ressources cognitives distincts, contribuent à la délibération lorsqu’elle porte sur un problème « ouvert », c’est-à-dire pour lequel il n’existe ni de solution technique ni de consensus apparemment optimal.",
+      "membres": [
+        {
+          "prenom": "Oscar",
+          "nom": "Basnier",
+          "photo": "images/equipe/oscar-basnier.jpg",
+          "affiliation": "Cevipof, IEP Paris"
+        }
+      ]
+    },
+    {
+      "titre": "De la délibération aux propositions pour la démocratie : analyse linguistique et discursive d’une convention citoyenne",
+      "presentation": "Ce projet analyse, à partir d’outils linguistiques et discursifs, la manière dont les échanges d’une convention citoyenne transforment des positions individuelles en propositions collectives sur la démocratie. Il interroge les formes concrètes de la délibération : marques énonciatives, reformulations, accords/désaccords, argumentation, passage de l’oral délibératif à l’écrit prescriptif... Son originalité est de compléter les approches politistes de la qualité délibérative par une analyse fine de la matérialité discursive des interactions. La comparaison avec les cahiers de doléances de 2018-2019 permet enfin de distinguer linguistiquement une parole citoyenne singularisée d’une parole collectivement délibérée.",
+      "membres": [
+        {
+          "prenom": "Manon",
+          "nom": "Pengham",
+          "photo": "images/equipe/manon-pengham.jpg",
+          "affiliation": "LT2D, Cergy"
+        }
+      ]
+    },
+    {
+      "titre": "La fabrique des conventions citoyennes : réglementation, légitimation et perspectives d'institutionnalisation",
+      "presentation": "Ce projet étudie la chaîne de légitimation de la convention citoyenne DemoCIS, en examinant comment la réglementation du dispositif, ses garanties procédurales, les interactions délibératives, la production des recommandations et leur suivi constituent autant de maillons susceptibles de renforcer ou de fragiliser sa légitimité aux différentes étapes de son déroulement. Au-delà de cette analyse, le projet vise à dégager des principes directeurs et bonnes pratiques pour encadrer les conventions citoyennes et à identifier les conditions de leur éventuelle institutionnalisation au sein de la démocratie représentative.",
+      "membres": [
+        {
+          "prenom": "Beverley",
+          "nom": "Toudic",
+          "photo": "images/equipe/beverley-toudic.jpg",
+          "affiliation": "CERAPS, Université de Lille/IEP de Lille"
+        }
+      ]
+    }
+  ],
+  "codac": [
+    {
+      "prenom": "Juliette",
+      "nom": "Agez",
+      "photo": "images/equipe/juliette-agez.jpg",
+      "statut": "Directrice de la participation citoyenne au CESE",
+      "motivation": ""
+    },
+    {
+      "prenom": "Floran",
+      "nom": "Augagneur",
+      "photo": "images/equipe/floran-augagneur.jpg",
+      "statut": "Vice-président de la Commission Nationale du Débat Public (CNDP)",
+      "motivation": ""
+    },
+    {
+      "prenom": "Elian",
+      "nom": "Belon",
+      "photo": "images/equipe/elian-belon.jpg",
+      "statut": "Administrateur de l'Institut de la Concertation et de la Participation Citoyenne (ICPC)",
+      "motivation": "Professionnel de la participation et des dispositifs délibératifs depuis une douzaine d'années, j'ai toujours conçu ma pratique comme nécessairement militante dans une période de crise profonde des démocraties libérales. La Convention citoyenne pour la démocratie, portée de façon originale par le projet de recherche DemoCIS, apportera sa contribution au débat nécessaire pour les présidentielles à venir. L’Institut de la Concertation et de la Participation Citoyenne (ICPC) que je représente souhaite soutenir et apporter son regard analytique sur la démarche au sein du Comité d’accompagnement."
+    },
+    {
+      "prenom": "Loïc",
+      "nom": "Blondiaux",
+      "photo": "images/equipe/loic-blondiaux.jpg",
+      "statut": "Politiste",
+      "motivation": "La Convention citoyenne sur la démocratie est un dispositif à la fois inédit et essentiel - il s'agit d'écouter ce qu'ont à dire les citoyens de leurs institutions démocratiques. Il était tout naturel pour moi, qui étudie la démocratie délibérative depuis de nombreuses années, de l'accompagner et de l'observer."
+    },
+    {
+      "prenom": "Céline",
+      "nom": "Braconnier",
+      "photo": "images/equipe/celine-braconnier.jpg",
+      "statut": "Professeure de science politique (CYU, Sciences Po Saint-Germain, CESDIP)",
+      "motivation": "Mes travaux de recherche portent sur la politisation, le vote et l'abstention. Je m'intéresse en particulier à tout ce qui fait obstacle à la participation politique et ce qui pourrait la faciliter. Je suis responsable scientifique DEMOCIS de l'université de Cergy et de Sciences Po Saint-Germain-en-Laye depuis le début du projet et en charge d'organiser la seconde convention citoyenne du programme, en 2028, qui portera sur les rapports entre la police et la population. C'est aussi à ce titre que je suis de près la convention citoyenne pour la démocratie à des fins de cumul d'expérience et de continuité."
+    },
+    {
+      "prenom": "Jérôme",
+      "nom": "Cohen",
+      "photo": "images/equipe/jerome-cohen.jpg",
+      "statut": "Dirigeant d'association",
+      "motivation": "Outre la montée inquiétante des extrêmes, je ressens la nécessité d'une refonte de notre démocratie et de ses institutions pour mieux répondre aux polycrises qui caractérisent notre époque. Pour avoir expérimenté ce format en créant le Grand Défi des entreprises pour la planète, je sais sa puissance. Cette refonte sera d'autant plus juste et efficiente qu'elle est co-construite avec l'ensemble des acteurs de la société et en particulier avec les citoyens."
+    },
+    {
+      "prenom": "Jean-Philippe",
+      "nom": "Derosier",
+      "photo": "images/equipe/jean-philippe-derosier.jpg",
+      "statut": "Professeur de droit public, Titulaire de la Chaire d'Études parlementaires, Université de Lille",
+      "motivation": "Professeur de droit public, je suis spécialisé en droit constitutionnel. À ce titre, je suis responsable de l'un des sous-défis du Défi 1 de DemoCIS, sur les innovations démocratiques et les réformes institutionnelles. Au-delà de l'intérêt pour la Convention elle-même, suivre ses travaux s'imposait naturellement au regard de DémoCIS."
+    },
+    {
+      "prenom": "Isabelle",
+      "nom": "Doresse",
+      "photo": "images/equipe/isabelle-doresse.jpg",
+      "statut": "Militante associative",
+      "motivation": "Approfondir les conditions de la participation de tous et toutes (notamment les personnes en situation de pauvreté, ceux à qui on ne demande généralement pas l'avis) et de la prise en compte de ce qu'ils peuvent apporter, dans ce type de processus. C'est une condition démocratique essentielle pour que la citoyenneté sociale de tous soit respectée. Apprendre des expertises présentes au CODAC."
+    },
+    {
+      "prenom": "Marthe",
+      "nom": "Fatin-Rouge Stephanini",
+      "photo": "images/equipe/marthe-fatin-rouge-stephanini.jpg",
+      "statut": "Directrice de recherches au CNRS, Juriste, UMR 7318 DICE",
+      "motivation": "Je m'intéresse depuis une trentaine d'années aux modalités de participation citoyenne en tant que chercheur en droit comparé. J'étudie les conventions citoyennes depuis 2016. Au regard des expériences qui ont déjà été menées dans le monde, je réfléchis à un cadre juridique qui permettrait à la fois d'assurer la sincérité du processus sans le scléroser et de clarifier la place des conventions citoyennes parmi les institutions. J'ai été également membre du Comité de gouvernance de la Convention citoyenne sur les temps de l'enfant en 2025. Ce fut une expérience très enrichissante. Les questions abordées par la Convention citoyenne sur la démocratie sont au coeur de mes recherches et réflexions tant sur la forme que sur le fond. Réfléchir en outre aux côtés des meilleurs spécialistes et praticiens de la démocratie délibérative est également particulièrement stimulant. Enfin, l'organisation de cette Convention citoyenne par des universitaires est un défi original et ambition. La thématique est majeure à quelques mois de l'élection présidentielle. C'est une des manifestations de l'implication de la société civile dans cette élection."
+    },
+    {
+      "prenom": "Marine",
+      "nom": "Fleury",
+      "photo": "images/equipe/marine-fleury.jpg",
+      "statut": "Enseignante-chercheuse en droit public",
+      "motivation": ""
+    },
+    {
+      "prenom": "Jean-Michel",
+      "nom": "Fourniau",
+      "photo": "images/equipe/jean-michel-fourniau.jpg",
+      "statut": "Sociologue à l'origine du groupe CNRS \"Démocratie et Participation\"",
+      "motivation": ""
+    },
+    {
+      "prenom": "Keyvan",
+      "nom": "Ghorbanzadeh",
+      "photo": "images/equipe/keyvan-ghorbanzadeh.jpg",
+      "statut": "Maître de conférence en science politique",
+      "motivation": ""
+    },
+    {
+      "prenom": "Clément",
+      "nom": "Girard",
+      "photo": "images/equipe/clement-girard.jpg",
+      "statut": "Directeur de la Participation Citoyenne chez Ville et Eurométropole de Strasbourg",
+      "motivation": ""
+    },
+    {
+      "prenom": "Mathilde",
+      "nom": "Imer",
+      "photo": "images/equipe/mathilde-imer.jpg",
+      "statut": "Activiste pour l'écologie et la démocratie",
+      "motivation": ""
+    },
+    {
+      "prenom": "Hélène",
+      "nom": "Landemore",
+      "photo": "images/equipe/helene-landemore.jpg",
+      "statut": "Politologue spécialisée dans la théorie démocratique et épistémique",
+      "motivation": ""
+    },
+    {
+      "prenom": "Armel",
+      "nom": "Lecoz",
+      "photo": "images/equipe/armel-lecoz.jpg",
+      "statut": "Co-fondateur de l'ONG Démocratie Ouverte",
+      "motivation": ""
+    },
+    {
+      "prenom": "Martine",
+      "nom": "Legris",
+      "photo": "images/equipe/martine-legris.jpg",
+      "statut": "Chercheur en socio membre de démocis, du codac et de l'équipe de facilitation",
+      "motivation": "en tant que membre du projet democis, je souhaitais contribuer à la mise en place des cc, notamment en m'appuyant sur mes travaux de recherche antérieur sur les jurys et conventions citoyens. Je travaille sur la question de la délibération et de l'engagement citoyen en démocratie depuis longtemps."
+    },
+    {
+      "prenom": "Blanche",
+      "nom": "Leridon",
+      "photo": "images/equipe/blanche-leridon.jpg",
+      "statut": "Essayiste, enseignante à Sciences Po, directrice des études France de l'Institut Montaigne",
+      "motivation": "Une initiative salutaire à quelques mois d'une présidentielle déterminante pour l'avenir de notre démocratie."
+    },
+    {
+      "prenom": "Priscillia",
+      "nom": "Ludosky",
+      "photo": "images/equipe/priscillia-ludosky.jpg",
+      "statut": "Militante",
+      "motivation": ""
+    },
+    {
+      "prenom": "Glen",
+      "nom": "Millot",
+      "photo": "images/equipe/glen-millot.jpg",
+      "statut": "Coordinateur associatif",
+      "motivation": "Les Conventions Citoyennes sont enfin considérées comme un outil efficace pour permettre à des citoyennes et citoyens de formuler des recommandations pertinentes sur des sujets complexes, même s'il reste un certain nombre d'aspects non réglés (déclenchement des Conventions, lien à la décision, expertise transmise...). DemoCis propose d'étudier et d'utiliser cet outil démocratique pour repenser la démocratie. Ma participation au CODAC est motivée autant par l'objectif de la CC que par le besoin de trouver des solutions concrètes permettant d'affuter ce type de dispositifs. Le partage d'expérience du CODAC constitue une aide précieuse à la réflexion."
+    },
+    {
+      "prenom": "Camille",
+      "nom": "Morio",
+      "photo": "images/equipe/camille-morio.jpg",
+      "statut": "Maitresse de conférence en droit public",
+      "motivation": ""
+    },
+    {
+      "prenom": "Kenza",
+      "nom": "Occansey",
+      "photo": "images/equipe/kenza-occansey.jpg",
+      "statut": "CESE et co-président de l'association \"A voté\"",
+      "motivation": ""
+    },
+    {
+      "prenom": "Etienne",
+      "nom": "Peyrat",
+      "photo": "images/equipe/etienne-peyrat.jpg",
+      "statut": "Directeur de Sciences Po Lille",
+      "motivation": ""
+    },
+    {
+      "prenom": "Bernard",
+      "nom": "Reber",
+      "photo": "images/equipe/bernard-reber.jpg",
+      "statut": "Directeur de recherche au CNRS, philosophe, membre du CEVIPOF-Sciences Po, Paris",
+      "motivation": "Philosophe, j’ai toujours pensé qu’il fallait choisir les sujets de recherche les plus urgents à traiter. La démocratie en est un, exigence pour organiser les savoirs afin de discuter tous les autres défis, par exemple ceux de l’IA ou de la transition écologique. C’est le cas avec sa forme la plus complète, celle de la démocratie délibérative, qui devrait animer les débats politiques dans toutes les institutions, comprises dans un système délibératif. Bien pensée elle convoque les perspectives, scientifiques, éthiques et politiques, chacune avec ses responsabilités, en prenant au sérieux le pluralisme et les incertitudes. Or, la démocratie est à la fois menacée et en même temps ses promesses restent largement à mettre en œuvre. Les assemblées citoyennes constituent un espace d’expérimentation prometteur doté d'une grande confiance de la part des citoyens, mais dont les responsabilités et les formes d'organisations restent largement à définir. Ayant la chance d’être Directeur de recherche au CNRS, j’ai toujours contribué à la réflexion théorique sur la délibération, la conversation et la considération démocratiques, à l’analyse, à la mise en place et au conseil pour des expériences réelles, bien conscient que la démocratie est un concept au cœur de querelles interprétatives et qu’elle reste un horizon à partir duquel critiquer et améliorer sa pratique. J’espère que la Convention citoyenne sur la démocratie permettra de révéler certaines de ces tensions, les dilemmes et les choix à faire."
+    },
+    {
+      "prenom": "Min",
+      "nom": "Reuchamps",
+      "photo": "images/equipe/min-reuchamps.jpg",
+      "statut": "Politiste",
+      "motivation": "En quête d'innovations démocratiques, une Convention Citoyenne pour la Démocratie offre l'opportunité de boucler la boucle."
+    },
+    {
+      "prenom": "Dominique",
+      "nom": "Reynié",
+      "photo": "images/equipe/dominique-reynie.jpg",
+      "statut": "Politiologue et professeur à Sciences Po",
+      "motivation": ""
+    },
+    {
+      "prenom": "Julien",
+      "nom": "Roirant",
+      "photo": "images/equipe/julien-roirant.jpg",
+      "statut": "Consultant en activation du débat public et militant du renouveau démocratique",
+      "motivation": "Après avoir été engagé au sein des Gilets citoyens, initiateurs et vigie de la Convention citoyenne sur le climat, et travaillé dès lors à tisser des liens entres acteurs du renouveau démocratique via #LesApérocrates, je suis ravi de pouvoir mettre l'expertise de mon cabinet de conseil en activation du débat public (AgoraLab) au service de l'impact institutionnel et médiatique de la Convention citoyenne pour la Démocratie à l'approche d'une élection présidentielle décisive pour le pays."
+    },
+    {
+      "prenom": "Chloé",
+      "nom": "Santoro",
+      "photo": "images/equipe/chloe-santoro-2.jpg",
+      "statut": "Philosophe",
+      "motivation": "Mes recherches en théorie politique portent sur la \"démocratie radicale\" et ses institutions, telles qu'elles ont pu être expérimentées aussi bien dans un lointain passé, notamment au sein de la démocratie athénienne, ou au présent, dans des dispositifs délibératifs comme les conventions citoyennes. La CCD m'intéresse donc doublement, par sa forme et par son sujet. C'est une chance d'avoir l'occasion d'observer et d'accompagner un dispositif dans lequel des citoyens et citoyennes françaises ordinaires vont réfléchir, en discussion avec des représentants politiques, à la façon de répartir et d'exercer le pouvoir en démocratie. J'espère pouvoir contribuer à établir les bonnes conditions d'une telle réflexion, dans un contexte national à la fois peu accueillant et affamé de ces discussions constitutionnelles."
+    },
+    {
+      "prenom": "Claire-Aline",
+      "nom": "Serrault",
+      "photo": "images/equipe/claire-aline-serrault.jpg",
+      "statut": "Cheffe de projet participation citoyenne au CESE",
+      "motivation": ""
+    },
+    {
+      "prenom": "Yves",
+      "nom": "Sintomer",
+      "photo": "images/equipe/yves-sintomer.jpg",
+      "statut": "Politiste",
+      "motivation": "Une expérience originale mettant en présence citoyens tirés au sort, représentants de la société civile et élus. Nous avons besoin d'un renouvellement radical de notre système politique pour faire face aux crises et catastrophes en cours"
+    },
+    {
+      "prenom": "Taoufik",
+      "nom": "Vallipuram",
+      "photo": "images/equipe/taoufik-vallipuram.jpg",
+      "statut": "Co-fondateur de Démocratisons la Politique",
+      "motivation": ""
+    }
+  ],
+  "elus": [
+    {
+      "prenom": "Alexandre",
+      "nom": "Basquin",
+      "photo": "images/equipe/alexandre-basquin.jpg",
+      "groupe": "Groupe Communiste Républicain Citoyen et Écologiste - Kanaky",
+      "mandat": "Sénateur du Nord"
+    },
+    {
+      "prenom": "Pierre-Yves",
+      "nom": "Cadalen",
+      "photo": "images/equipe/pierre-yves-cadalen.jpg",
+      "groupe": "La France insoumise - Nouveau Front Populaire",
+      "mandat": "Député du Finistère (2e)"
+    },
+    {
+      "prenom": "Hendrik",
+      "nom": "Davi",
+      "photo": "images/equipe/hendrik-davi.jpg",
+      "groupe": "Écologiste et Social",
+      "mandat": "Député des Bouches-du-Rhône (5e)"
+    },
+    {
+      "prenom": "Audrey",
+      "nom": "Linkenheld",
+      "photo": "images/equipe/audrey-linkenheld.jpg",
+      "groupe": "Groupe Socialiste, Écologiste et Républicain",
+      "mandat": "Sénatrice du Nord"
+    },
+    {
+      "prenom": "Olivia",
+      "nom": "Richard",
+      "photo": "images/equipe/olivia-richard.jpg",
+      "groupe": "Groupe Union Centriste",
+      "mandat": "Sénatrice indépendante représentant les Français établis hors de France"
+    }
+  ],
+  "groupes_absents": [
+    {
+      "groupe": "Rassemblement National",
+      "sigle": "RN"
+    },
+    {
+      "groupe": "Ensemble pour la République",
+      "sigle": "EPR"
+    },
+    {
+      "groupe": "Droite Républicaine",
+      "sigle": "DR"
+    },
+    {
+      "groupe": "Horizons & Indépendants",
+      "sigle": "Hor"
+    },
+    {
+      "groupe": "Libertés, Indépendants, Outre-mer et Territoires",
+      "sigle": "LIOT"
+    },
+    {
+      "groupe": "Union des droites pour la République",
+      "sigle": "UDR"
+    }
+  ]
+}

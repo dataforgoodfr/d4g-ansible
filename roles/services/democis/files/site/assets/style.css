@@ -201,6 +201,17 @@ p.lead {
 .nav-cta::after { display: none !important; }
 .nav-cta:hover { background: #c52f31; color: var(--blanc); }
 
+.nav-links a { white-space: nowrap; }
+/* Écrans intermédiaires : sans le nom à côté du logo et avec des liens plus
+   serrés, les six liens tiennent sur une ligne. */
+@media (max-width: 1240px) {
+  .nav-links { gap: 20px; }
+  .nav-logo-text { display: none; }
+}
+@media (max-width: 1000px) {
+  .nav-links { gap: 14px; }
+  .nav-links a { font-size: 11px; letter-spacing: 0.04em; }
+}
 @media (max-width: 880px) {
   .nav-links { gap: 18px; }
   .nav-links a:not(.nav-cta) { display: none; }
@@ -2014,4 +2025,299 @@ body.modal-open { overflow: hidden; }
 @media (max-width: 880px) {
   .cit-hero-grid { grid-template-columns: 1fr; gap: 40px; }
   .cit-hero-glyphs { justify-content: flex-start; }
+}
+
+/* =========================================================================
+   PAGE : QUI SOMMES-NOUS ?
+   ========================================================================= */
+.equipe-header .lead {
+  max-width: 760px;
+  margin-top: 24px;
+}
+
+/* Onglets, collés sous la nav pendant le défilement des longues listes. */
+.equipe-tabs-bar {
+  position: sticky;
+  top: 81px; /* hauteur de la nav dans son état « scrolled » */
+  z-index: 50;
+  background: var(--blanc);
+  border-bottom: 1px solid var(--gris);
+}
+.equipe-tabs {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.equipe-tabs[hidden] { display: none; }
+.equipe-tab {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 22px 17px;
+  font-family: var(--font-tech);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--encre-doux);
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.equipe-tab:first-child { padding-left: 0; }
+.equipe-tab:hover { color: var(--rouge); }
+.equipe-tab[aria-selected="true"] {
+  color: var(--encre);
+  border-bottom-color: var(--rouge);
+}
+.equipe-tab-nb {
+  font-size: 11px;
+  letter-spacing: 0;
+  padding: 2px 7px;
+  background: var(--gris);
+  color: var(--encre-doux);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.equipe-tab[aria-selected="true"] .equipe-tab-nb {
+  background: var(--rouge);
+  color: var(--blanc);
+}
+.equipe-tab-court { display: none; text-decoration: none; }
+
+.equipe-panel {
+  padding-top: 56px;
+  padding-bottom: var(--section-pad-y);
+}
+.equipe-panel[hidden] { display: none; }
+/* Sans onglets (JavaScript désactivé), les groupes s'enchaînent sous leur titre. */
+.equipe-panel-title {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.equipe.has-tabs .equipe-panel-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.equipe-intro {
+  max-width: var(--max-text);
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--encre-doux);
+  margin-bottom: 56px;
+}
+
+/* Grille de cartes « personne » */
+.equipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 48px 32px;
+}
+
+/* Chercheur.euses : un bloc par projet de recherche */
+.equipe-projet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 56px;
+  padding: 48px 0;
+  border-top: 1px solid var(--gris);
+}
+.equipe-projet:last-child { padding-bottom: 0; }
+/* Quatre colonnes : les équipes (quatre personnes au plus) tiennent sur une ligne. */
+.equipe-grid-projet {
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 40px 24px;
+  align-content: start;
+}
+.equipe-projet-num {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rouge);
+  margin-bottom: 14px;
+}
+.equipe-projet-titre {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.25;
+  color: var(--encre);
+}
+.equipe-projet-desc { margin-top: 20px; }
+.equipe-projet-desc summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bleu);
+  cursor: pointer;
+  list-style: none;
+  padding-bottom: 3px;
+  border-bottom: 1px solid currentColor;
+}
+.equipe-projet-desc summary::-webkit-details-marker { display: none; }
+.equipe-projet-desc summary::after { content: '+'; font-size: 15px; line-height: 1; }
+.equipe-projet-desc[open] summary::after { content: '–'; }
+.equipe-projet-desc summary:hover { color: var(--rouge); }
+.equipe-projet-desc p {
+  margin-top: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--encre-doux);
+}
+
+/* Carte d'une personne */
+.personne { position: relative; }
+.personne-photo {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--gris);
+  margin-bottom: 18px;
+}
+.personne-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+.personne-initiales {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-title);
+  font-size: 56px;
+  color: var(--bleu);
+}
+.personne-nom {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--encre);
+  margin-bottom: 6px;
+}
+.personne-role {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--encre-doux);
+}
+.personne-meta {
+  margin-top: 8px;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gris-fonce);
+}
+.personne-lire {
+  margin-top: 14px;
+  font-family: var(--font-tech);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rouge);
+  text-align: left;
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--ease);
+}
+/* Toute la carte ouvre la motivation. */
+.personne-lire::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.personne-ouvrable { cursor: pointer; }
+
+/* Groupe parlementaire invité qui n'a désigné personne : photo vierge. */
+.personne-absente .personne-photo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: #f1f1f0;
+  border: 1px dashed #c7c7c5;
+}
+.personne-silhouette { width: 70%; fill: var(--gris); }
+.personne-absente .personne-nom { color: var(--encre-doux); }
+.personne-absente .personne-role { font-style: italic; color: var(--gris-fonce); }
+.personne-ouvrable:hover .personne-photo img { transform: scale(1.04); }
+.personne-ouvrable:hover .personne-lire { border-bottom-color: var(--rouge); }
+
+/* Pop-in « Pourquoi je m'engage » (reprend le cadre de la pop-in actualité) */
+.personne-modal { max-width: 860px; }
+.personne-modal-body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 40px;
+  padding: 56px clamp(24px, 4vw, 56px);
+}
+.personne-modal-photo {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--gris);
+}
+.personne-modal-photo img { width: 100%; height: 100%; object-fit: cover; }
+.personne-modal-nom {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.15;
+  color: var(--encre);
+  margin-bottom: 10px;
+  padding-right: 40px; /* place du bouton de fermeture */
+}
+.personne-modal-role {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--encre-doux);
+}
+.personne-modal-label {
+  display: block;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  font-family: var(--font-tech);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rouge);
+}
+.personne-modal-texte {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--encre);
+}
+
+@media (max-width: 880px) {
+  .equipe-projet { grid-template-columns: 1fr; gap: 32px; }
+  .equipe-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 36px 20px; }
+  .personne-modal-body { grid-template-columns: 1fr; gap: 24px; }
+  .personne-modal-photo { width: 140px; }
+}
+@media (max-width: 480px) {
+  .equipe-grid, .equipe-grid-projet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .personne-nom { font-size: 17px; }
+  .personne-role { font-size: 13px; }
+}
+/* Mobile : libellés courts pour que les trois onglets tiennent sans défiler. */
+@media (max-width: 640px) {
+  .equipe-tabs { justify-content: space-between; }
+  .equipe-tab { padding: 18px 0 15px; gap: 8px; font-size: 12px; letter-spacing: 0.04em; }
+  .equipe-tab-long { display: none; }
+  .equipe-tab-court { display: inline; }
+}
+@media (max-width: 380px) {
+  .equipe-tab { gap: 5px; font-size: 11px; letter-spacing: 0; }
+  .equipe-tab-nb { padding: 2px 5px; }
 }

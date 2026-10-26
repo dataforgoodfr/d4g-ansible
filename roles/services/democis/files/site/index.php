@@ -45,7 +45,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
       </div>
     </div>
     <div class="hero-image">
-      <img src="./images/1.jpg" alt="Portrait d’une participante de la Convention Citoyenne">
+      <img src="./images/5.jpg" alt="Délibération citoyenne">
     </div>
   </div>
 </header>
@@ -59,7 +59,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
   <div class="wrap">
     <div class="intro-grid reveal">
       <div class="intro-media">
-        <img src="./images/5.jpg" alt="Délibération citoyenne">
+        <img src="./images/1.jpg" alt="Portrait d’une participante de la Convention Citoyenne">
       </div>
       <div class="intro-narrative">
         <span class="eyebrow bleu">Pourquoi cette convention</span>
@@ -260,6 +260,9 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
       <span class="eyebrow bleu">Gouvernance &amp; écosystème</span>
       <h2 class="title section-title">Un projet de recherche, un programme national, des partenaires.</h2>
       <p class="lead" style="margin-top: 24px;">La Convention Citoyenne pour la Démocratie s’inscrit dans le projet de recherche <a href="https://democis.fr/ " target="_blank" rel="noopener" style="border-bottom:1px solid var(--bleu);">DemoCIS</a>, lauréat d’un programme France 2030 réunissant des centaines de chercheur.euses.</p>
+      <div style="margin-top: 32px;">
+        <a href="qui-sommes-nous.php" class="btn-link">Qui sommes-nous ? Découvrir l’équipe →</a>
+      </div>
     </div>
 
     <div class="gov-cols reveal-stagger">

@@ -1,12 +1,14 @@
 <?php
 /**
- * Morceaux de page partagés entre l'accueil (index.php) et la page
- * « toutes les actualités » (actualites.php) : nav, footer, pop-in, cartes.
+ * Morceaux de page partagés entre l'accueil (index.php), la page « toutes les
+ * actualités » (actualites.php) et « qui sommes-nous ? » (qui-sommes-nous.php) :
+ * nav, footer, pop-in, cartes.
  */
 declare(strict_types=1);
 
 require_once __DIR__ . '/actus.php';
 require_once __DIR__ . '/presse.php';
+require_once __DIR__ . '/equipe.php';
 
 /**
  * Balises <meta> Open Graph. Si une actu est passée (lien partagé ?actu=…),
@@ -36,10 +38,10 @@ function layout_og_tags(string $title, string $description, string $url, ?array 
 }
 
 /**
- * Barre de navigation. Sur l'accueil les liens sont des ancres ; ailleurs ils
- * renvoient vers l'accueil et la nav est affichée d'emblée dans son état
- * « scrolled » (fond blanc), faute de hero derrière elle. $active désigne
- * l'ancre surlignée sur ces autres pages (ex. '#actualites').
+ * Barre de navigation. Sur l'accueil les liens de section sont des ancres ;
+ * ailleurs ils renvoient vers l'accueil et la nav est affichée d'emblée dans son
+ * état « scrolled » (fond blanc), faute de hero derrière elle. $active désigne
+ * le lien surligné sur ces autres pages (ex. '#actualites', 'qui-sommes-nous.php').
  */
 function layout_nav(bool $is_home, ?string $active = null): void
 {
@@ -50,6 +52,7 @@ function layout_nav(bool $is_home, ?string $active = null): void
         '#panel' => 'Le panel',
         '#calendrier' => 'Calendrier',
         '#gouvernance' => 'Gouvernance',
+        'qui-sommes-nous.php' => 'Qui sommes-nous ?',
     ];
     ?>
 <nav class="nav<?= $is_home ? '' : ' scrolled' ?>" id="nav">
@@ -58,8 +61,8 @@ function layout_nav(bool $is_home, ?string $active = null): void
     <span class="nav-logo-text">Convention Citoyenne<br>pour la Démocratie</span>
   </a>
   <div class="nav-links">
-<?php foreach ($links as $anchor => $label): ?>
-    <a href="<?= $home . $anchor ?>"<?= (!$is_home && $anchor === $active) ? ' class="active"' : '' ?>><?= $label ?></a>
+<?php foreach ($links as $target => $label): ?>
+    <a href="<?= str_starts_with($target, '#') ? $home . $target : $target ?>"<?= (!$is_home && $target === $active) ? ' class="active"' : '' ?>><?= $label ?></a>
 <?php endforeach; ?>
     <a href="<?= $home ?>#newsletter" class="nav-cta">Suivre</a>
   </div>
@@ -88,6 +91,7 @@ function layout_footer(bool $is_home): void
         <li><a href="<?= $home ?>#panel">Le panel</a></li>
         <li><a href="<?= $home ?>#calendrier">Calendrier</a></li>
         <li><a href="<?= $home ?>#gouvernance">Gouvernance</a></li>
+        <li><a href="qui-sommes-nous.php">Qui sommes-nous ?</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -97,7 +101,7 @@ function layout_footer(bool $is_home): void
         <li><a href="mailto:contact@conventioncitoyennepourlademocratie.fr">contact@<wbr>conventioncitoyennepourlademocratie.fr</a></li>
         <li class="footer-contact-role">
           <span>Contact presse</span>
-          <a href="mailto:oteixeira@bonafide.paris">oteixeira@<wbr>bonafide.paris</a>
+          <a href="mailto:contactpresseccd@gmail.com">contactpresseccd@<wbr>gmail.com</a>
         </li>
       </ul>
     </div>
@@ -327,5 +331,50 @@ function layout_actu_tile(array $actu): void
 <?php endif; ?>
   </div>
 </a>
+<?php
+}
+
+/**
+ * Carte d'une personne (page « qui sommes-nous ? ») : photo, nom, puis les
+ * lignes de $lignes (rôle, affiliation…) ; les vides sont ignorées. Une
+ * motivation non vide ajoute un bouton qui l'ouvre en pop-in
+ * (assets/equipe.js) ; elle est aussi présente, masquée, dans la page.
+ */
+function layout_personne(array $p, array $lignes, string $motivation = ''): void
+{
+    $nom = trim($p['prenom'] . ' ' . $p['nom']);
+    $lignes = array_values(array_filter($lignes, fn(string $l) => $l !== ''));
+    ?>
+<article class="personne<?= $motivation !== '' ? ' personne-ouvrable' : '' ?>">
+  <div class="personne-photo">
+<?php if ($p['photo'] !== ''): ?>
+    <img src="<?= e($p['photo']) ?>" alt="<?= e($nom) ?>" loading="lazy" width="480" height="480">
+<?php else: ?>
+    <span class="personne-initiales" aria-hidden="true"><?= e(equipe_initiales($p)) ?></span>
+<?php endif; ?>
+  </div>
+  <h3 class="personne-nom"><?= e($nom) ?></h3>
+<?php foreach ($lignes as $i => $ligne): ?>
+  <p class="<?= $i === 0 ? 'personne-role' : 'personne-meta' ?>"><?= e($ligne) ?></p>
+<?php endforeach; ?>
+<?php if ($motivation !== ''): ?>
+  <button type="button" class="personne-lire" aria-haspopup="dialog">Pourquoi je m’engage&nbsp;<span aria-hidden="true">→</span></button>
+  <div class="personne-motivation" hidden><?= e($motivation) ?></div>
+<?php endif; ?>
+</article>
+<?php
+}
+
+/** Carte d'un groupe parlementaire invité qui n'a désigné personne : photo vierge. */
+function layout_groupe_absent(array $g): void
+{
+    ?>
+<article class="personne personne-absente">
+  <div class="personne-photo">
+    <svg class="personne-silhouette" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="38" r="17"/><path d="M18 92c2-19 15-31 32-31s30 12 32 31z"/></svg>
+  </div>
+  <h3 class="personne-nom"><?= e($g['groupe']) ?><?= $g['sigle'] !== '' ? ' (' . e($g['sigle']) . ')' : '' ?></h3>
+  <p class="personne-role">Ce groupe parlementaire n’a pas désigné d’élu.e pour participer à la Convention.</p>
+</article>
 <?php
 }

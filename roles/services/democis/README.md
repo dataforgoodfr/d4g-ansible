@@ -13,6 +13,9 @@ Site PHP sans base de données, servi par l'image `php:8.3-apache` :
   - `lib/presse.php` : articles de presse « On en parle » ; `lib/presse-defaut.json`
     (logos dans `images/presse/`) sert de liste de départ tant que rien n'a été
     enregistré depuis le back-office
+  - `qui-sommes-nous.php` : chercheur.euses (par projet de recherche), CODAC et
+    élu.es, en onglets ; les données sont dans `lib/equipe.json` (à modifier à la
+    main, pas de back-office) et les photos dans `images/equipe/`
 - `/opt/democis/actus/` sur le serveur, seul dossier à sauvegarder :
   - `data/<slug>/` : les actualités créées depuis le back-office (`actu.json`,
     `photo.<ext>`, miniature de vidéo `video-<id>-<n>.jpg`)

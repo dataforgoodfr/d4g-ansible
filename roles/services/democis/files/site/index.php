@@ -45,7 +45,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
       </div>
     </div>
     <div class="hero-image">
-      <img src="./images/1.jpg" alt="Portrait d’une participante de la Convention Citoyenne">
+      <img src="./images/5.jpg" alt="Délibération citoyenne">
     </div>
   </div>
 </header>
@@ -59,7 +59,7 @@ $actu_partagee = isset($_GET['actu']) ? actu_load((string) $_GET['actu']) : null
   <div class="wrap">
     <div class="intro-grid reveal">
       <div class="intro-media">
-        <img src="./images/5.jpg" alt="Délibération citoyenne">
+        <img src="./images/1.jpg" alt="Portrait d’une participante de la Convention Citoyenne">
       </div>
       <div class="intro-narrative">
         <span class="eyebrow bleu">Pourquoi cette convention</span>

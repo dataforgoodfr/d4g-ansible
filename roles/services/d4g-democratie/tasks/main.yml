@@ -42,7 +42,7 @@
 - import_role:
     name: roles/utilities/s3-backup
   vars:
-    service_name: moodle
+    service_name: d4g-democratie
     data_dir: /opt/d4g-democratie/data
   tags:
     - backup

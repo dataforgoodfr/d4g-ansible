@@ -26,19 +26,6 @@
     - docker-compose.yml
     - democis.env
 
-- name: Copy democis server configuration
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "/opt/democis/{{ item }}"
-  loop:
-    - apache-democis.conf
-    - php-democis.ini
-
-- name: Copy democis site
-  ansible.builtin.copy:
-    src: site/
-    dest: /opt/democis/site/
-
 - name: Pull
   command: docker compose pull
   args:
@@ -54,3 +41,13 @@
   tags:
     - up
   when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/s3-backup
+  vars:
+    service_name: democis
+    data_dir: /opt/democis/actus
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on

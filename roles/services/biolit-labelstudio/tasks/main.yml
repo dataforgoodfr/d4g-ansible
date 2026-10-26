@@ -32,7 +32,7 @@
 - import_role:
     name: roles/utilities/s3-backup
   vars:
-    service_name: mattermost
+    service_name: biolit-labelstudio
     data_dir: /opt/biolit-labelstudio/data
   tags:
     - backup

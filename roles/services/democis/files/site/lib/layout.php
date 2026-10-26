@@ -101,7 +101,7 @@ function layout_footer(bool $is_home): void
         <li><a href="mailto:contact@conventioncitoyennepourlademocratie.fr">contact@<wbr>conventioncitoyennepourlademocratie.fr</a></li>
         <li class="footer-contact-role">
           <span>Contact presse</span>
-          <a href="mailto:oteixeira@bonafide.paris">oteixeira@<wbr>bonafide.paris</a>
+          <a href="mailto:contactpresseccd@gmail.com">contactpresseccd@<wbr>gmail.com</a>
         </li>
       </ul>
     </div>

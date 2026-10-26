@@ -1,5 +1,0 @@
-# Dossier monté en écriture par docker : les actualités (data/) et les articles
-# « On en parle » (presse/) gérés depuis le back-office vivent sur le serveur,
-# jamais dans le dépôt.
-data/
-presse/

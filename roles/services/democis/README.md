@@ -2,21 +2,17 @@
 
 Site de la Convention Citoyenne pour la Démocratie (conventioncitoyennepourlademocratie.fr).
 
-Site PHP sans base de données, servi par l'image `php:8.3-apache` :
+Le site vit dans son propre dépôt, [dataforgoodfr/democis-site](https://github.com/dataforgoodfr/democis-site) :
+c'est là qu'on modifie les pages, les images et la configuration Apache/PHP. Chaque push
+sur `main` y publie l'image `ghcr.io/dataforgoodfr/democis-site:main-<sha>`.
 
-- `files/site/` : le site (déployé dans `/opt/democis/site`, monté en lecture seule)
-  - `index.php`, `actualites.php` : pages publiques
-  - `get-actu.php` : contenu d'une actualité (JSON) pour la pop-in
-  - `rss.php` : flux RSS des actualités
-  - `admin/` : back-office des actualités et de la section « On en parle »
-  - `lib/actus.php` : stockage et helpers des actualités
-  - `lib/presse.php` : articles de presse « On en parle » ; `lib/presse-defaut.json`
-    (logos dans `images/presse/`) sert de liste de départ tant que rien n'a été
-    enregistré depuis le back-office
-  - `qui-sommes-nous.php` : chercheur.euses (par projet de recherche), CODAC et
-    élu.es, en onglets ; les données sont dans `lib/equipe.json` (à modifier à la
-    main, pas de back-office) et les photos dans `images/equipe/`
-- `/opt/democis/actus/` sur le serveur, seul dossier à sauvegarder :
+Ce rôle ne fait que la déployer :
+
+- le tag de l'image est épinglé dans `templates/docker-compose.yml.j2` ; pour livrer une
+  nouvelle version du site, monter ce tag puis lancer
+  `bin/d4g-ansible playbook playbooks/swarm-production.yml --tags democis` ;
+- `/opt/democis/actus/` sur le serveur, monté dans le conteneur, garde les données du
+  back-office ; il est sauvegardé chaque nuit sur S3 (rôle `s3-backup`, service `democis`) :
   - `data/<slug>/` : les actualités créées depuis le back-office (`actu.json`,
     `photo.<ext>`, miniature de vidéo `video-<id>-<n>.jpg`)
   - `presse/` : `presse.json` (articles « On en parle », dans l'ordre d'affichage)

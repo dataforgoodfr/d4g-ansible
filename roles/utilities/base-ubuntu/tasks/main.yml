@@ -131,3 +131,8 @@
   tags:
     - base
     - flexible-ip
+
+- import_tasks: syn-ip-options.yml
+  tags:
+    - base
+    - syn-ip-options

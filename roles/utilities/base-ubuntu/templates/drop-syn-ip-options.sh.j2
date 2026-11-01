@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+# CVE-2026-98432: kernel use-after-free on IPv4 options (Record Route /
+# Timestamp) during the TCP handshake, reachable with a single forged SYN.
+# Drop incoming TCP SYNs whose IPv4 header is longer than 20 bytes (IHL > 5).
+# raw/PREROUTING runs before conntrack and before every Docker chain, so it
+# covers both host ports and the swarm ingress. VXLAN overlay (UDP 4789) is
+# never matched. Remove once the host boots a patched kernel.
+RULE=(-p tcp --syn -m u32 --u32 "0>>24&0x0F=6:0xF" -j DROP)
+
+if ! iptables -t raw -C PREROUTING "${RULE[@]}" 2>/dev/null; then
+    iptables -t raw -I PREROUTING 1 "${RULE[@]}"
+fi

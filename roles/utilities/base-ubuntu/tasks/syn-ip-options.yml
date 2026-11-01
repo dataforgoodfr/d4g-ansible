@@ -1,0 +1,32 @@
+---
+- name: Install SYN with IP options drop script
+  template:
+    src: drop-syn-ip-options.sh.j2
+    dest: /usr/local/bin/drop-syn-ip-options
+    mode: "0755"
+  notify: restart drop-syn-ip-options
+
+- name: Create SYN with IP options drop systemd service
+  copy:
+    dest: /etc/systemd/system/drop-syn-ip-options.service
+    content: |
+      [Unit]
+      Description=Drop incoming TCP SYN carrying IPv4 options (CVE-2026-98432)
+      Before=network-pre.target docker.service
+      Wants=network-pre.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/drop-syn-ip-options
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: restart drop-syn-ip-options
+
+- name: Enable SYN with IP options drop service
+  systemd:
+    name: drop-syn-ip-options.service
+    enabled: yes
+    state: started
+    daemon_reload: yes

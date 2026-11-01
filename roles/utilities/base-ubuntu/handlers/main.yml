@@ -10,3 +10,9 @@
     name: flexible-ip.service
     state: restarted
     daemon_reload: yes
+
+- name: restart drop-syn-ip-options
+  systemd:
+    name: drop-syn-ip-options.service
+    state: restarted
+    daemon_reload: yes

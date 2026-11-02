@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backups D4G</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--mut:#6b6a66;--line:#e2dfd8;--card:#fff;--ok:#2f7d4f;--warn:#a46a00;--bad:#b3261e;--acc:#2b5fab}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--fg:#ecebe6;--mut:#a3a19b;--line:#33322f;--card:#1e1e1c;--ok:#6cc08b;--warn:#e0a84a;--bad:#ef7a70;--acc:#86aef0}}
+:root[data-theme="dark"]{--bg:#161615;--fg:#ecebe6;--mut:#a3a19b;--line:#33322f;--card:#1e1e1c;--ok:#6cc08b;--warn:#e0a84a;--bad:#ef7a70;--acc:#86aef0}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;padding:24px 16px 64px}
+main{max-width:980px;margin:0 auto}
+h1{font-size:1.6rem;margin:0 0 .2rem}h2{font-size:1.15rem;margin:2.2rem 0 .6rem;border-bottom:1px solid var(--line);padding-bottom:.3rem}h3{font-size:1rem;margin:1.4rem 0 .4rem}
+p,li{max-width:72ch}.mut{color:var(--mut)}
+code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:color-mix(in srgb,var(--fg) 7%,transparent);padding:1px 4px;border-radius:3px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600;background:color-mix(in srgb,var(--fg) 4%,var(--card))}
+.ok{color:var(--ok);font-weight:600}.warn{color:var(--warn);font-weight:600}.bad{color:var(--bad);font-weight:600}
+.box{border-left:3px solid var(--acc);background:var(--card);padding:10px 14px;margin:1rem 0}
+td.n{text-align:right;white-space:nowrap}
+</style>
+</head>
+<body><main>
+<h1>Backups D4G : état au 02/11/2026 et cible</h1>
+<p class="mut">Carte DA-14. Relevé en lecture seule : listing S3 en direct (<code>aws s3api</code> sur fr-par), d4g-tf, d4g-gitops, d4g-ansible, d4g-nix, <code>kubectl --context d4g-tools</code>. Rien n'a été modifié.</p>
+
+<div class="box">
+<strong>En une minute</strong>
+<ul>
+<li><span class="bad">Rien ne sauvegarde la prod k3s.</span> Aucun CronJob, aucun backup CNPG, aucun outil de backup de volumes. Les volumes prod sont des <code>local-path</code> sur un seul nœud.</li>
+<li>Les seuls backups qui tournent encore sont <strong>les cron du Swarm</strong> (metal-1, metal-2, staging-01). Ils écrivent chaque nuit dans <code>poletech-backups-s3</code>.
+  <ul>
+  <li>Les dumps <code>*-sql</code> visent la RDB Scaleway. Ils restent donc utiles pour les applis passées sur k3s, et ce sont aujourd'hui <strong>les seuls dumps par base de la prod</strong>. Ils s'arrêteront le jour où l'on éteindra les hôtes Swarm.</li>
+  <li>Les archives de fichiers des applis déjà basculées (vaultwarden, uptime-kuma, ghost…) copient le répertoire Swarm, qui est désormais mort. Elles donnent une fausse impression de sécurité.</li>
+  </ul></li>
+<li>Rétention : 14 jours, appliquée par le script lui-même avec une clé qui a le droit de supprimer. Le bucket n'a <strong>ni versioning, ni lifecycle, ni object lock</strong>.</li>
+<li>Instantanés de la RDB Scaleway : 1 par jour, <strong>gardés 2 jours</strong>, pas de PITR, restauration de l'instance entière (36 bases d'un coup).</li>
+<li><span class="bad">Aucun test de restauration</span>, aucun runbook vérifié, aucune alerte sur l'âge d'un backup. Le seul signal est un message Slack par cron.</li>
+</ul>
+</div>
+
+<h2>1. Les buckets de backup</h2>
+<div class="scroll"><table>
+<tr><th>Bucket</th><th>Déclaré</th><th>Protection</th><th>Contenu, volume</th><th>Qui écrit</th></tr>
+<tr><td><code>poletech-backups-s3</code></td><td>d4g-tf <code>platform/poletech.tf:16</code></td><td class="bad">pas de versioning, pas de lifecycle (retiré en 2024, 18f8833), clé avec <code>ObjectsDelete</code></td><td>49 préfixes, 674 objets, <strong>117 Go</strong></td><td>cron Swarm prod (rôles <code>s3-backup</code> et <code>sql-backup</code>), dumps ponctuels DCM2-26</td></tr>
+<tr><td><code>poletech-backups-staging</code></td><td><code>poletech.tf:22</code></td><td class="bad">idem</td><td>16 préfixes, <strong>17,6 Go</strong>, dont 9 dumps SQL vides (0 octet)</td><td>cron de d4g-staging-01</td></tr>
+<tr><td><code>d4g-tools-cnpg-backups</code>, <code>d4g-projects-cnpg-backups</code></td><td><code>projects/clusters.tf:70-112</code>, projet dédié <code>d4g-&lt;cluster&gt;-backups</code></td><td class="ok">versioning, lifecycle 45 j (versions courantes et anciennes), clé lecture et écriture <em>sans suppression</em></td><td>déclarés, <strong>inutilisés</strong> : aucun manifeste n'y écrit. Non vus dans le listing, puisqu'ils sont dans un autre projet que la clé utilisée.</td><td>personne</td></tr>
+<tr><td>Instantanés RDB <code>poletech</code></td><td><code>poletech.tf:5-13</code></td><td class="warn">géré par Scaleway</td><td>1 par jour, 2 jours, instance entière</td><td>Scaleway</td></tr>
+<tr><td>Instantanés etcd k3s</td><td>d4g-nix <code>modules/k3s-server.nix:223-232</code></td><td class="warn">disque local du nœud</td><td>toutes les 6 h, 28 gardés (7 j)</td><td>k3s</td></tr>
+</table></div>
+<p class="mut">Les 26 buckets applicatifs (<code>outline-uploads</code>, <code>noco-uploads</code>, <code>penpot-uploads</code>, <code>grist-docs</code>, <code>docs-uploads</code>, <code>ghost-s3</code>, <code>strapi-uploads</code>, <code>d4g-stalwart</code>, <code>mm-uploads</code>…) n'ont ni versioning, ni lifecycle, ni copie. Une suppression faite par l'appli ou par la clé partagée est définitive.</p>
+
+<h2>2. <code>poletech-backups-s3</code>, préfixe par préfixe</h2>
+<p>Mécanisme commun : chaque nuit entre 01:00 et 06:00, un cron lance l'image <code>ghcr.io/dataforgoodfr/d4g-s3-backup:latest</code> (rsync, puis tar.gz, puis <code>s3cmd sync</code>). Pour les bases, un <code>pg_dump --format=plain</code> le précède d'une heure. Le script supprime ensuite ce qui a plus de 14 jours sous <em>son</em> préfixe : on observe 15 objets par préfixe actif.</p>
+<div class="scroll"><table>
+<tr><th>État</th><th>Préfixes</th><th>Ce que ça vaut</th></tr>
+<tr><td class="ok">Vivant et utile</td><td><code>d4g-outline-sql</code>, <code>d4g-mattermost-sql</code>, <code>d4g-authentik-sql</code>, <code>d4g-noco-sql</code> (2,75 Go par jour), <code>d4g-strapi-sql</code>, <code>d4g-vaultwarden-sql</code>, <code>d4g-n8n-sql</code>, <code>d4g-moodle-sql</code></td><td>Dumps quotidiens de la RDB, dont la taille progresse : ce sont les bases qui servent la prod, k3s comprise. <strong>À garder tant qu'un remplaçant k8s ne tourne pas.</strong></td></tr>
+<tr><td class="warn">Doublon</td><td><code>democis-sql</code>, <code>d4g-democratie-sql</code></td><td>Ces deux préfixes dumpent la base <code>moodle</code> (21 Mo chacun, bug de copier-coller). Moodle est donc dumpée trois fois.</td></tr>
+<tr><td class="ok">Swarm encore servi</td><td><code>mattermost</code> (693 Mo, en croissance), <code>nextcloud-data</code>, <code>victoria-metrics</code> (29 Go)</td><td><code>mattermost/</code> est partagé avec biolit-labelstudio, qui écrase le même fichier (DA-9). <code>nextcloud-data</code> alterne 565 et 700 Mo un jour sur deux, ce qui suggère deux écrivains. Nextcloud doit être retiré (DA-6).</td></tr>
+<tr><td class="bad">Vide (0 octet) chaque nuit</td><td><code>d4g-stalwart-sql</code>, <code>d4g-decidim-sql</code>, <code>d4g-nextcloud-sql</code>, <code>cc-outline-sql</code>, <code>stalwart</code>, <code>noco</code>, <code>moodle</code>, <code>decidim</code>, <code>nextcloud-html</code>, <code>biolit-labelstudio</code></td><td>Mauvais mot de passe (stalwart et decidim utilisent <code>NC_DB_PASSWORD</code>) ou mauvais <code>data_dir</code>. Les cron <code>backup-moodle</code> de trois rôles se marchent dessus (DA-8). Le message Slack dit « succès » quand même.</td></tr>
+<tr><td class="warn">Copie d'un répertoire mort</td><td><code>vaultwarden</code>, <code>uptime-kuma</code>, <code>ghost</code>, <code>democis</code>, <code>kano</code></td><td>L'appli tourne sur k3s et le Swarm est arrêté (commits DCM2-26), donc on archive des données qui ne bougent plus. <code>kano</code> fait 218 Mo constants, et son écrivain n'est pas dans d4g-ansible.</td></tr>
+<tr><td class="mut">Gelé depuis 2024-2025, jamais élagué</td><td><code>d4g-noco</code> (14,5 Go), <code>d4g-outline</code>, <code>d4g-mattermost</code>, <code>d4g-moodle</code>, <code>d4g-authentik</code>, <code>d4g-n8n</code>, <code>d4g-strapi</code>, <code>d4g-vaultwarden</code>, <code>d4g-grist-sql</code>, <code>grist</code>, <code>authentik</code>, <code>penpot</code>, <code>synapse</code>, <code>cc-outline</code>, <code>app</code>, <code>outline_*_data</code></td><td><strong>15,4 Go</strong> au total. L'élagage ne passe que sur le préfixe d'un cron vivant, donc ce qu'un cron supprimé a laissé reste là pour toujours.</td></tr>
+<tr><td class="ok">Ponctuel, à garder</td><td><code>dcm2-26</code> (0,9 Go)</td><td>Dumps de bascule (Swarm arrêté), 01-02/11.</td></tr>
+</table></div>
+
+<h2>3. Ce que la prod k3s devrait sauvegarder</h2>
+<p class="mut">Tailles réelles mesurées avec <code>du</code> dans les pods (namespace <code>prod</code>, cluster d4g-tools).</p>
+<div class="scroll"><table>
+<tr><th>Donnée</th><th>Où</th><th class="n">Taille</th><th>Backup aujourd'hui</th></tr>
+<tr><td>Bases Postgres de 16 applis prod</td><td>RDB <code>poletech</code></td><td class="n">~55 Go (dont noco 42 Go, surtout du journal d'audit, cf. DG-46)</td><td class="warn">instantané Scaleway 2 j + dumps Swarm <code>*-sql</code> (partiels)</td></tr>
+<tr><td>Vidéos PeerTube</td><td>PVC <code>peertube-data</code>, nœud 01</td><td class="n">3,0 Go</td><td class="bad">aucun</td></tr>
+<tr><td>Plausible ClickHouse</td><td>PVC <code>events-data</code>, nœud 02</td><td class="n">728 Mo</td><td class="bad">aucun</td></tr>
+<tr><td>moodledata</td><td>PVC <code>moodle-data</code>, nœud 02</td><td class="n">566 Mo</td><td class="bad">aucun</td></tr>
+<tr><td>Uptime Kuma (sqlite)</td><td>PVC, nœud 02</td><td class="n">275 Mo</td><td class="bad">aucun</td></tr>
+<tr><td>Fizzy (sqlite), Ghost (sqlite + réglages), Vaultwarden (<code>rsa_key</code>, pièces jointes), Plausible, Grist, NocoDB</td><td>PVC</td><td class="n">&lt; 7 Mo chacun</td><td class="bad">aucun</td></tr>
+<tr><td>Fichiers des applis</td><td>buckets <code>*-uploads</code>, <code>grist-docs</code>, <code>ghost-s3</code>…</td><td class="n">non mesuré</td><td class="bad">aucun (pas de versioning)</td></tr>
+<tr><td>État du cluster</td><td>etcd</td><td class="n">—</td><td class="warn">instantanés locaux, perdus avec le nœud</td></tr>
+</table></div>
+<p>Hors Postgres, la prod tient en <strong>~5 Go</strong>. Une archive complète chaque nuit gardée 45 jours, c'est au pire ~225 Go chez Scaleway, soit quelques euros par mois. La déduplication (restic) n'est donc pas un argument de coût à cette échelle.</p>
+<p><strong>Encore sur le Swarm</strong>, contrairement à ce que dit la carte : Mattermost (fichiers et base vivants), Authentik (le CM de prod s'en sert, 7d575e3), n8n, Stalwart, Nextcloud, Decidim, Démocis, Démocratie, biolit-labelstudio. Mattermost, n8n et Stalwart ont des manifestes k8s mais ne sont pas dans <code>overlays/prod</code>.</p>
+
+<h2>4. Rétention, élagage, restauration : aujourd'hui</h2>
+<div class="scroll"><table>
+<tr><th></th><th>Rétention</th><th>Élagage</th><th>Test de restauration</th></tr>
+<tr><td>Swarm → <code>poletech-backups-s3</code></td><td>14 j</td><td>le script lui-même (<code>s3cmd del</code> sur la date du nom), clé avec droit de suppression</td><td class="bad">jamais</td></tr>
+<tr><td>RDB Scaleway</td><td>2 j</td><td>Scaleway</td><td class="bad">jamais</td></tr>
+<tr><td>Bucket CNPG (inutilisé)</td><td>45 j</td><td>lifecycle du bucket, la clé ne peut pas supprimer</td><td>—</td></tr>
+<tr><td>etcd</td><td>7 j</td><td>k3s</td><td class="bad">jamais</td></tr>
+</table></div>
+<p class="mut">Seule doc de restauration existante : <code>d4g-docs/docs/runbooks/restauration-pitr-cnpg.md</code>, qui se présente elle-même comme une « procédure cible, jamais vérifiée » et qui est obsolète.</p>
+
+<h2>5. Cible proposée</h2>
+<p class="mut">Les choix marqués « question » sont posés sur la carte. Le reste découle du modèle déjà retenu pour le bucket CNPG dans d4g-tf.</p>
+<h3>Un seul modèle de stockage</h3>
+<ul>
+<li>Un bucket de backup par cluster, dans le projet dédié <code>d4g-&lt;cluster&gt;-backups</code> : soit le bucket CNPG avec un préfixe par type, soit un bucket <code>d4g-tools-backups</code> jumeau.</li>
+<li><strong>Versioning, clé sans droit de suppression, lifecycle 45 j.</strong> La lifecycle est à la fois la rétention et l'élagage, et c'est le seul endroit où ils vivent. Aucun job ne supprime quoi que ce soit, donc une clé volée ou un script fou ne peut pas effacer l'historique.</li>
+<li>Des archives complètes et datées (<code>&lt;cible&gt;/&lt;date&gt;.dump|.tar.zst</code>), lisibles sans outil particulier.</li>
+</ul>
+<h3>Par type de donnée</h3>
+<ul>
+<li><strong>Postgres</strong> (question 2) : un CronJob <code>pg_dump -Fc</code> par base de la RDB, chaque nuit (le périmètre de DG-17). Si DG-46 fait passer la prod sur CNPG, on ajoute barman-cloud (WAL continu, base hebdo, PITR 30 j) vers le bucket CNPG, et le dump logique reste comme filet par base.</li>
+<li><strong>Volumes</strong> : un CronJob par PVC, programmé sur le nœud du volume (la nodeAffinity du PV local-path s'en charge), qui monte le PVC en lecture seule et pousse une archive. Pour sqlite (fizzy, uptime-kuma, ghost), on fait <code>sqlite3 .backup</code> avant le tar.</li>
+<li><strong>ClickHouse Plausible</strong> (question 5) : <code>BACKUP DATABASE … TO S3(…)</code> natif, une fois par semaine.</li>
+<li><strong>Buckets applicatifs</strong> (question 6) : versioning plus expiration des anciennes versions à 30 j. Une version supprimée ou écrasée se récupère pendant 30 jours.</li>
+<li><strong>etcd</strong> : l'option native de k3s, <code>etcd-s3</code>, dans d4g-nix, vers le même bucket.</li>
+</ul>
+<h3>Surveillance</h3>
+<ul>
+<li>Chaque job pousse <code>backup_last_success_timestamp{cible}</code>. Une alerte <code>BackupTooOld</code> se déclenche au-delà de 36 h, <em>y compris pour une cible qui n'a jamais réussi</em>. Elle corrige le trou de <code>CNPGBackupTooOld</code>, qui se tait sur un cluster jamais sauvegardé.</li>
+<li>Un dump de 0 octet compte comme un échec, pas comme un succès.</li>
+</ul>
+<h3>Test de restauration (question 7)</h3>
+<ul>
+<li>Chaque mois, un CronJob restaure le dernier dump de chaque base dans une base jetable du CNPG de staging, compte les tables et les lignes, puis pousse <code>backup_restore_last_success_timestamp</code>. Une alerte se déclenche au-delà de 35 j.</li>
+<li>Chaque trimestre, un exercice manuel restaure un volume, Vaultwarden par exemple, sur staging. Il est chronométré et écrit dans un runbook de d4g-docs.</li>
+</ul>
+<h3>Legacy Swarm</h3>
+<ul>
+<li>On garde les cron <code>*-sql</code> jusqu'à ce que les dumps k8s aient tourné et aient été restaurés une fois. Ensuite, on retire les rôles <code>s3-backup</code> et <code>sql-backup</code> service par service, au fil du retrait du Swarm.</li>
+<li>On ne corrige pas les bugs des cron legacy (DA-8, DA-9, mots de passe stalwart et decidim) : ils disparaissent avec eux.</li>
+</ul>
+</main></body>
+</html>

@@ -465,6 +465,12 @@
             addresses: ["d4g-mattermost_app:8065"]
           - name: "authentik"
             addresses: ["d4g-authentik_app"]
+          # Authentik sous un nom qui ne pointe pas sur le cluster k8s, pour les
+          # apps restées dessus après la bascule Keycloak (Data Center Bombs,
+          # DCM2-36), jusqu'à l'extinction d'Authentik.
+          - name: "auth-legacy"
+            addresses: ["d4g-authentik_app"]
+            override_name: "auth-legacy.dataforgood.fr"
           - name: "nextcloud"
             addresses: ["d4g-nextcloud_apache:8443"]
           - name: "cartocampement"

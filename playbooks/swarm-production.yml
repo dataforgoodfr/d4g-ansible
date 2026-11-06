@@ -343,6 +343,7 @@
       vars:
         deploy_on: "metal-1.dataforgood.fr"
         replicas: 1
+        home_worker_enabled: true
       tags:
         - d4g-home
         - service

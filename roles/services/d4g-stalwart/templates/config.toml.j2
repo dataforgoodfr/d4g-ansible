@@ -105,7 +105,7 @@ data = "postgres"
 blob = "s3"
 fts = "postgres"
 lookup = "postgres"
-directory = "internal"
+directory = "{{ stalwart_directory }}"
 
 
 ### IAM directory ###
@@ -113,6 +113,35 @@ directory = "internal"
 [directory.internal]
 type = "internal"
 store = "postgres"
+{% if stalwart_directory == "ldap" %}
+
+### Outpost LDAP d'Authentik ###
+# Les placeholders admis dans un filtre LDAP sont ?, {user}, {username},
+# {email}, {local} et {domain} : tout autre jeton fait echouer le parsing de la
+# cle, l'annuaire n'est alors pas charge du tout et toute authentification
+# echoue.
+
+[directory.ldap]
+type = "ldap"
+url = "ldap://d4g-stalwart_ldap:3389"
+base-dn = "dc=ldap,dc=goauthentik,dc=io"
+timeout = "30s"
+
+[directory.ldap.bind]
+dn = "cn=%{env:LDAP_BIND_USER}%,ou=users,dc=ldap,dc=goauthentik,dc=io"
+secret = "%{env:LDAP_BIND_PASSWORD}%"
+
+[directory.ldap.filter]
+name = "(&(uid=?)(objectClass=user))"
+email = "(&(|(mail=?)(uid=?))(objectClass=user))"
+
+[directory.ldap.attributes]
+name = "cn"
+class = "objectClass"
+email = "mail"
+groups = "memberOf"
+description = ["displayName"]
+{% endif %}
 
 
 ### Postgres ###

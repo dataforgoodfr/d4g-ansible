@@ -8,10 +8,8 @@
   template:
     src: "{{ item }}.j2"
     dest: /opt/d4g-stalwart/{{ item }}
-  with_items:
-    - config.toml
-    - docker-compose.yml
-    - stalwart.env
+  with_items: "{{ ['config.toml', 'docker-compose.yml', 'stalwart.env']
+                  + (['ldap.env'] if stalwart_directory == 'ldap' else []) }}"
 
 - name: Pull
   command: docker compose pull
@@ -48,7 +46,7 @@
     pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
     pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
     pgsql_user: stalwart
-    pgsql_password: "{{ lookup('env', 'NC_DB_PASSWORD') }}"
+    pgsql_password: "{{ lookup('env', 'STALWART_POSTGRES_PASSWORD') }}"
     pgsql_database: stalwart
   tags:
     - backup

@@ -12,6 +12,20 @@ services:
         constraints:
           - node.hostname == {{ deploy_on }}
 
+{% if stalwart_directory == "ldap" %}
+  # Outpost LDAP d'Authentik : c'est lui que [directory.ldap] interroge.
+  ldap:
+    image: ghcr.io/goauthentik/ldap:2025.12.3
+    env_file: ./ldap.env
+    networks:
+      - d4g-internal
+    deploy:
+      replicas: {{ replicas }}
+      placement:
+        constraints:
+          - node.hostname == {{ deploy_on }}
+{% endif %}
+
 networks:
   d4g-internal:
     external: true

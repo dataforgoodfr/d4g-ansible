@@ -1,0 +1,13 @@
+---
+base_domain: services.d4g.fr
+
+# Epinglee, comme les autres montees testees en staging avant la production.
+keycloak_image_tag: "26.7.3"
+
+keycloak_realm: d4g
+
+# Le realm et ses clients sont decrits dans Terraform (d4g-tf/keycloak), pas
+# ici : ce role ne pose que le serveur. La seule chose qu'il cree lui-meme est
+# le compte d'administration initial, sans lequel Terraform n'aurait personne
+# a qui parler.
+keycloak_admin_user: admin

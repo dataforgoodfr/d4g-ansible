@@ -1,0 +1,44 @@
+---
+- name: Create d4g-keycloak directory
+  file:
+    path: /opt/d4g-keycloak
+    state: directory
+
+- name: Template d4g-keycloak config files
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/d4g-keycloak/{{ item }}
+  with_items:
+    - docker-compose.yml
+    - keycloak.env
+
+- name: Pull
+  command: docker compose pull
+  args:
+    chdir: /opt/d4g-keycloak
+  tags:
+    - pull
+  when: inventory_hostname == deploy_on
+
+- name: Up
+  command: docker stack deploy -c docker-compose.yml d4g-keycloak
+  args:
+    chdir: /opt/d4g-keycloak
+  tags:
+    - up
+  when: is_swarm_leader | default(false)
+
+- import_role:
+    name: roles/utilities/sql-backup
+  vars:
+    service: d4g-keycloak
+    service_dir: /opt/d4g-keycloak
+    pgsql_host: "{{ lookup('env', 'POLETECH_DB_HOST') }}"
+    pgsql_port: "{{ lookup('env', 'POLETECH_DB_PORT') }}"
+    pgsql_user: keycloak
+    pgsql_password: "{{ lookup('env', 'KEYCLOAK_DB_PASSWORD') }}"
+    pgsql_database: keycloak
+  tags:
+    - backup
+    - service
+  when: inventory_hostname == deploy_on
